@@ -1,0 +1,80 @@
+<?xml version='1.0'?>
+<config>
+    <connairs>
+        <connair>
+            <address>192.168.42.3</address>
+            <port>49880</port>
+        </connair>
+        <connair>
+            <address>192.168.42.4</address>
+            <port>49880</port>
+        </connair>
+    </connairs>
+    <devices>
+        <device>
+            <id>1</id>
+            <name>Lichterkette Wohnzimmertür</name>
+            <vendor>Intertechno</vendor>
+            <address>
+                <masterdip>M</masterdip>
+                <slavedip>2</slavedip>
+                <tx433version>1</tx433version>
+                <rawCodeOn></rawCodeOn>
+                <rawCodeOff></rawCodeOff>
+            </address>
+            <room>Flur</room>
+            <favorite>false</favorite>
+        </device>
+        <device>
+            <id>2</id>
+            <name>Lampe Fensterbank</name>
+            <vendor>Brennstuhl</vendor>
+            <address>
+                <masterdip>10111</masterdip>
+                <slavedip>01000</slavedip>
+                <tx433version>2</tx433version>
+                <rawCodeOn></rawCodeOn>
+                <rawCodeOff></rawCodeOff>
+            </address>
+            <room>Wohnzimmer</room>
+            <favorite>false</favorite>
+        </device>
+        <device>
+            <id>3</id>
+            <name>große Papierlampe</name>
+            <vendor>Intertechno</vendor>
+            <address>
+                <masterdip></masterdip>
+                <slavedip></slavedip>
+                <tx433version></tx433version>
+                <rawCodeOn>TXP:0,0,10,5600,350,25,1,3,3,1,1,3,1,3,1,3,3,1,1,3,1,3,1,3,3,1,1,3,1,3,1,3,1,3,1,3,1,3,1,3,3,1,1,3,1,3,1,3,1,3,1,3,3,1,1,16,;</rawCodeOn>
+                <rawCodeOff>TXP:0,0,10,5600,350,25,1,3,3,1,1,3,1,3,1,3,3,1,1,3,1,3,1,3,3,1,1,3,1,3,1,3,1,3,1,3,1,3,1,3,3,1,1,3,1,3,1,3,3,1,1,3,1,1,1,16,;</rawCodeOff>
+            </address>
+            <room>Wohnzimmer</room>
+            <favorite>true</favorite>
+        </device>
+    </devices>
+    <groups>
+        <group>
+            <id>1</id>
+            <name>Alle</name>
+            <favorite>false</favorite>
+            <deviceid>1</deviceid>
+            <deviceid>2</deviceid>
+            <deviceid>3</deviceid>
+        </group>
+        <group>
+            <id>2</id>
+            <name>gemütlicher Abend</name>
+            <favorite>true</favorite>
+            <deviceid>1</deviceid>
+            <deviceid>3</deviceid>
+        </group>
+        <group>
+            <id>3</id>
+            <name>Aufs Klo gehen</name>
+            <favorite>true</favorite>
+            <deviceid>2</deviceid>
+        </group>
+    </groups>
+</config>
