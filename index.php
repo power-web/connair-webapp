@@ -1,5 +1,33 @@
 <?php
 
+//http://php.net/manual/de/function.ip2long.php
+function clientInSameSubnet($client_ip=false,$server_ip=false) {
+    if (!$client_ip)
+        $client_ip = $_SERVER['REMOTE_ADDR'];
+    if (!$server_ip)
+        $server_ip = $_SERVER['SERVER_ADDR'];
+    // Extract broadcast and netmask from ifconfig
+    if (!($p = popen("ifconfig","r"))) return false;
+    $out = "";
+    while(!feof($p))
+        $out .= fread($p,1024);
+    fclose($p);
+    // This is because the php.net comment function does not
+    // allow long lines.
+    $match  = "/^.*".$server_ip;
+    $match .= ".*Bcast:(\d{1,3}\.\d{1,3}i\.\d{1,3}\.\d{1,3}).*";
+    $match .= "Mask:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/im";
+    if (!preg_match($match,$out,$regs))
+        return false;
+    $bcast = ip2long($regs[1]);
+    $smask = ip2long($regs[2]);
+    $ipadr = ip2long($client_ip);
+    $nmask = $bcast & $smask;
+    return (($ipadr & $smask) == ($nmask & $smask));
+}
+
+
+
 libxml_use_internal_errors(true);
 $xml = simplexml_load_file('config.xml');
 if (!$xml) {
@@ -9,6 +37,14 @@ if (!$xml) {
     }
     exit(1);
 }
+
+
+//mini Login wenn nicht im Subnetz
+//if( ! clientInSameSubnet() ) {
+//    echo "LOGIN";
+//    exit;
+//}
+
 
 $errormessage="";
    
@@ -259,6 +295,92 @@ function tx433_intertechno($device, $action) {
     connair_send($msg);
 }
 
+
+function tx433_elro($device, $action) {
+    if(empty($device->address->masterdip)) {
+        echo "ERROR: masterdip ist ungültig für device id ".$device->id;
+        return;
+    }
+    if(empty($device->address->slavedip)) {
+        echo "ERROR: slavedip ist ungültig für device id ".$device->id;
+        return;
+   }
+
+   $sA=0;
+   $sG=0;
+   $sRepeat=10;
+   $sPause=5600;
+   $sTune=350;
+   $sBaud=25;
+   $sSpeed=16;
+   
+   $uSleep=800000;
+   
+/*
+system code 10111
+Dann in Reihenfolge unit code
+A 10000
+B 01000
+E 00001   
+*/
+
+//Elro AB440D 200W         TXP:0,0,10,5600,350,25   ,16:
+//Elro AB440D 300W         TXP:0,0,10,5600,350,25   ,16:
+//Elro AB440ID            TXP:0,0,10,5600,350,25   ,16:
+//Elro AB440IS            TXP:0,0,10,5600,350,25   ,16:
+//Elro AB440L            TXP:0,0,10,5600,350,25   ,16:
+//Elro AB440WD            TXP:0,0,10,5600,350,25   ,16:
+   
+   
+ 
+    if ($device->address->tx433version==1) $txversion=3;
+    else $txversion=1;
+   
+   $HEAD="TXP:$sA,$sG,$sRepeat,$sPause,$sTune,$sBaud,";
+   $TAIL=",$txversion,1,$sSpeed,;";
+   $AN="1,3,1,3,3";
+   $AUS="3,1,1,3,1";
+   
+   $bitLow=1;
+   $bitHgh=3;
+   
+   $seqLow=$bitHgh.",".$bitHgh.",".$bitLow.",".$bitLow.",";
+   $seqHgh=$bitHgh.",".$bitLow.",".$bitHgh.",".$bitLow.",";
+
+   $bits=$device->address->masterdip;
+   $msg="";
+   for($i=0;$i<strlen($bits);$i++) {   
+      $bit=substr($bits,$i,1);
+      if($bit=="0")
+         $msg=$msg.$seqLow;
+      else
+         $msg=$msg.$seqHgh;
+   }
+   $msgM=$msg;
+   $bits=$device->address->slavedip;
+   $msg="";
+   for($i=0;$i<strlen($bits);$i++) {
+      $bit=substr($bits,$i,1);
+      if($bit=="0")
+         $msg=$msg.$seqLow;
+      else
+         $msg=$msg.$seqHgh;
+   }
+
+   $msgS=$msg;
+   $msg_ON=$HEAD.$bitLow.",".$msgM.$msgS.$bitHgh.",".$AN.$TAIL;
+   $msg_OFF=$HEAD.$bitLow.",".$msgM.$msgS.$bitHgh.",".$AUS.$TAIL;
+   
+    if($action=="ON") {
+        $msg=$msg_ON;
+    } else {
+        $msg=$msg_OFF;
+    }
+
+   connair_send($msg);
+}
+
+
 function tx433_message($device, $action) {
     if ($action=="ON" && !empty($device->address->rawCodeOn) ) {
         connair_send($device->address->rawCodeOn);
@@ -277,14 +399,14 @@ if (isset($_POST['action'])) {
     if (($_POST['action'])=="alloff") {
         foreach($xml->devices->device as $device) {
             tx433_message($device, "OFF");
-            usleep(500000);
+            usleep(300000);
         }
         echo $errormessage;
 
     } else if (($_POST['action'])=="allon") {
         foreach($xml->devices->device as $device) {
             tx433_message($device, "ON");
-            usleep(500000);
+            usleep(300000);
         }
         echo $errormessage;
 
@@ -298,12 +420,52 @@ if (isset($_POST['action'])) {
         if (($_POST['type'])=="device") {
             $devicesFound = $xml->xpath("//devices/device/id[text()='".(string)$_POST['id']."']/parent::*");
             tx433_message($devicesFound[0], $action);
+
+        } else if (($_POST['type'])=="room") {
+            $devicesFound = $xml->xpath("//devices/device/room[text()='".(string)$_POST['id']."']/parent::*");
+            foreach($devicesFound as $device) {
+                tx433_message($device, $action);
+                usleep(300000);
+            }
+
         } else if (($_POST['type'])=="group") { 
             $groupsFound = $xml->xpath("//groups/group/id[text()='".(string)$_POST['id']."']/parent::*");
             foreach($groupsFound[0]->deviceid as $deviceid) {
                 $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
-                tx433_message($devicesFound[0], $action);
-                usleep(500000);
+                $device = $devicesFound[0];
+                if($action == "ON") {
+                    if(empty($deviceid['onaction'])) {
+                        tx433_message($device, $action);
+                    } else {
+                        switch ($deviceid['onaction']){
+                            case "on":
+                            tx433_message($device, "ON");
+                            break;
+                            case "off":
+                            tx433_message($device, "OFF");
+                            break;
+                            case "none":
+                            break;
+                        }
+                    }
+                } else if($action == "OFF") {
+                    if(empty($deviceid['offaction'])) {
+                        tx433_message($device, $action);
+                    } else {
+                        switch ($deviceid['offaction']){
+                            case "on":
+                            tx433_message($device, "ON");
+                            break;
+                            case "off":
+                            tx433_message($device, "OFF");
+                            break;
+                            case "none":
+                            break;
+                        }
+                    }
+                }
+
+                usleep(300000);
             }
         }
         
@@ -318,7 +480,7 @@ if (isset($_POST['action'])) {
 <meta charset="UTF-8">
 <title>Mobile Connair</title>
 
-<link rel="stylesheet" href="jquery.mobile-1.3.0-beta.1.min.css" />
+<link rel="stylesheet" href="jquery.mobile-1.3.0-rc.1.min.css" />
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
 <style type="text/css">
@@ -382,7 +544,7 @@ if (isset($_POST['action'])) {
         */
     });
 </script>
-<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0-beta.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0-rc.1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="jquery.toast.mobile.js"></script>
 
 
@@ -437,15 +599,18 @@ if (isset($_POST['action'])) {
 
 <div data-role="page" id="Favoriten">
 
-    <div data-role="panel" id="mypanel" data-position="left" data-display="overlay" data-theme="a">
+    <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
         <center>
             <a href="#Favoriten" data-role="button" data-theme="e" class="ui-disabled">Favoriten</a>
             <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
             <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
             <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
-            <button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alles An</button>
-            <button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alles aus</button>
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+            </div>
             <br />
             <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
         </center>
@@ -530,17 +695,20 @@ if (isset($_POST['action'])) {
 
 <div data-role="page" id="Geräte">
 
-    <div data-role="panel" id="mypanel" data-position="left" data-display="overlay" data-theme="a">
+    <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
 	    <center>
             <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
             <a href="#Geräte" data-role="button" data-theme="e" class="ui-disabled">Geräte</a>
-			<a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
-			<a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
+            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
-            <button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alles An</button>
-            <button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alles aus</button>
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+            </div>
             <br />
-            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen																	    </a>
+            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
  
@@ -548,6 +716,7 @@ if (isset($_POST['action'])) {
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Geräte</h1>
+        <a href="#newdevice" data-rel="dialog" data-transition="slidedown" class="ui-disabled">+</a>
     </div><!-- /header -->
 
 
@@ -569,7 +738,13 @@ if (isset($_POST['action'])) {
 ?>
 
             <li data-role="list-divider" role="heading" data-theme="a">
-                <?php echo $room; ?>
+                    <div class="ui-grid-a">
+	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
+	                    <div class="ui-block-b" style="text-align:right">
+	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
+	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
+	                    </div>
+                    </div>
             </li>
 
 <?php
@@ -595,8 +770,10 @@ if (isset($_POST['action'])) {
                 Alle
             </li>
             <li data-theme="c">
-                <button data-theme="g"  onclick="send_connair('allon')">An</button>
-                <button data-theme="r"  onclick="send_connair('alloff')">Aus</button>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">An</button></div>
+                    <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Aus</button></div>     
+                </div>
             </li>
          </ul>
     </div><!-- /content -->
@@ -611,15 +788,18 @@ if (isset($_POST['action'])) {
 
 <div data-role="page" id="Gruppen">
     
-    <div data-role="panel" id="mypanel" data-position="left" data-display="overlay" data-theme="a">
+    <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
         <center>
             <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
             <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
-			<a href="#Gruppen" data-role="button" data-theme="e" class="ui-disabled">Gruppen</a>
-			<a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#Gruppen" data-role="button" data-theme="e" class="ui-disabled">Gruppen</a>
+            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
+            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
-            <button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alles An</button>
-            <button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alles aus</button>
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+            </div>
             <br />
             <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
         </center>
@@ -650,7 +830,27 @@ if (isset($_POST['action'])) {
 <?php
         foreach($group->deviceid as $deviceid) {
             $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
-            echo "<p>".$devicesFound[0]->name."</p>";
+            $device = $devicesFound[0];
+            $text = $device->name;
+            if(!empty($deviceid['onaction'])) {
+                if($deviceid['onaction'] == "on") {
+                    $text = $text."<small> [ <i><font color=#3A7315>on</font></i> ]</small>";
+                } else if($deviceid['onaction'] == "off") {
+                    $text = $text."<small> [ <i><font color=#3A7315>off</font></i> ]</small>";
+                } else if($deviceid['onaction'] == "none") {
+                    $text = $text."<small> [ <i><font color=#3A7315>none</font></i> ]</small>";
+                }
+            }
+            if(!empty($deviceid['offaction'])) {
+                if($deviceid['offaction'] == "on") {
+                    $text = $text."<small> [ <i><font color=#731515>on</font></i> ]</small>";
+                } else if($deviceid['offaction'] == "off") {
+                    $text = $text."<small> [ <i><font color=#731515>off</font></i> ]</small>";
+                } else if($deviceid['offaction'] == "none") {
+                    $text = $text."<small> [ <i><font color=#731515>none</font></i> ]</small>";
+                }
+            }
+            echo "<p>".$text."</p>";
         }
 ?>
 
@@ -671,17 +871,90 @@ if (isset($_POST['action'])) {
 
 
 
+
+<div data-role="page" id="Räume">
+
+    <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
+	    <center>
+            <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
+            <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
+            <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#Räume" data-role="button" data-theme="e" class="ui-disabled">Räume</a>
+            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <br />
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+            </div>
+            <br />
+            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
+        </center>
+    </div><!-- /panel -->
+ 
+       
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#mypanel">Menu</a>
+        <h1>Räume</h1>
+    </div><!-- /header -->
+
+
+    <div data-role="content">  
+        <ul data-role="listview" data-divider-theme="e" data-inset="false">
+
+<?php
+    $roomDevices = array();
+    foreach($xml->devices->device as $device) {
+        $curRoom = (string)$device->room;
+        if(!array_key_exists($curRoom, $roomDevices)) {
+            $roomDevices[$curRoom] = array();
+        }
+        $roomDevices[$curRoom][] = $device;
+    }
+    ksort($roomDevices);
+    foreach($roomDevices as $room => $devices) {
+?>
+
+                <li data-theme="c">
+                    <div class="ui-grid-a">
+	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
+	                    <div class="ui-block-b" style="text-align:right">
+	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
+	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
+	                    </div>
+                    </div>
+                </li>
+
+<?php
+    }
+?>
+   
+         </ul>
+    </div><!-- /content -->
+</div><!-- /page -->
+
+
+
+
+
+
+
+
+
+
 <div data-role="page" id="Einstellungen">
 
-    <div data-role="panel" id="mypanel" data-position="left" data-display="overlay" data-theme="a">
+    <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
         <center>
             <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
             <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
             <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
             <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
-            <button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alles An</button>
-            <button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alles aus</button>
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+            </div>
             <br />
             <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
         </center>
@@ -718,6 +991,57 @@ if (isset($_POST['action'])) {
 
     </div><!-- /content -->
 </div><!-- /page -->
+
+
+
+
+
+
+
+
+
+
+<div data-role="page" id="newdevice" data-theme="e">
+
+    <div data-role="header">
+        <h1>Neues Gerät</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">
+        <form id="newdeviceform" method="post">
+            <div data-role="fieldcontain">
+	            <label for="name">Name:</label>
+	            <input type="text" name="name" id="name" value="" />
+	            <br/>
+	            <label for="name">Raum:</label>
+	            <input type="text" name="room" id="room" value="" />
+	            <br/>
+	            <label for="name">Hersteller:</label>
+	            <input type="text" name="vendor" id="vendor" value="" />
+	            <br/>
+	            <label for="name">Masterdip:</label>
+	            <input type="text" name="masterdip" id="masterdip" value="" />
+	            <br/>
+	            <label for="name">Slavedip:</label>
+	            <input type="text" name="slavedip" id="slavedip" value="" />
+	            <br/>
+	            <label for="name">Version:</label>
+	            <input type="text" name="tx433version" id="tx433version" value="" />
+	            <br/>
+	            <div data-role="fieldcontain">
+                    <label for="favorite">Favorit:</label>
+                    <select name="favorite" id="favorite" data-role="slider">
+	                    <option value="false">Nein</option>
+	                    <option value="true">Ja</option>
+                    </select> 
+                </div>
+	        </div>
+	        <input type="submit" value="Speichern" data-theme="g"/>
+            <a href="#" data-role="button" data-rel="back" data-theme="r">Abbrechen</a>
+        </form>
+    </div><!-- /content -->
+</div><!-- /page -->
+
 
 </body>
 </html>
