@@ -1,5 +1,15 @@
 <?php
 
+
+/*
+Hilfreiche Links:
+http://developer.apple.com/library/safari/#documentation/iPhone/Conceptual/SafariJSDatabaseGuide/OfflineApplicationCache/OfflineApplicationCache.html
+http://jquerymobile.com/demos/1.0rc2/docs/pages/page-cache.html
+
+
+*/
+
+
 //http://php.net/manual/de/function.ip2long.php
 function clientInSameSubnet($client_ip=false,$server_ip=false) {
     if (!$client_ip)
@@ -79,7 +89,7 @@ function connair_send($msg) {
 }
 
 
-function tx433_brennstuhl($device, $action) {   
+function tx433_brennenstuhl($device, $action) {   
     if(empty($device->address->masterdip)) {
         echo "ERROR: masterdip ist ungültig für device id ".$device->id;
         return;
@@ -386,12 +396,17 @@ function tx433_message($device, $action) {
         connair_send($device->address->rawCodeOn);
     } else if ($action=="OFF" && !empty($device->address->rawCodeOff)) {
         connair_send($device->address->rawCodeOff);
-    } else if ($device->vendor=="Brennstuhl") {
-        tx433_brennstuhl($device, $action);
-    } else if ($device->vendor=="Intertechno") {
+    } else if (strtolower($device->vendor)=="brennenstuhl") {
+        tx433_brennenstuhl($device, $action);
+    } else if (strtolower($device->vendor)=="intertechno") {
         tx433_intertechno($device, $action);
+    } else if (strtolower($device->vendor)=="elro") {
+        tx433_elro($device, $action);
     }
+    $device->status = $action;
 }
+
+
 
 
 if (isset($_POST['action'])) {
@@ -419,7 +434,8 @@ if (isset($_POST['action'])) {
         
         if (($_POST['type'])=="device") {
             $devicesFound = $xml->xpath("//devices/device/id[text()='".(string)$_POST['id']."']/parent::*");
-            tx433_message($devicesFound[0], $action);
+            $device = $devicesFound[0];
+            tx433_message($device, $action);
 
         } else if (($_POST['type'])=="room") {
             $devicesFound = $xml->xpath("//devices/device/room[text()='".(string)$_POST['id']."']/parent::*");
@@ -436,6 +452,7 @@ if (isset($_POST['action'])) {
                 if($action == "ON") {
                     if(empty($deviceid['onaction'])) {
                         tx433_message($device, $action);
+                        
                     } else {
                         switch ($deviceid['onaction']){
                             case "on":
@@ -468,13 +485,17 @@ if (isset($_POST['action'])) {
                 usleep(300000);
             }
         }
-        
+ 
         echo $errormessage;
     }
+        
+    $xml->asXML("config.xml"); 
+
 } else {
     header("Content-Type: text/html; charset=utf-8");
 ?>
 <!DOCTYPE html>
+<!--html manifest="cache.manifest"-->
 <html>
 <head>
 <meta charset="UTF-8">
@@ -484,31 +505,27 @@ if (isset($_POST['action'])) {
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
 <style type="text/css">
+
+/* icon größe von der liste */
+.ui-li-thumb, .ui-li-icon {
+    left: 1px;
+    max-height: 32px; 
+    max-width: 32px;
+    position: absolute;
+    top: 0;
+}
+
+.ui-icon-on {
+	background-image: url("app-icon-on.png");
+}
+.ui-icon-off {
+	background-image: url("app-icon-off.png");
+}
+
 /*
 .ui-grid-a .ui-block-a { width: 66.95%; }
 .ui-grid-a .ui-block-b { width: 32.925%; }
 .ui-grid-a .ui-block-a { clear: left; }
-*/
-
-
-/* wrap push on wide viewports once open
-@media (min-width: 35em){
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-open.ui-panel-content-fixed-toolbar-display-push,
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-open.ui-panel-content-fixed-toolbar-display-reveal,
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-open.ui-panel-content-wrap-display-push,
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-open.ui-panel-content-wrap-display-reveal {
-		margin-right: 17em;
-	}
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-open.ui-panel-content-wrap-display-push.ui-panel-content-fixed-toolbar-position-right,
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-open.ui-panel-content-wrap-display-reveal.ui-panel-content-fixed-toolbar-position-right,
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-open.ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-right,
-	.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-open.ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-right {
-		margin: 0 0 0 17em;
-	}
-	.ui-responsive-panel .ui-panel-dismiss-display-push {
-		display: none;
-	}
-}
 */
 
 </style>
@@ -518,6 +535,7 @@ if (isset($_POST['action'])) {
 <script type="text/javascript">
     $(document).bind("mobileinit", function(){
         $.mobile.defaultPageTransition = 'none';
+        //$.mobile.page.prototype.options.domCache = true;
     });
     $(document).ready(function() {
         $.event.special.swipe.scrollSupressionThreshold=10;
@@ -584,6 +602,99 @@ if (isset($_POST['action'])) {
                 }
             });
         }
+    
+    
+           
+        function updateTheme(newTheme) {
+            var rmbtnClasses = '';
+            var rmhfClasses = '';
+            var rmbdClassess = '';
+            var arr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"  ];
+
+            $.each(arr,function(index, value){
+                rmbtnClasses = rmbtnClasses + " ui-btn-up-"+value + " ui-btn-hover-"+value;
+                rmhfClasses = rmhfClasses + " ui-bar-"+value;
+                rmbdClassess = rmbdClassess + " ui-body-"+value;
+            });
+
+            // reset all the buttons widgets
+             $.mobile.activePage.find('.ui-btn').not('.ui-li-divider').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+
+             // reset the header/footer widgets
+             $.mobile.activePage.find('.ui-header, .ui-footer').removeClass(rmhfClasses).addClass('ui-bar-' + newTheme).attr('data-theme', newTheme);
+
+             // reset the page widget
+             $.mobile.activePage.removeClass(rmbdClassess).addClass('ui-body-' + newTheme).attr('data-theme', newTheme);
+
+             // target the list divider elements, then iterate through them and
+             // change its theme (this is the jQuery Mobile default for
+             // list-dividers)
+             $.mobile.activePage.find('.ui-li-divider').each(function(index, obj) {
+                $(this).removeClass(rmhfClasses).addClass('ui-bar-' + newTheme).attr('data-theme',newTheme);
+             });
+        } 
+    
+        
+        function switchRowTheme(action, id, onColor, offColor) {
+            var rmbtnClasses = '';
+            var rmhfClasses = '';
+            var rmbdClassess = '';
+            var arr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"  ];
+            $.each(arr,function(index, value){
+                rmbtnClasses = rmbtnClasses + " ui-btn-up-"+value + " ui-btn-hover-"+value;
+                rmhfClasses = rmhfClasses + " ui-bar-"+value;
+                rmbdClassess = rmbdClassess + " ui-body-"+value;
+            });
+            if(action == "on") {
+                newTheme = onColor;
+            } else if(action == "off") {
+                newTheme = offColor;
+            }         
+            $('#deviceRow'+id).removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+        }
+    
+        
+        function switchButtonTheme(action, id, onColor, offColor, curColor) {
+            var rmbtnClasses = '';
+            var rmhfClasses = '';
+            var rmbdClassess = '';
+            var arr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"  ];
+            $.each(arr,function(index, value){
+                rmbtnClasses = rmbtnClasses + " ui-btn-up-"+value + " ui-btn-hover-"+value;
+                rmhfClasses = rmhfClasses + " ui-bar-"+value;
+                rmbdClassess = rmbdClassess + " ui-body-"+value;
+            });
+            if(action == "on") {
+                newTheme = curColor;
+                $('#btnOn'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                newTheme = offColor;
+                $('#btnOff'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+            } else if(action == "off") {
+                newTheme = onColor;
+                $('#btnOn'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                newTheme = curColor;
+                $('#btnOff'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+            }
+        }
+    
+        
+        function switchButtonIcon(action, id, onIcon, offIcon) {
+            var rmbtnClasses = '';
+            var rmhfClasses = '';
+            var rmbdClassess = '';
+            var arr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"  ];
+            $.each(arr,function(index, value){
+                rmbtnClasses = rmbtnClasses + " ui-btn-up-"+value + " ui-btn-hover-"+value;
+                rmhfClasses = rmhfClasses + " ui-bar-"+value;
+                rmbdClassess = rmbdClassess + " ui-body-"+value;
+            });
+            if(action == "on") {
+                $('#btnOn'+id).buttonMarkup({ icon: onIcon });
+            } else if(action == "off") {
+                $('#btnOn'+id).buttonMarkup({ icon: offIcon });
+            }
+        }
+
     </script>
 </head>
 <body>
@@ -664,14 +775,70 @@ if (isset($_POST['action'])) {
 <?php
         $devicesFound = $xml->xpath("//devices/device/favorite[text()='true']/parent::*");
         foreach($devicesFound as $device) {
+
+        switch ($xml->gui->showDeviceStatus){
+            case "ROW_COLOR":
+                $rowOnDataTheme="g";
+                $rowOffDataTheme="r";
+                if($device->status=='ON') {
+                    $rowDataTheme=$rowOnDataTheme;
+                } else {
+                    $rowDataTheme=$rowOffDataTheme;
+                }
+                $btnOnDataTheme="g";
+                $btnOffDataTheme="r";
+                $btnOnIcon="";
+                $btnOnJS="send_connair('on','device','".$device->id."'); switchRowTheme('on','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
+                $btnOffJS="send_connair('off','device','".$device->id."'); switchRowTheme('off','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
+            break;
+            case "BUTTON_COLOR":
+                $rowDataTheme="c";
+                $btnOnColor="g";
+                $btnOffColor="r";
+                $btnCurColor="e";
+                if($device->status=='ON') {
+                    $btnOnDataTheme=$btnOnColor;
+                    $btnOffDataTheme=$btnCurColor;
+                } else {
+                    $btnOnDataTheme=$btnCurColor;
+                    $btnOffDataTheme=$btnOffColor;
+                }
+                $btnOnIcon="";
+                $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonTheme('on','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
+                $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonTheme('off','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
+            break;
+            case "BUTTON_ICON":
+                $onIcon="check";
+                $offIcon="off";
+                $rowDataTheme="c";
+                $btnOnDataTheme="g";
+                $btnOffDataTheme="r";
+                if($device->status=='ON') {
+                    $btnOnIcon=$onIcon;
+                } else {
+                    $btnOnIcon=$offIcon;
+                }
+                $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonIcon('on','".$device->id."','".$onIcon."','".$offIcon."')";
+                $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonIcon('off','".$device->id."','".$onIcon."','".$offIcon."')";
+            break;
+            default:
+                $rowDataTheme="c";
+                $btnOnDataTheme="g";
+                $btnOffDataTheme="r";
+                $btnOnIcon="";
+                $btnOnJS="send_connair('on','device','".$device->id."')";
+                $btnOffJS="send_connair('off','device','".$device->id."')";
+            break;
+        }
+
 ?>
 
-                <li data-theme="c">
+                <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $device->name; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','device','<?php echo $device->id; ?>')">Ein</button>
-	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','device','<?php echo $device->id; ?>')">Aus</button>
+	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>">Ein</button>
+	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>">Aus</button>
 	                    </div>
                     </div>
                 </li>
@@ -716,7 +883,7 @@ if (isset($_POST['action'])) {
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Geräte</h1>
-        <a href="#newdevice" data-rel="dialog" data-transition="slidedown" class="ui-disabled">+</a>
+        <a href="#newdevice" data-rel="dialog" data-transition="slidedown">+</a>
     </div><!-- /header -->
 
 
@@ -741,22 +908,78 @@ if (isset($_POST['action'])) {
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
-	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
+	                        <button data-theme="a"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
+	                        <button data-theme="a"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
 	                    </div>
                     </div>
             </li>
 
 <?php
         foreach($devices as $device) {
+
+        switch ($xml->gui->showDeviceStatus){
+            case "ROW_COLOR":
+                $rowOnDataTheme="g";
+                $rowOffDataTheme="r";
+                if($device->status=='ON') {
+                    $rowDataTheme=$rowOnDataTheme;
+                } else {
+                    $rowDataTheme=$rowOffDataTheme;
+                }
+                $btnOnDataTheme="g";
+                $btnOffDataTheme="r";
+                $btnOnIcon="";
+                $btnOnJS="send_connair('on','device','".$device->id."'); switchRowTheme('on','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
+                $btnOffJS="send_connair('off','device','".$device->id."'); switchRowTheme('off','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
+            break;
+            case "BUTTON_COLOR":
+                $rowDataTheme="c";
+                $btnOnColor="g";
+                $btnOffColor="r";
+                $btnCurColor="e";
+                if($device->status=='ON') {
+                    $btnOnDataTheme=$btnOnColor;
+                    $btnOffDataTheme=$btnCurColor;
+                } else {
+                    $btnOnDataTheme=$btnCurColor;
+                    $btnOffDataTheme=$btnOffColor;
+                }
+                $btnOnIcon="";
+                $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonTheme('on','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
+                $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonTheme('off','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
+            break;
+            case "BUTTON_ICON":
+                $onIcon="check";
+                $offIcon="off";
+                $rowDataTheme="c";
+                $btnOnDataTheme="g";
+                $btnOffDataTheme="r";
+                if($device->status=='ON') {
+                    $btnOnIcon=$onIcon;
+                } else {
+                    $btnOnIcon=$offIcon;
+                }
+                $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonIcon('on','".$device->id."','".$onIcon."','".$offIcon."')";
+                $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonIcon('off','".$device->id."','".$onIcon."','".$offIcon."')";
+            break;
+            default:
+                $rowDataTheme="c";
+                $btnOnDataTheme="g";
+                $btnOffDataTheme="r";
+                $btnOnIcon="";
+                $btnOnJS="send_connair('on','device','".$device->id."')";
+                $btnOffJS="send_connair('off','device','".$device->id."')";
+            break;
+        }
+
 ?>
 
-                <li data-theme="c">
+                <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $device->name; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','device','<?php echo $device->id; ?>')">Ein</button>
-	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','device','<?php echo $device->id; ?>')">Aus</button>
+	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>">Ein</button>
+	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>">Aus</button>
 	                    </div>
                     </div>
                 </li>
@@ -967,7 +1190,6 @@ if (isset($_POST['action'])) {
 
    
     <div data-role="content">  
-        <button data-theme="r"  onclick="send_connair('alloff')">Alles aus</button>
         <div data-role="controlgroup" data-type="horizontal">
             <a href="index.html" data-role="button" data-theme="g">I</a>
             <a href="index.html" data-role="button" data-theme="r">0</a>
@@ -977,11 +1199,26 @@ if (isset($_POST['action'])) {
             <a href="index.html" data-role="button" data-theme="a">T</a>
             <a href="index.html" data-role="button" data-theme="r">0</a>
         </div>
-        <button data-theme="g"   data-inline="true" onclick="send_connair('on',1)">Ein</button>
-        <button data-theme="r"   data-inline="true" onclick="send_connair('off',1)">Aus</button>
+        <div data-role="controlgroup" data-mini="true" data-type="horizontal">
+            <a href="index.html" data-role="button" data-theme="g">An</a>
+            <a href="index.html" data-role="button" data-theme="e" data-icon="check" data-iconpos="notext"></a>
+            <a href="index.html" data-role="button" data-theme="r">Aus</a>
+        </div>
+        <div data-role="controlgroup" data-mini="true" data-type="horizontal">
+            <a href="index.html" data-role="button" data-theme="g">An</a>
+            <a href="index.html" data-role="button" data-theme="c" data-icon="minus" data-iconpos="notext"></a>
+            <a href="index.html" data-role="button" data-theme="r">Aus</a>
+        </div>
+        <button data-theme="g" data-inline="true" onclick="send_connair('on',1)">Ein</button>
+        <button data-theme="r" data-inline="true" onclick="send_connair('off',1)">Aus</button>
         <br>
-        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on',1)">Ein</button>
-        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off',1)">Aus</button>
+        <button data-theme="e" data-mini="true" data-inline="true" data-icon="check" data-iconpos="notext"></button>
+        <button data-theme="g" data-mini="true" data-inline="true" onclick="send_connair('on',1)">Ein</button>
+        <button data-theme="r" data-mini="true" data-inline="true" onclick="send_connair('off',1)">Aus</button>
+        <br>
+        <button data-theme="c" data-mini="true" data-inline="true" data-icon="minus" data-iconpos="notext"></button>
+        <button data-theme="g" data-mini="true" data-inline="true" onclick="send_connair('on',1)">Ein</button>
+        <button data-theme="r" data-mini="true" data-inline="true" onclick="send_connair('off',1)">Aus</button>
         <br>
         <button data-theme="g"   data-inline="true" onclick="send_connair('on',1)">I</button>
         <button data-theme="r"   data-inline="true" onclick="send_connair('off',1)">O</button>
@@ -1001,7 +1238,7 @@ if (isset($_POST['action'])) {
 
 
 
-<div data-role="page" id="newdevice" data-theme="e">
+<div data-role="page" id="newdevice" data-theme="e" data-close-btn="none">
 
     <div data-role="header">
         <h1>Neues Gerät</h1>
