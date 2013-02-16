@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<config>
+<config debug="true">
     <gui>
         <showDeviceStatus>OFF</showDeviceStatus>
     </gui>
@@ -13,11 +13,16 @@
             <port>49880</port>
         </connair>
     </connairs>
+    <culs>
+        <cul>
+            <device>/dev/ttyACM0</device>
+        </cul>
+    </culs>
     <devices>
         <device>
             <id>1</id>
             <name>Lichterkette Wohnzimmert&#xFC;r</name>
-            <vendor>Intertechno</vendor>
+            <vendor>intertechno</vendor>
             <address>
                 <masterdip>M</masterdip>
                 <slavedip>2</slavedip>
@@ -32,7 +37,7 @@
         <device>
             <id>2</id>
             <name>Lampe Fensterbank</name>
-            <vendor>Brennenstuhl</vendor>
+            <vendor>brennenstuhl</vendor>
             <address>
                 <masterdip>10111</masterdip>
                 <slavedip>01000</slavedip>
@@ -47,7 +52,7 @@
         <device>
             <id>3</id>
             <name>gro&#xDF;e Papierlampe</name>
-            <vendor>Intertechno</vendor>
+            <vendor>intertechno</vendor>
             <address>
                 <masterdip/>
                 <slavedip/>
@@ -57,7 +62,7 @@
             </address>
             <room>Wohnzimmer</room>
             <favorite>true</favorite>
-            <status>ON</status>
+            <status>OFF</status>
         </device>
     </devices>
     <groups>
