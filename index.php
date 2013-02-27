@@ -8,7 +8,8 @@ if(phpversion() < '5.3.0') {
 
 
 // Suppress DateTime warnings
-date_default_timezone_set(@date_default_timezone_get());
+//date_default_timezone_set(@date_default_timezone_get());
+date_default_timezone_set('UTC');
 
 
 /*
@@ -49,13 +50,13 @@ function debug($msg) {
 		date_default_timezone_set("UTC");
         $file = 'debug.log';
         $handle = fopen ($file, 'a+');
-        fwrite($handle, date("Y-m-d H:i:s",time())." ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REQUEST_TIME']." ".$msg."\r\n");
+        fwrite($handle, date("Y-m-d H:i:s",time())." ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REQUEST_TIME']."   ".$msg."\r\n");
         fclose($handle);
     }
 }
 
 
-debug("Request start");
+//debug("Request start");
 
 
 //http://php.net/manual/de/function.ip2long.php
@@ -113,8 +114,14 @@ function connair_send($msg) {
         return;
     }
     foreach($xml->connairs->connair as $connair) {
-        debug("Sending Message '".$msg."' to ConnAir ".(string)$connair->address.":".(integer)$connair->port);
-        if( ! socket_sendto ( $sock , $msg, $len , 0, (string)$connair->address , (integer)$connair->port)) {
+        if ((string)$connair["type"]=="itgw") {
+            $newmsg=str_replace("TXP:","",$msg);
+            $newmsg=str_replace("#baud#","26,0",$newmsg);
+        } else {
+            $newmsg=str_replace("#baud#","25",$msg);
+        }
+        debug("Sending Message '".$newmsg."' to ConnAir ".(string)$connair->address.":".(integer)$connair->port);
+        if( ! socket_sendto ( $sock , $newmsg, $len , 0, (string)$connair->address , (integer)$connair->port)) {
 	        $errorcode = socket_last_error();
 	        if($errorcode>0) {
                 $errormsg = socket_strerror($errorcode);
@@ -151,7 +158,7 @@ function connair_create_msg_brennenstuhl($device, $action) {
     $sRepeat=10;
     $sPause=5600;
     $sTune=350;
-    $sBaud=25;
+    $sBaud="#baud#";
     $sSpeed=16;
     $uSleep=800000;
     if ($device->address->tx433version==1) {
@@ -212,7 +219,7 @@ function connair_create_msg_intertechno($device, $action) {
     $sRepeat=6;
     $sPause=11125;
     $sTune=89;
-    $sBaud=25;
+    $sBaud="#baud#";
     $sSpeed=125;
     $uSleep=800000;
     $HEAD="TXP:$sA,$sG,$sRepeat,$sPause,$sTune,$sBaud,";
@@ -366,7 +373,7 @@ function connair_create_msg_elro($device, $action) {
     $sRepeat=10;
     $sPause=5600;
     $sTune=350;
-    $sBaud=25;
+    $sBaud="#baud#";
     $sSpeed=16;
     $uSleep=800000;
     if ($device->address->tx433version==1) {
@@ -591,17 +598,181 @@ function send_message($device, $action) {
 }
 
 
-// Variablenbelegung POST / GET
+function timer_check() {
+    global $xml;
+    if($xml->timers->count() > 0 ) {
+        // Sonnenauf- und -untergangskonfiguration (sunrise = Sonnenaufgang = SU (Sun Up) // sunset = Sonnenuntergang = SD (Sun Down)
+        $latitude=empty($xml->global->latitude) ? 48.64727 : ($xml->global->latitude)*1;
+        $longitude=empty($xml->global->longitude) ? 9.44858 : ($xml->global->longitude)*1;
+        $sunrise = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90+5/6, date("O")/100);
+        $sunset = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90+5/6, date("O")/100);
+        //Aktuelle Zeit ermitteln und Puffer definieren, die beim Timer berücksichtigt werden sollen
+        $now = strtotime(date('G:i'));
+        $timepuffer = 5.5; // Zeitpuffer in Minuten
+        $timeWindowStart = $now - (60 * $timepuffer);
+        $timeWindowStop = $now;
+        //Wochentag ermitteln
+        $nowday = date("N") -1;
+        $preday = date ("N", time() - ( 24 * 60 * 60)) -1; //Vortag
+        // Timer auslesen und bei gefunden Timern Aktionen ausführen
+        foreach($xml->timers->timer as $timer) {
+            $timerday=(string)$timer->day;
+            ###### Timer ermitteln ################
+            // On Timer
+            switch ($timer->timerOn) {
+                case "SU":
+                debug();
+                    $OnTimer = $sunrise;
+                    break;
+                case "SD":
+                    $OnTimer = $sunset;
+                    break;
+                default:
+                    $OnTimer = strtotime($timer->timerOn);
+            }
+            // Off Timer
+            switch ($timer->timerOff) {
+                case "SU":
+                    $OffTimer = $sunrise;
+                    break;
+                case "SD":
+                    $OffTimer = $sunset;
+                    break;
+                default:
+                    $OffTimer = strtotime($timer->timerOff);
+            }
+            ###### Timer On bearbeiten ############
+            // Prüfen, ob aktueller Tag mit dem OnTimer Tag zulässig ist
+            $checkDayOn = strpos("MDTWFSS",$timerday[$nowday]);
+            if (is_numeric($checkDayOn)) {
+                //debug("TimerID:".$timer->id." OnTimer ".date('h:i', $OnTimer)." Von ".date('h:i', $timeWindowStart)." - ".date('h:i', $timeWindowStop));
+                // Tag gültig -> Prüfen, ob On Timer innerhalb des Zeitfensters liegt
+                if (($OnTimer >= $timeWindowStart) && ($OnTimer <= $timeWindowStop)) {
+                    // Timer liegt innerhalb des Zeitfensters -> Schaltungen durchführen
+                    debug("Timer in action (ON) ".$timer->id);
+                    $action = "ON";
+                    // Timer mit Device
+                    if (($timer->type)=="device") {
+                        $devicesFound = $xml->xpath("//devices/device/id[text()='".$timer->typeid."']/parent::*");
+                        $device = $devicesFound[0];
+                        send_message($device, $action);
+                    }
+                    // Timer mit Room
+                    if (($timer->type)=="room") {
+                        $devicesFound = $xml->xpath("//devices/device/room[text()='".$timer->typeid."']/parent::*");
+                        foreach($devicesFound as $device) {
+                            send_message($device, $action);
+                            usleep(300000);
+                        }
+                    }
+                    // Timer mit Group
+                    if (($timer->type)=="group") {
+                        $groupsFound = $xml->xpath("//groups/group/id[text()='".$timer->typeid."']/parent::*");
+                        foreach($groupsFound[0]->deviceid as $deviceid) {
+                            $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
+                            $device = $devicesFound[0];
+                            if(empty($deviceid['onaction'])) {
+                                send_message($device, $action);
+                            } else {
+                                switch ($deviceid['onaction']) {
+                                    case "on":
+                                        send_message($device, "ON");
+                                        break;
+                                    case "off":
+                                        send_message($device, "OFF");
+                                        break;
+                                    case "none":
+                                        break;
+                                }
+                            }
+                            usleep(300000);
+                        }
+                    }
+                }
+            }
+            ###### Timer Off bearbeiten ############
+            // Prüfen, ob aktueller Tag mit dem OffTimer Tag zulässig ist
+            if ($OffTimer < $OnTimer) {
+                // OffTimer ist geringer als OnTimer => Für die Zulässigkeitsprüfung wird der PHP Vortag genommen
+                $checkDayOff = strpos("MDTWFSS",$timerday[$preday]);
+            } else {
+                // Off Timer ist höher als OnTimer => Für die Zulässigkeitsprüfung wird der aktuelle PHP Tag genommen
+                $checkDayOff = strpos("MDTWFSS",$timerday[$nowday]);
+            }
+            if (is_numeric($checkDayOff)) {
+                //debug("TimerID:".$timer->id." OffTimer ".date('h:i', $OffTimer)." Von ".date('h:i', $timeWindowStart)." - ".date('h:i', $timeWindowStop));
+                // Tag gültig -> Prüfen, ob On Timer innerhalb des Zeitfensters liegt
+                if (($OffTimer >= $timeWindowStart) && ($OffTimer <= $timeWindowStop)) {
+                    // Timer liegt innerhalb des Zeitfensters -> Schaltungen durchführen
+                    debug("Timer in action (OFF) ".$timer->id);
+                    $action = "OFF";                  
+                    // Timer mit Device
+                    if (($timer->type)=="device") {
+                        $devicesFound = $xml->xpath("//devices/device/id[text()='".$timer->typeid."']/parent::*");
+                        $device = $devicesFound[0];
+                        send_message($device, $action);
+                    }
+                    // Timer mit Room
+                    if (($timer->type)=="room") {
+                        $devicesFound = $xml->xpath("//devices/device/room[text()='".$timer->typeid."']/parent::*");
+                        foreach($devicesFound as $device) {
+                            send_message($device, $action);
+                            usleep(300000);
+                        }
+                    }
+                    // Timer mit Group
+                    if (($timer->type)=="group") {
+                        $groupsFound = $xml->xpath("//groups/group/id[text()='".$timer->typeid."']/parent::*");
+                        foreach($groupsFound[0]->deviceid as $deviceid) {
+                            $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
+                            $device = $devicesFound[0];
+                            if(empty($deviceid['onaction'])) {
+                                send_message($device, $action);
+                            } else {
+                                switch ($deviceid['onaction']) {
+                                    case "on":
+                                        send_message($device, "ON");
+                                        break;
+                                    case "off":
+                                        send_message($device, "OFF");
+                                        break;
+                                    case "none":
+                                        break;
+                                }
+                            }
+                            usleep(300000);
+                        }
+                    }
+                }             
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+// Über Tastenfunktion -> POST
 if (isset($_POST['action'])) {
     $r_action = (string)$_POST['action'];
     $r_type = (string)$_POST['type'];
     $r_id = (string)$_POST['id'];
 }
+// Über Linkfunktion -> GET
 if (isset($_GET['action'])) {
     $r_action = (string)$_GET['action'];
     $r_type = (string)$_GET['type'];
     $r_id = (string)$_GET['id'];
 }
+// Über Timerfunktion -> GET
+if (isset($_GET['timerrun'])) {
+    timer_check();   
+    exit();
+}
+
 
 
 if (isset($r_action)) {
@@ -695,7 +866,7 @@ if (isset($r_action)) {
 <meta charset="UTF-8">
 <title>Mobile Connair</title>
 
-<link rel="stylesheet" href="jquery.mobile-1.3.0-rc.1.min.css" />
+<link rel="stylesheet" href="jquery.mobile-1.3.0.min.css" />
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
 <style type="text/css">
@@ -734,8 +905,8 @@ if (isset($r_action)) {
     $(document).ready(function() {
         $.event.special.swipe.scrollSupressionThreshold=10;
         $.event.special.swipe.durationThreshold=1000;
-        $.event.special.swipe.horizontalDistanceThreshold=30;
-        $.event.special.swipe.verticalDistanceThreshold=75;
+        $.event.special.swipe.horizontalDistanceThreshold=180;
+        $.event.special.swipe.verticalDistanceThreshold=20;
         $(document).on( 'swiperight', swiperightHandler );
         function swiperightHandler( event ){
             $.mobile.activePage.find('#mypanel').panel( "open" );
@@ -744,19 +915,23 @@ if (isset($r_action)) {
         function swipeleftHandler( event ){
             $.mobile.activePage.find('#mypanel').panel( "close" );
         }
-        /*
-        $(document).delegate('.ui-page', 'pageshow', function () {
+<?php 
+	if ($xml->gui->showMenuOnLoad=="true") {
+?>
             setTimeout(function() {
-                $( "#mypanel" ).panel( "open" );
+                $.mobile.activePage.find('#mypanel').panel( "open" );
+/*
                 setTimeout(function() {
-                    $( "#mypanel" ).panel( "close" );
+                    $.mobile.activePage.find('#mypanel').panel( "close" );
                 }, 1000);
+*/
             }, 1000);
-        });
-        */
+<?php 
+	}
+?>
     });
 </script>
-<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0-rc.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="jquery.toast.mobile.js"></script>
 
 
@@ -964,7 +1139,7 @@ if (isset($r_action)) {
         $devicesFound = $xml->xpath("//devices/device/favorite[text()='true']/parent::*");
         foreach($devicesFound as $device) {
 
-        switch ($xml->gui->showDeviceStatus){
+        switch ($xml->gui->showDeviceStatus) {
             case "ROW_COLOR":
                 $rowOnDataTheme="g";
                 $rowOffDataTheme="r";
@@ -1164,7 +1339,16 @@ if (isset($r_action)) {
 
                 <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
-	                    <div class="ui-block-a" style="text-align:left"><?php echo $device->name; ?></div>
+	                    <div class="ui-block-a" style="text-align:left">
+	                    <?php 
+	                    	if($debug) {
+	                    		echo "<h3>".$device->name."</h3>";
+	                    		echo "<p><i>".$device->id." ".$device->vendor." ".$device->address->masterdip." ".$device->address->slavedip."</i></p>";
+	                    	} else {
+	                    		echo $device->name;
+	                    	}
+	                    ?>
+	                    </div>
 	                    <div class="ui-block-b" style="text-align:right">
 
 <?php 
@@ -1497,5 +1681,5 @@ if (isset($r_action)) {
 
 <?php
 } 
-    debug("END");  
+    //debug("END");  
 ?> 

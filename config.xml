@@ -1,14 +1,19 @@
 <?xml version="1.0"?>
 <config debug="true">
+    <global>
+       <longitude>9.44858</longitude>
+       <latitude>48.64727</latitude>
+    </global>
     <gui>
         <showDeviceStatus>OFF</showDeviceStatus>
+        <showMenuOnLoad>true</showMenuOnLoad>
     </gui>
     <connairs>
         <connair>
             <address>192.168.42.3</address>
             <port>49880</port>
         </connair>
-        <connair>
+        <connair type="itgw">
             <address>192.168.42.4</address>
             <port>49880</port>
         </connair>
@@ -88,4 +93,30 @@
             <deviceid>2</deviceid>
         </group>
     </groups>
+    <timers>
+        <timer>
+            <id>1</id>
+            <type>device</type>
+            <typeid>1</typeid>
+            <day>M______</day>
+            <timerOn>SD</timerOn>
+            <timerOff>23:59</timerOff>
+        </timer>
+        <timer>
+            <id>2</id>
+            <type>group</type>
+            <typeid>2</typeid>
+            <day>_____SS</day>
+            <timerOn>SD</timerOn>
+            <timerOff>00:30</timerOff>
+        </timer>
+        <timer>
+            <id>3</id>
+            <type>room</type>
+            <typeid>Flur</typeid>
+            <day>MDMDFSS</day>
+            <timerOn>19:00</timerOn>
+            <timerOff>23:00</timerOff>
+        </timer>
+    </timers>
 </config>
