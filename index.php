@@ -8,8 +8,7 @@ if(phpversion() < '5.3.0') {
 
 
 // Suppress DateTime warnings
-//date_default_timezone_set(@date_default_timezone_get());
-date_default_timezone_set('UTC');
+date_default_timezone_set(@date_default_timezone_get());
 
 
 /*
@@ -47,10 +46,9 @@ $errormessage="";
 function debug($msg) {
     global $debug;
     if($debug == "true") {
-		date_default_timezone_set("UTC");
-        $file = 'debug.log';
+		$file = 'debug.log';
         $handle = fopen ($file, 'a+');
-        fwrite($handle, date("Y-m-d H:i:s",time())." ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REQUEST_TIME']."   ".$msg."\r\n");
+        fwrite($handle, date("Y-m-d H:i:s")." ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REQUEST_TIME']."   ".$msg."\r\n");
         fclose($handle);
     }
 }
@@ -364,36 +362,27 @@ function connair_create_msg_elro($device, $action) {
         echo "ERROR: slavedip ist ungültig für device id ".$device->id;
         return;
     }
-    if(empty($device->address->tx433version)) {
-        echo "ERROR: tx433version ist ungültig für device id ".$device->id;
-        return;
-    }
     $sA=0;
     $sG=0;
     $sRepeat=10;
     $sPause=5600;
     $sTune=350;
     $sBaud="#baud#";
-    $sSpeed=16;
+    $sSpeed=14;
     $uSleep=800000;
-    if ($device->address->tx433version==1) {
-        $txversion=3;
-    } else {
-        $txversion=1;
-    }
     $HEAD="TXP:$sA,$sG,$sRepeat,$sPause,$sTune,$sBaud,";
-    $TAIL=",$txversion,1,$sSpeed,;";
-    $AN="1,3,1,3,3";
-    $AUS="3,1,1,3,1";
+    $TAIL="1,$sSpeed,;";
+    $AN="1,3,1,3,1,3,3,1,";
+    $AUS="1,3,3,1,1,3,1,3,";
     $bitLow=1;
     $bitHgh=3;
-    $seqLow=$bitHgh.",".$bitHgh.",".$bitLow.",".$bitLow.",";
-    $seqHgh=$bitHgh.",".$bitLow.",".$bitHgh.",".$bitLow.",";
+    $seqLow=$bitLow.",".$bitHgh.",".$bitLow.",".$bitHgh.",";
+    $seqHgh=$bitLow.",".$bitHgh.",".$bitHgh.",".$bitLow.",";
     $bits=$device->address->masterdip;
     $msg="";
     for($i=0;$i<strlen($bits);$i++) {   
         $bit=substr($bits,$i,1);
-        if($bit=="0") {
+        if($bit=="1") {
             $msg=$msg.$seqLow;
         } else {
             $msg=$msg.$seqHgh;
@@ -404,7 +393,7 @@ function connair_create_msg_elro($device, $action) {
     $msg="";
     for($i=0;$i<strlen($bits);$i++) {
         $bit=substr($bits,$i,1);
-        if($bit=="0") {
+        if($bit=="1") {
             $msg=$msg.$seqLow;
         } else {
             $msg=$msg.$seqHgh;
@@ -412,9 +401,9 @@ function connair_create_msg_elro($device, $action) {
     }
     $msgS=$msg;
     if($action=="ON") {
-        return $HEAD.$bitLow.",".$msgM.$msgS.$bitHgh.",".$AN.$TAIL;
+        return $HEAD.$msgM.$msgS.$AN.$TAIL;
     } else {
-        return $HEAD.$bitLow.",".$msgM.$msgS.$bitHgh.",".$AUS.$TAIL;
+        return $HEAD.$msgM.$msgS.$AUS.$TAIL;
     }
 }
 
@@ -599,6 +588,7 @@ function send_message($device, $action) {
 
 
 function timer_check() {
+//    debug("Timer Checking...");
     global $xml;
     if($xml->timers->count() > 0 ) {
         // Sonnenauf- und -untergangskonfiguration (sunrise = Sonnenaufgang = SU (Sun Up) // sunset = Sonnenuntergang = SD (Sun Down)
@@ -607,7 +597,7 @@ function timer_check() {
         $sunrise = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90+5/6, date("O")/100);
         $sunset = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90+5/6, date("O")/100);
         //Aktuelle Zeit ermitteln und Puffer definieren, die beim Timer berücksichtigt werden sollen
-        $now = strtotime(date('G:i'));
+        $now = time();
         $timepuffer = 5.5; // Zeitpuffer in Minuten
         $timeWindowStart = $now - (60 * $timepuffer);
         $timeWindowStop = $now;
@@ -616,6 +606,7 @@ function timer_check() {
         $preday = date ("N", time() - ( 24 * 60 * 60)) -1; //Vortag
         // Timer auslesen und bei gefunden Timern Aktionen ausführen
         foreach($xml->timers->timer as $timer) {
+//            debug("Timer: \n".$timer->asXML());
             $timerday=(string)$timer->day;
             ###### Timer ermitteln ################
             // On Timer
@@ -645,7 +636,8 @@ function timer_check() {
             // Prüfen, ob aktueller Tag mit dem OnTimer Tag zulässig ist
             $checkDayOn = strpos("MDTWFSS",$timerday[$nowday]);
             if (is_numeric($checkDayOn)) {
-                //debug("TimerID:".$timer->id." OnTimer ".date('h:i', $OnTimer)." Von ".date('h:i', $timeWindowStart)." - ".date('h:i', $timeWindowStop));
+//                debug("Timer Tag stimmt (ON) ".$timer->id);
+//                debug("TimerID:".$timer->id." OnTimer ".date('H:i', $OnTimer)." Von ".date('H:i', $timeWindowStart)." - ".date('H:i', $timeWindowStop));
                 // Tag gültig -> Prüfen, ob On Timer innerhalb des Zeitfensters liegt
                 if (($OnTimer >= $timeWindowStart) && ($OnTimer <= $timeWindowStop)) {
                     // Timer liegt innerhalb des Zeitfensters -> Schaltungen durchführen
@@ -700,7 +692,8 @@ function timer_check() {
                 $checkDayOff = strpos("MDTWFSS",$timerday[$nowday]);
             }
             if (is_numeric($checkDayOff)) {
-                //debug("TimerID:".$timer->id." OffTimer ".date('h:i', $OffTimer)." Von ".date('h:i', $timeWindowStart)." - ".date('h:i', $timeWindowStop));
+//                debug("Timer Tag stimmt (OFF) ".$timer->id);
+//                debug("TimerID:".$timer->id." OffTimer ".date('H:i', $OffTimer)." Von ".date('H:i', $timeWindowStart)." - ".date('H:i', $timeWindowStop));
                 // Tag gültig -> Prüfen, ob On Timer innerhalb des Zeitfensters liegt
                 if (($OffTimer >= $timeWindowStart) && ($OffTimer <= $timeWindowStop)) {
                     // Timer liegt innerhalb des Zeitfensters -> Schaltungen durchführen
@@ -905,7 +898,7 @@ if (isset($r_action)) {
     $(document).ready(function() {
         $.event.special.swipe.scrollSupressionThreshold=10;
         $.event.special.swipe.durationThreshold=1000;
-        $.event.special.swipe.horizontalDistanceThreshold=180;
+        $.event.special.swipe.horizontalDistanceThreshold=150;
         $.event.special.swipe.verticalDistanceThreshold=20;
         $(document).on( 'swiperight', swiperightHandler );
         function swiperightHandler( event ){
@@ -1017,7 +1010,9 @@ if (isset($r_action)) {
             } else if(action == "off") {
                 newTheme = offColor;
             }         
-            $('#deviceRow'+id).removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+            $("[id=deviceRow"+id+"]").each(function() {
+                $(this).removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+            });
         }
 
         function switchButtonTheme(action, id, onColor, offColor, curColor) {
@@ -1032,14 +1027,22 @@ if (isset($r_action)) {
             });
             if(action == "on") {
                 newTheme = curColor;
-                $('#btnOn'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                $("[id=btnOn"+id+"]").each(function() {
+                    $(this).button().attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                });
                 newTheme = offColor;
-                $('#btnOff'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                $("[id=btnOff"+id+"]").each(function() {
+                    $(this).button().attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                });
             } else if(action == "off") {
                 newTheme = onColor;
-                $('#btnOn'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                $("[id=btnOn"+id+"]").each(function() {
+                    $(this).button().attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                });
                 newTheme = curColor;
-                $('#btnOff'+id).attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                $("[id=btnOff"+id+"]").each(function() {
+                    $(this).button().attr('data-theme', newTheme).parent('.ui-btn').removeClass(rmbtnClasses).addClass('ui-btn-up-' + newTheme).attr('data-theme', newTheme);
+                });
             }
         }
 
@@ -1054,9 +1057,13 @@ if (isset($r_action)) {
                 rmbdClassess = rmbdClassess + " ui-body-"+value;
             });
             if(action == "on") {
-                $('#btnOn'+id).buttonMarkup({ icon: onIcon });
+                $("[id=btnOn"+id+"]").each(function() {
+                    $(this).button().buttonMarkup({ icon: onIcon });
+                });
             } else if(action == "off") {
-                $('#btnOn'+id).buttonMarkup({ icon: offIcon });
+                $("[id=btnOn"+id+"]").each(function() {
+                    $(this).button().buttonMarkup({ icon: offIcon });
+                });
             }
         }
     </script>
@@ -1072,22 +1079,24 @@ if (isset($r_action)) {
 
 
 
-<div data-role="page" id="Favoriten">
+<div data-role="page" id="favorites">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
         <center>
-            <a href="#Favoriten" data-role="button" data-theme="e" class="ui-disabled">Favoriten</a>
-            <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
-            <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
-            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
-            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#favorites" data-role="button" data-theme="e" class="ui-disabled">Favoriten</a>
+            <!--a href="#my-header" data-rel="close" data-role="button" data-theme="b">Favoriten</a-->
+            <a href="#devices" data-role="button" data-theme="e">Geräte</a>
+            <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#rooms" data-role="button" data-theme="e">Räume</a>
+            <a href="#timers" data-role="button" data-theme="e">Timer</a>
+            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
-                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
-                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+                <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
-            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
+            <a href="#favorites" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
 
@@ -1204,6 +1213,7 @@ if (isset($r_action)) {
 	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>">Aus</button>
 	                    </div>
                     </div>
+                    <p><?php echo $device->room; ?></p>
                 </li>
 
 <?php
@@ -1223,22 +1233,23 @@ if (isset($r_action)) {
 
 
 
-<div data-role="page" id="Geräte">
+<div data-role="page" id="devices">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
 	    <center>
-            <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
-            <a href="#Geräte" data-role="button" data-theme="e" class="ui-disabled">Geräte</a>
-            <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
-            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
-            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
+            <a href="#devices" data-role="button" data-theme="e" class="ui-disabled">Geräte</a>
+            <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#rooms" data-role="button" data-theme="e">Räume</a>
+            <a href="#timers" data-role="button" data-theme="e">Timer</a>
+            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
-                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
-                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+                <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
-            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
+            <a href="#devices" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
  
@@ -1405,22 +1416,23 @@ if (isset($r_action)) {
 
 
 
-<div data-role="page" id="Gruppen">
+<div data-role="page" id="groups">
     
     <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
         <center>
-            <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
-            <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
-            <a href="#Gruppen" data-role="button" data-theme="e" class="ui-disabled">Gruppen</a>
-            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
-            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
+            <a href="#devices" data-role="button" data-theme="e">Geräte</a>
+            <a href="#groups" data-role="button" data-theme="e" class="ui-disabled">Gruppen</a>
+            <a href="#rooms" data-role="button" data-theme="e">Räume</a>
+            <a href="#timers" data-role="button" data-theme="e">Timer</a>
+            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
-                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
-                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+                <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
-            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
+            <a href="#groups" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
 
@@ -1491,22 +1503,23 @@ if (isset($r_action)) {
 
 
 
-<div data-role="page" id="Räume">
+<div data-role="page" id="rooms">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
 	    <center>
-            <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
-            <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
-            <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
-            <a href="#Räume" data-role="button" data-theme="e" class="ui-disabled">Räume</a>
-            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
+            <a href="#devices" data-role="button" data-theme="e">Geräte</a>
+            <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#rooms" data-role="button" data-theme="e" class="ui-disabled">Räume</a>
+            <a href="#timers" data-role="button" data-theme="e">Timer</a>
+            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
-                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
-                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+                <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
-            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
+            <a href="#rooms" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
  
@@ -1560,22 +1573,167 @@ if (isset($r_action)) {
 
 
 
-<div data-role="page" id="Einstellungen">
+<div data-role="page" id="timers">
+
+    <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
+       <center>
+            <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
+            <a href="#devices" data-role="button" data-theme="e">Geräte</a>
+            <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#rooms" data-role="button" data-theme="e">Räume</a>
+            <a href="#timers" data-role="button" data-theme="e" class="ui-disabled">Timer</a>
+            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <br />
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+            </div>
+            <br />
+            <a href="#timers" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
+        </center>
+    </div><!-- /panel -->
+ 
+       
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#mypanel">Menu</a>
+        <h1>Timer</h1>
+        <a href="#newtimer" data-rel="dialog" data-transition="slidedown">+</a>
+    </div><!-- /header -->
+
+
+    <div data-role="content"> 
+        <ul data-role="listview" data-divider-theme="e" data-inset="false">
+
+<?php
+    foreach($xml->timers->timer as $timer) {
+?>
+
+                <li data-theme="c">
+                    <div class="ui-grid-a">
+                       <div class="ui-block-a" style="text-align:left">
+<?php
+    if($timer->type=="device") {
+        foreach($xml->devices->device as $tmp_device) {
+            //echo $timer->tid."-".$tmp_device->id."<br>";
+            if ((string)$timer->typeid === (string)$tmp_device->id) {
+                echo $tmp_device->name;
+                $tmp_room = $tmp_device->room;
+            }      
+        }
+    }
+    if($timer->type=="group") {
+        foreach($xml->groups->group as $tmp_group) {
+            //echo $timer->tid."-".$tmp_device->id."<br>";
+            if ((string)$timer->typeid === (string)$tmp_group->id) {
+                echo $tmp_group->name;
+            }      
+        }
+    }
+    if($timer->type=="room") {
+        echo $timer->typeid;
+    }
+?>
+                        </div>
+                        <div class="ui-block-b" style="text-align:right">
+                            <a href="#newtimer" data-role="button" data-mini="true" data-inline="true" data-theme="r" data-rel="dialog" data-transition="slidedown">Edit</a>
+                        </div>
+                    </div>
+                    <p></p>
+                    <p><b>Typ: </b>
+<?php
+    switch ($timer->type) {
+        case "device":
+            echo "Gerät";
+            break;
+        case "group":
+            echo "Gruppe";
+            break;
+        case "room":
+            echo "Raum";
+            break;
+        default:
+            echo "unbekannt";
+            break;
+    }
+?>
+                    </p>
+<?php 
+                    if($timer->type=="device") {
+                       echo "<p><b>Raum: </b>".$tmp_room."</p>";
+                    }
+?>
+                    <p><b>Tage: </b>
+<?php 
+    echo $timer->day;
+?>                             
+                    </p>
+                    <p><b>An: </b>
+<?php
+    switch ($timer->timerOn) {
+        case "SD":
+            echo "Sonnenuntergang";
+            break;
+        case "SU":
+            echo "Sonnenaufgang";
+            break;
+        default:
+            echo $timer->timerOn." Uhr";
+            break;
+    }
+?>
+                    </p>
+                    <p><b>Aus: </b>
+<?php
+    switch ($timer->timerOff) {
+        case "SD":
+            echo "Sonnenuntergang";
+            break;
+        case "SU":
+            echo "Sonnenaufgang";
+            break;
+        default:
+            echo $timer->timerOff." Uhr";
+            break;
+    }
+?>
+                    </p>
+                </li>
+
+<?php
+    }
+?>
+   
+         </ul>
+    </div><!-- /content -->
+</div><!-- /page -->
+
+
+
+
+
+
+
+
+
+
+
+<div data-role="page" id="configurations">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="reveal" data-theme="a">
         <center>
-            <a href="#Favoriten" data-role="button" data-theme="e">Favoriten</a>
-            <a href="#Geräte" data-role="button" data-theme="e">Geräte</a>
-            <a href="#Gruppen" data-role="button" data-theme="e">Gruppen</a>
-            <a href="#Räume" data-role="button" data-theme="e">Räume</a>
-            <a href="#Einstellungen" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
+            <a href="#devices" data-role="button" data-theme="e">Geräte</a>
+            <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
+            <a href="#rooms" data-role="button" data-theme="e">Räume</a>
+            <a href="#timers" data-role="button" data-theme="e">Timer</a>
+            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
-                <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
-                <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
+                <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
+                <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
-            <a href="#my-header" data-role="button" data-theme="a" data-rel="close">Schliessen</a>
+            <a href="#configurations" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
 
@@ -1674,6 +1832,148 @@ if (isset($r_action)) {
         </form>
     </div><!-- /content -->
 </div><!-- /page -->
+
+
+
+
+
+
+<div data-role="page" id="newtimer" data-theme="e" data-close-btn="none">
+
+    <div data-role="header">
+        <h1>Neuer Timer</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">
+        <form id="newtimerform" method="post">
+            <div data-role="fieldcontain">
+              
+              
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-mini="true" data-type="horizontal">
+                   <legend>Typ:</legend>
+                        <input type="radio" name="timertype" id="radio-choice-1" value="device" checked="checked" />
+                        <label for="radio-choice-1">Gerät</label>
+            
+                        <input type="radio" name="timertype" id="radio-choice-2" value="group"  />
+                        <label for="radio-choice-2">Gruppe</label>
+            
+                        <input type="radio" name="timertype" id="radio-choice-3" value="room"  />
+                        <label for="radio-choice-3">Raum</label>
+            
+                </fieldset>
+            </div>
+
+              
+              
+               <label for="ID">ID:</label>
+               <input type="text" name="ID" id="ID" value="" />
+               <br/>
+              
+               <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-mini="true" data-type="horizontal">
+                   <legend>Tage:</legend>
+                        <input type="checkbox" name="timertype" id="radio-choice-1" value="0" />
+                        <label for="radio-choice-1">M</label>
+            
+                        <input type="checkbox" name="timertype" id="radio-choice-2" value="1" />
+                        <label for="radio-choice-2">D</label>
+            
+                        <input type="checkbox" name="timertype" id="radio-choice-3" value="2" />
+                        <label for="radio-choice-3">M</label>
+            
+                        <input type="checkbox" name="timertype" id="radio-choice-4" value="3" />
+                        <label for="radio-choice-4">D</label>
+            
+                        <input type="checkbox" name="timertype" id="radio-choice-5" value="4" />
+                        <label for="radio-choice-5">F</label>
+            
+                        <input type="checkbox" name="timertype" id="radio-choice-6" value="5" />
+                        <label for="radio-choice-6">S</label>
+            
+                        <input type="checkbox" name="timertype" id="radio-choice-7" value="6" />
+                        <label for="radio-choice-7">S</label>
+            
+                </fieldset>
+            </div>
+              
+           <div data-role="fieldcontain">
+                <label for="OnTimerSun">An:</label>
+                <select name="OnTimerSun" id="OnTimerSun" data-mini="true">
+                    <option>Automatik</option>
+                    <option>Sonnenaufgang</option>
+                    <option>Sonnenuntergang</option>
+                </select>
+                                   
+                <fieldset id="timer-an-zeit" data-role="controlgroup" data-type="horizontal">
+                    <legend> </legend>
+               
+                    <label for="OnTimerHH">Stunden</label>
+                    <select name="OnTimerHH" id="OnTimerHH" data-mini="true">
+                        <option>Stunden</option>
+                        <?php
+                        for ($i = 0; $i <= 23; $i++) {
+                         echo "<option value='".sprintf ("%02d", $i)."'>".sprintf ("%02d", $i)."</option>";
+                     }
+                     ?>
+                    </select>
+               
+                    <label for="OnTimerMM">Minuten</label>
+                    <select name="OnTimerMM" id="OnTimerMM" data-mini="true">
+                        <option>Minuten</option>
+                        <?php
+                        for ($i = 0; $i <= 59; $i++) {
+                         echo "<option value='".sprintf ("%02d", $i)."'>".sprintf ("%02d", $i)."</option>";
+                     }
+                     ?>
+                    </select>
+
+                </fieldset>
+            </div>
+
+            <div data-role="fieldcontain">
+                <label for="OffTimerSun">Aus:</label>
+                <select name="OffTimerSun" id="OffTimerSun" data-mini="true">
+                    <option>Automatik</option>
+                    <option>Sonnenaufgang</option>
+                    <option>Sonnenuntergang</option>
+                </select>
+ 
+                 <fieldset id="timer-aus-zeit" data-role="controlgroup" data-type="horizontal">
+                    <legend> </legend>
+               
+                    <label for="OffTimerHH">Stunden</label>
+                    <select name="OffTimerHH" id="OffTimerHH" data-mini="true">
+                        <option>Stunden</option>
+                        <?php
+                        for ($i = 0; $i <= 23; $i++) {
+                         echo "<option value='".sprintf ("%02d", $i)."'>".sprintf ("%02d", $i)."</option>";
+                     }
+                     ?>
+                    </select>
+               
+                    <label for="OffTimerMM">Minuten</label>
+                    <select name="OffTimerMM" id="OffTimerMM" data-mini="true">
+                        <option>Minuten</option>
+                        <?php
+                        for ($i = 0; $i <= 59; $i++) {
+                         echo "<option value='".sprintf ("%02d", $i)."'>".sprintf ("%02d", $i)."</option>";
+                     }
+                     ?>
+                    </select>
+                  
+                </fieldset>
+            </div>
+              
+
+           </div>
+           <input type="submit" value="Speichern" data-theme="g"/>
+            <a href="#" data-role="button" data-rel="back" data-theme="r">Abbrechen</a>
+        </form>
+    </div><!-- /content -->
+</div><!-- /page -->
+
+
 
 
 </body>
