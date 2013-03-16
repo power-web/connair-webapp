@@ -679,11 +679,16 @@ function timer_check() {
             // On Timer
             switch ($timer->timerOn) {
                 case "SU":
-                debug();
                     $OnTimer = $sunrise;
+                    if(!empty($timer->timerOn[offset])) {
+                        $OnTimer += ($timer->timerOn[offset]*60);
+                    }
                     break;
                 case "SD":
                     $OnTimer = $sunset;
+                    if(!empty($timer->timerOn[offset])) {
+                        $OnTimer += ($timer->timerOn[offset]*60);
+                    }
                     break;
                 default:
                     $OnTimer = strtotime($timer->timerOn);
@@ -692,9 +697,15 @@ function timer_check() {
             switch ($timer->timerOff) {
                 case "SU":
                     $OffTimer = $sunrise;
+                    if(!empty($timer->timerOff[offset])) {
+                        $OffTimer += ($timer->timerOff[offset]*60);
+                    }
                     break;
                 case "SD":
                     $OffTimer = $sunset;
+                    if(!empty($timer->timerOff[offset])) {
+                        $OffTimer += ($timer->timerOff[offset]*60);
+                    }
                     break;
                 default:
                     $OffTimer = strtotime($timer->timerOff);
@@ -703,8 +714,8 @@ function timer_check() {
             // Prüfen, ob aktueller Tag mit dem OnTimer Tag zulässig ist
             $checkDayOn = strpos("MDTWFSS",$timerday[$nowday]);
             if (is_numeric($checkDayOn)) {
-//                debug("Timer Tag stimmt (ON) ".$timer->id);
-//                debug("TimerID:".$timer->id." OnTimer ".date('H:i', $OnTimer)." Von ".date('H:i', $timeWindowStart)." - ".date('H:i', $timeWindowStop));
+                // debug("Timer Tag stimmt (ON) ".$timer->id);
+                // debug("++++TimerID:".$timer->id." OnTimer ".date('H:i', $OnTimer)." Von ".date('H:i', $timeWindowStart)." - ".date('H:i', $timeWindowStop));
                 // Tag gültig -> Prüfen, ob On Timer innerhalb des Zeitfensters liegt
                 if (($OnTimer >= $timeWindowStart) && ($OnTimer <= $timeWindowStop)) {
                     // Timer liegt innerhalb des Zeitfensters -> Schaltungen durchführen
@@ -1509,7 +1520,7 @@ location.reload();
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left">
 	                    <?php 
-	                    	if($debug) {
+	                    	if($debug == "true") {
 	                    		echo "<h3>".$device->name."</h3>";
 	                    		echo "<p><i>".$device->id." ".$device->vendor." ".$device->address->masterdip." ".$device->address->slavedip."</i></p>";
 	                    	} else {
