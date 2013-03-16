@@ -6,7 +6,12 @@
     </global>
     <gui>
         <showDeviceStatus>OFF</showDeviceStatus>
+        <showRoomButtonInDevices>OFF</showRoomButtonInDevices>
         <showMenuOnLoad>true</showMenuOnLoad>
+        <sortOrderDevices>SORT_BY_NAME</sortOrderDevices>
+        <sortOrderGroups>SORT_BY_NAME</sortOrderGroups>
+        <sortOrderRooms>SORT_BY_NAME</sortOrderRooms>
+        <sortOrderTimers>SORT_BY_TYPE_AND_NAME</sortOrderTimers>
     </gui>
     <connairs>
         <connair>
@@ -57,7 +62,7 @@
         <device>
             <id>3</id>
             <name>gro&#xDF;e Papierlampe</name>
-            <vendor>intertechno</vendor>
+            <vendor>raw</vendor>
             <address>
                 <masterdip/>
                 <slavedip/>
@@ -67,7 +72,7 @@
             </address>
             <room>Wohnzimmer</room>
             <favorite>true</favorite>
-            <status>OFF</status>
+            <status>ON</status>
         </device>
     </devices>
     <groups>

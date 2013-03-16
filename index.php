@@ -1,5 +1,7 @@
 <?php
 
+$directaccess = true;
+
 //voraussetzungen
 if(phpversion() < '5.3.0') {
     echo "please use php >= 5.3.x";
@@ -24,20 +26,8 @@ http://isn-systems.com/tools/it2elro/
 */
 
 
-//config.xml einlesen
-libxml_use_internal_errors(true);
-$xml = simplexml_load_file('config.xml');
-if (!$xml) {
-    echo "Laden des XML fehlgeschlagen\n";
-    foreach(libxml_get_errors() as $error) {
-        echo "\t", $error->message;
-    }
-    exit(1);
-}
+require("config.php");
 
-
-//globale variabeln
-$debug=empty($xml["debug"]) ? "false" : $xml["debug"];
 $authentificated=false;
 $errormessage="";
 
@@ -47,7 +37,7 @@ function debug($msg) {
     global $debug;
     if($debug == "true") {
 		$file = 'debug.log';
-        $handle = fopen ($file, 'a+');
+        $handle = fopen ($file, 'a');
         fwrite($handle, date("Y-m-d H:i:s")." ".$_SERVER['REMOTE_ADDR']." ".$_SERVER['REQUEST_TIME']."   ".$msg."\r\n");
         fclose($handle);
     }
@@ -97,6 +87,74 @@ if( clientInSameSubnet() ) {
     exit;
 }
 */
+
+
+function compareDevicesByName($a, $b) {
+   return strcmp($a->name,$b->name);
+}
+function compareDevicesByID($a, $b) {
+   return strcmp($a->id,$b->id);
+}
+function compareDevicesByRoom($a, $b) {
+   return strcmp($a->room,$b->room);
+}
+function compareGroupsByName($a, $b) {
+   return strcmp($a->name,$b->name);
+}
+function compareGroupsByID($a, $b) {
+   return strcmp($a->id,$b->id);
+}
+function compareTimersByTypeAndName($a, $b) {
+    global $xml;
+    switch($a->type) {
+        case "device":
+            $devicesFound = $xml->xpath("//devices/device/id[text()='".$a->typeid."']/parent::*");
+            $deviceA = $devicesFound[0];
+            $nameA = $deviceA->name;
+            break;
+        case "group":
+            $groupsFound = $xml->xpath("//groups/group/id[text()='".$a->typeid."']/parent::*");
+            $groupA = $groupsFound[0];
+            $nameA = $groupA->name;
+            break;
+        case "room":
+            $nameA = $a->typeid;
+            break;
+        default:
+            $nameA = $a->id;
+            break;
+    }
+    switch($b->type) {
+        case "device":
+            $devicesFound = $xml->xpath("//devices/device/id[text()='".$b->typeid."']/parent::*");
+            $deviceB = $devicesFound[0];
+            $nameB = $deviceB->name;
+            break;
+        case "group":
+            $groupsFound = $xml->xpath("//groups/group/id[text()='".$b->typeid."']/parent::*");
+            $groupB = $groupsFound[0];
+            $nameB = $groupB->name;
+            break;
+        case "room":
+            $nameB = $b->typeid;
+            break;
+        default:
+            $nameB = $b->id;
+            break;
+    }
+    return strcmp($nameA,$nameB);
+}
+function compareTimersByID($a, $b) {
+   return strcmp($a->id,$b->id);
+}
+function compareTimersByType($a, $b) {
+    $cmp = strcmp($a->type,$b->type);
+    if($cmp == 0) {
+        $cmp = compareTimersByName($a, $b);
+    }
+    return $cmp;
+}
+
 
 
 function connair_send($msg) {
@@ -416,15 +474,22 @@ function cul_send($msg) {
     $len = strlen($msg);
     foreach($xml->culs->cul as $cul) {
         debug("Sending Message '".$msg."' to CUL ".(string)$cul->device);
-        $handle = fopen((string)$cul->device, "w");
-        if(!$handle) {
-            echo "error opening CUL ".(string)$cul->device."\n";
-            $errormessage="error opening CUL ".(string)$cul->device."\n";
-            return;
+        if(is_writable((string)$cul->device)) {
+            $handle = fopen((string)$cul->device, "wb");
+            if(!$handle) {
+                $errormessage="CUL Device ".(string)$cul->device." ist nicht schreibbar!\n";
+                debug($errormessage);
+                echo $errormessage;
+                continue;
+            }
+            fwrite($handle, $msg, $len);
+            fclose($handle);
+            $errormessage="Befehl an CUL gesendet \n";
+        } else {
+            $errormessage="CUL Device ".(string)$cul->device." ist nicht schreibbar!\n";
+            debug($errormessage);
+            echo $errormessage;
         }
-        fwrite($handle, $msg, $len);
-        fclose($handle);
-        $errormessage="Befehl an CUL gesendet \n";
     }
 }
 
@@ -557,10 +622,12 @@ function send_message($device, $action) {
     //wenn connairs configuriert senden
     if($xml->connairs->count() > 0) {
         $msg="";
-        if ($action=="ON" && !empty($device->address->rawCodeOn)) {
-            $msg = $device->address->rawCodeOn;
-        } else if ($action=="OFF" && !empty($device->address->rawCodeOff)) {
-            $msg = $device->address->rawCodeOff;
+        if ($vendor=="raw") {
+            if ($action=="ON") {
+                $msg = $device->address->rawCodeOn;
+            } else {
+                $msg = $device->address->rawCodeOff;
+            }    
         } else if ($vendor=="brennenstuhl") {
             $msg = connair_create_msg_brennenstuhl($device, $action);
         } else if ($vendor=="intertechno") {
@@ -680,6 +747,7 @@ function timer_check() {
                             usleep(300000);
                         }
                     }
+                    config_save();
                 }
             }
             ###### Timer Off bearbeiten ############
@@ -719,10 +787,10 @@ function timer_check() {
                         foreach($groupsFound[0]->deviceid as $deviceid) {
                             $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
                             $device = $devicesFound[0];
-                            if(empty($deviceid['onaction'])) {
+                            if(empty($deviceid['offaction'])) {
                                 send_message($device, $action);
                             } else {
-                                switch ($deviceid['onaction']) {
+                                switch ($deviceid['offaction']) {
                                     case "on":
                                         send_message($device, "ON");
                                         break;
@@ -736,7 +804,8 @@ function timer_check() {
                             usleep(300000);
                         }
                     }
-                }             
+                    config_save();
+                }           
             }
         }
     }
@@ -762,7 +831,7 @@ if (isset($_GET['action'])) {
 }
 // Über Timerfunktion -> GET
 if (isset($_GET['timerrun'])) {
-    timer_check();   
+    timer_check();
     exit();
 }
 
@@ -771,7 +840,17 @@ if (isset($_GET['timerrun'])) {
 if (isset($r_action)) {
     debug("Running in action='".$r_action."'");  
 
-    if (($r_action)=="alloff") {
+    if (($r_action)=="editdevice") {
+        
+        
+        
+
+    } else if (($r_action)=="edittimer") {
+        
+        
+        
+
+    } else if (($r_action)=="alloff") {
         foreach($xml->devices->device as $device) {
             send_message($device, "OFF");
             usleep(300000);
@@ -845,7 +924,7 @@ if (isset($r_action)) {
         }
         echo $errormessage;
     }
-    $xml->asXML("config.xml"); 
+    config_save(); 
 } else {
     debug("Sending HTML Site");  
     header("Content-Type: text/html; charset=utf-8");
@@ -922,6 +1001,25 @@ if (isset($r_action)) {
 <?php 
 	}
 ?>
+
+        $('#newdevicesubmit').click(function (e) {
+            $.ajax({
+	            url: "edit_device.php",
+	            type: "POST",
+	            data: $('#newdeviceform').serialize(),
+                async: true,
+	            success: function(response) {
+		            //alert('response:'+response);
+		            if(response.trim()=="ok") {
+		                $('#newdevice').dialog('close');
+		                toast('gespeichert');
+		                refreshPage();
+                    } else {
+                        toast('response:'+response);
+                    }
+	            }
+            });
+	    });
     });
 </script>
 <script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0.min.js"></script>
@@ -930,6 +1028,10 @@ if (isset($r_action)) {
 
 <!-- WebApp -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scaleable=no">
+<!--
+<meta name="viewport" content="320.1, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scaleable=no">
+-->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <!-- iPhone -->
@@ -965,6 +1067,20 @@ if (isset($r_action)) {
                 }
             });
         }
+        
+        function refreshPage()
+{
+location.reload();
+/*
+    alert(window.location.href);
+    jQuery.mobile.changePage(window.location.href, {
+        allowSamePageTransition: true,
+        transition: 'none',
+        changeHash: false,
+        reloadPage: true
+    });
+*/
+}
 
         function updateTheme(newTheme) {
             var rmbtnClasses = '';
@@ -1114,6 +1230,16 @@ if (isset($r_action)) {
  
 <?php
         $groupsFound = $xml->xpath("//groups/group/favorite[text()='true']/parent::*");
+        switch ($xml->gui->sortOrderGroups){
+            case "SORT_BY_NAME":
+                usort($groupsFound, "compareGroupsByName");
+                break;
+            case "SORT_BY_ID":
+                usort($groupsFound, "compareGroupsByID");
+                break;
+            default:
+                break;
+        }
         foreach($groupsFound as $group) {
 ?>
 
@@ -1146,62 +1272,72 @@ if (isset($r_action)) {
 
 <?php
         $devicesFound = $xml->xpath("//devices/device/favorite[text()='true']/parent::*");
+        switch ($xml->gui->sortOrderDevices){
+            case "SORT_BY_NAME":
+                usort($devicesFound, "compareDevicesByName");
+                break;
+            case "SORT_BY_ID":
+                usort($devicesFound, "compareDevicesByID");
+                break;
+            default:
+                break;
+        }
         foreach($devicesFound as $device) {
 
-        switch ($xml->gui->showDeviceStatus) {
-            case "ROW_COLOR":
-                $rowOnDataTheme="g";
-                $rowOffDataTheme="r";
-                if($device->status=='ON') {
-                    $rowDataTheme=$rowOnDataTheme;
-                } else {
-                    $rowDataTheme=$rowOffDataTheme;
-                }
-                $btnOnDataTheme="g";
-                $btnOffDataTheme="r";
-                $btnOnIcon="";
-                $btnOnJS="send_connair('on','device','".$device->id."'); switchRowTheme('on','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
-                $btnOffJS="send_connair('off','device','".$device->id."'); switchRowTheme('off','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
-            break;
-            case "BUTTON_COLOR":
-                $rowDataTheme="c";
-                $btnOnColor="g";
-                $btnOffColor="r";
-                $btnCurColor="e";
-                if($device->status=='ON') {
-                    $btnOnDataTheme=$btnOnColor;
-                    $btnOffDataTheme=$btnCurColor;
-                } else {
-                    $btnOnDataTheme=$btnCurColor;
-                    $btnOffDataTheme=$btnOffColor;
-                }
-                $btnOnIcon="";
-                $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonTheme('on','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
-                $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonTheme('off','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
-            break;
-            case "BUTTON_ICON":
-                $onIcon="check";
-                $offIcon="off";
-                $rowDataTheme="c";
-                $btnOnDataTheme="g";
-                $btnOffDataTheme="r";
-                if($device->status=='ON') {
-                    $btnOnIcon=$onIcon;
-                } else {
-                    $btnOnIcon=$offIcon;
-                }
-                $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonIcon('on','".$device->id."','".$onIcon."','".$offIcon."')";
-                $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonIcon('off','".$device->id."','".$onIcon."','".$offIcon."')";
-            break;
-            default:
-                $rowDataTheme="c";
-                $btnOnDataTheme="g";
-                $btnOffDataTheme="r";
-                $btnOnIcon="";
-                $btnOnJS="send_connair('on','device','".$device->id."')";
-                $btnOffJS="send_connair('off','device','".$device->id."')";
-            break;
-        }
+            switch ($xml->gui->showDeviceStatus) {
+                case "ROW_COLOR":
+                    $rowOnDataTheme="g";
+                    $rowOffDataTheme="r";
+                    if($device->status=='ON') {
+                        $rowDataTheme=$rowOnDataTheme;
+                    } else {
+                        $rowDataTheme=$rowOffDataTheme;
+                    }
+                    $btnOnDataTheme="g";
+                    $btnOffDataTheme="r";
+                    $btnOnIcon="";
+                    $btnOnJS="send_connair('on','device','".$device->id."'); switchRowTheme('on','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
+                    $btnOffJS="send_connair('off','device','".$device->id."'); switchRowTheme('off','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
+                break;
+                case "BUTTON_COLOR":
+                    $rowDataTheme="c";
+                    $btnOnColor="g";
+                    $btnOffColor="r";
+                    $btnCurColor="e";
+                    if($device->status=='ON') {
+                        $btnOnDataTheme=$btnOnColor;
+                        $btnOffDataTheme=$btnCurColor;
+                    } else {
+                        $btnOnDataTheme=$btnCurColor;
+                        $btnOffDataTheme=$btnOffColor;
+                    }
+                    $btnOnIcon="";
+                    $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonTheme('on','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
+                    $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonTheme('off','".$device->id."','".$btnOnColor."','".$btnOffColor."','".$btnCurColor."')";
+                break;
+                case "BUTTON_ICON":
+                    $onIcon="check";
+                    $offIcon="off";
+                    $rowDataTheme="c";
+                    $btnOnDataTheme="g";
+                    $btnOffDataTheme="r";
+                    if($device->status=='ON') {
+                        $btnOnIcon=$onIcon;
+                    } else {
+                        $btnOnIcon=$offIcon;
+                    }
+                    $btnOnJS="send_connair('on','device','".$device->id."'); switchButtonIcon('on','".$device->id."','".$onIcon."','".$offIcon."')";
+                    $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonIcon('off','".$device->id."','".$onIcon."','".$offIcon."')";
+                break;
+                default:
+                    $rowDataTheme="c";
+                    $btnOnDataTheme="g";
+                    $btnOffDataTheme="r";
+                    $btnOnIcon="";
+                    $btnOnJS="send_connair('on','device','".$device->id."')";
+                    $btnOffJS="send_connair('off','device','".$device->id."')";
+                break;
+            }
 
 ?>
 
@@ -1273,17 +1409,38 @@ if (isset($r_action)) {
         }
         $roomDevices[$curRoom][] = $device;
     }
-    ksort($roomDevices);
+    switch ($xml->gui->sortOrderRooms){
+        case "SORT_BY_NAME":
+            ksort($roomDevices);
+            break;
+        default:
+            break;
+    }
     foreach($roomDevices as $room => $devices) {
-        sort($devices);
+        switch ($xml->gui->sortOrderDevices){
+            case "SORT_BY_NAME":
+                usort($devices, "compareDevicesByName");
+                break;
+            case "SORT_BY_ID":
+                usort($devices, "compareDevicesByID");
+                break;
+            default:
+                break;
+        }
 ?>
 
             <li data-role="list-divider" role="heading" data-theme="a">
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
+<?php
+    if($xml->gui->showRoomButtonInDevices == "true") {
+?>
 	                        <button data-theme="a"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
 	                        <button data-theme="a"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
+<?php
+    }
+?>
 	                    </div>
                     </div>
             </li>
@@ -1446,7 +1603,21 @@ if (isset($r_action)) {
         <ul data-role="listview" data-divider-theme="e" data-inset="false">
  
 <?php
+    $groups = array();
     foreach($xml->groups->group as $group) {
+        $groups[] = $group;
+    }
+    switch ($xml->gui->sortOrderGroups){
+        case "SORT_BY_NAME":
+            usort($groups, "compareGroupsByName");
+            break;
+        case "SORT_BY_ID":
+            usort($groups, "compareGroupsByID");
+            break;
+        default:
+            break;
+    }
+    foreach($groups as $group) {
 ?>
 
             <li data-theme="c">
@@ -1542,7 +1713,13 @@ if (isset($r_action)) {
         }
         $roomDevices[$curRoom][] = $device;
     }
-    ksort($roomDevices);
+    switch ($xml->gui->sortOrderRooms){
+        case "SORT_BY_NAME":
+            ksort($roomDevices);
+            break;
+        default:
+            break;
+    }
     foreach($roomDevices as $room => $devices) {
 ?>
 
@@ -1605,7 +1782,24 @@ if (isset($r_action)) {
         <ul data-role="listview" data-divider-theme="e" data-inset="false">
 
 <?php
+    $timers = array();
     foreach($xml->timers->timer as $timer) {
+        $timers[] = $timer;
+    }
+    switch ($xml->gui->sortOrderTimers){
+        case "SORT_BY_NAME":
+            usort($timers, "compareTimersByName");
+            break;
+        case "SORT_BY_ID":
+            usort($timers, "compareTimersByID");
+            break;
+        case "SORT_BY_TYPE_AND_NAME":
+            usort($timers, "compareTimersByTypeAndName");
+            break;
+        default:
+            break;
+    }
+    foreach($timers as $timer) {
 ?>
 
                 <li data-theme="c">
@@ -1799,7 +1993,8 @@ if (isset($r_action)) {
     </div><!-- /header -->
 
     <div data-role="content">
-        <form id="newdeviceform" method="post">
+        <form id="newdeviceform" method="post" data-ajax="false">
+            <input type="hidden" name="action" id="action" value="add" />
             <div data-role="fieldcontain">
 	            <label for="name">Name:</label>
 	            <input type="text" name="name" id="name" value="" />
@@ -1807,8 +2002,14 @@ if (isset($r_action)) {
 	            <label for="name">Raum:</label>
 	            <input type="text" name="room" id="room" value="" />
 	            <br/>
-	            <label for="name">Hersteller:</label>
-	            <input type="text" name="vendor" id="vendor" value="" />
+	            <div data-role="fieldcontain">
+                    <label for="vendor">Hersteller:</label>
+                    <select name="vendor" id="vendor">
+                        <option value="Brennenstuhl">Brennenstuhl</option>
+                        <option value="Elro">Elro</option>
+                        <option value="Intertechno">Intertechno</option>
+                    </select>
+                </div>
 	            <br/>
 	            <label for="name">Masterdip:</label>
 	            <input type="text" name="masterdip" id="masterdip" value="" />
@@ -1827,12 +2028,14 @@ if (isset($r_action)) {
                     </select> 
                 </div>
 	        </div>
-	        <input type="submit" value="Speichern" data-theme="g"/>
+            <a href="#" id="newdevicesubmit" data-role="button" data-theme="g">Speichern</a>
             <a href="#" data-role="button" data-rel="back" data-theme="r">Abbrechen</a>
         </form>
     </div><!-- /content -->
 </div><!-- /page -->
+<script type="text/javascript">
 
+</script>
 
 
 
