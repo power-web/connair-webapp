@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <config debug="true">
     <global>
-       <longitude>9.44858</longitude>
-       <latitude>48.64727</latitude>
+        <timezone>Europe/Berlin</timezone>
+        <longitude>9.44858</longitude>
+        <latitude>48.64727</latitude>
     </global>
     <gui>
         <showDeviceStatus>OFF</showDeviceStatus>
-        <showRoomButtonInDevices>OFF</showRoomButtonInDevices>
+        <showRoomButtonInDevices>false</showRoomButtonInDevices>
         <showMenuOnLoad>true</showMenuOnLoad>
         <sortOrderDevices>SORT_BY_NAME</sortOrderDevices>
         <sortOrderGroups>SORT_BY_NAME</sortOrderGroups>

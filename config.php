@@ -43,6 +43,10 @@ function config_save() {
     $dom->save($CONFIG_FILENAME);
 }
 
+function check_config_global() {
+    return true;
+}
+
 function check_device($device) {
     if(empty($device->id)) {
         echo "Device-ID darf nicht leer sein!";

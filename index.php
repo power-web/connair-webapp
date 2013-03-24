@@ -2,23 +2,13 @@
 
 $directaccess = true;
 
-//voraussetzungen
-if(phpversion() < '5.3.0') {
-    echo "please use php >= 5.3.x";
-    exit;
-}
-
-
-// Suppress DateTime warnings
-date_default_timezone_set(@date_default_timezone_get());
-
-
 /*
 Hilfreiche Links:
 
 Dev:
 http://developer.apple.com/library/safari/#documentation/iPhone/Conceptual/SafariJSDatabaseGuide/OfflineApplicationCache/OfflineApplicationCache.html
 http://jquerymobile.com/demos/1.0rc2/docs/pages/page-cache.html
+http://code.google.com/p/jqueryrotate/
 
 Config:
 http://www.fhemwiki.de/wiki/Intertechno_Code_Berechnung
@@ -26,7 +16,14 @@ http://isn-systems.com/tools/it2elro/
 */
 
 
+// Suppress DateTime warnings
+date_default_timezone_set(@date_default_timezone_get());
+
 require("config.php");
+
+if(!empty($xml->global->timezone)) {
+    date_default_timezone_set($xml->global->timezone);
+}
 
 $authentificated=false;
 $errormessage="";
@@ -154,7 +151,9 @@ function compareTimersByType($a, $b) {
     }
     return $cmp;
 }
-
+function compareTimersByName($a, $b) {
+   return strcmp($a->name,$b->name);
+}
 
 
 function connair_send($msg) {
@@ -620,7 +619,7 @@ function send_message($device, $action) {
     global $xml;
     $vendor=strtolower($device->vendor);
     //wenn connairs configuriert senden
-    if($xml->connairs->count() > 0) {
+    if(@count($xml->connairs->children()) > 0) {
         $msg="";
         if ($vendor=="raw") {
             if ($action=="ON") {
@@ -641,7 +640,7 @@ function send_message($device, $action) {
         }
     }
     //wenn CULS Configuriert auch über die senden
-    if($xml->culs->count() > 0) {
+    if(@count($xml->culs->children()) > 0) {
         $msg="";
         if ($vendor=="intertechno" && !empty($device->address->masterdip) && !empty($device->address->slavedip)) {
             $msg = cul_create_msg_intertechno($device, $action);
@@ -657,7 +656,7 @@ function send_message($device, $action) {
 function timer_check() {
 //    debug("Timer Checking...");
     global $xml;
-    if($xml->timers->count() > 0 ) {
+    if(@count($xml->timers->children()) > 0 ) {
         // Sonnenauf- und -untergangskonfiguration (sunrise = Sonnenaufgang = SU (Sun Up) // sunset = Sonnenuntergang = SD (Sun Down)
         $latitude=empty($xml->global->latitude) ? 48.64727 : ($xml->global->latitude)*1;
         $longitude=empty($xml->global->longitude) ? 9.44858 : ($xml->global->longitude)*1;
@@ -976,6 +975,15 @@ if (isset($r_action)) {
 .ui-grid-a .ui-block-a { clear: left; }
 */
 
+.hide {
+    visibility:hidden;
+    display:none;
+}
+.show {
+    visibility:visible;
+    display:inline;
+}
+
 </style>
 
     
@@ -1003,11 +1011,6 @@ if (isset($r_action)) {
 ?>
             setTimeout(function() {
                 $.mobile.activePage.find('#mypanel').panel( "open" );
-/*
-                setTimeout(function() {
-                    $.mobile.activePage.find('#mypanel').panel( "close" );
-                }, 1000);
-*/
             }, 1000);
 <?php 
 	}
@@ -1023,6 +1026,24 @@ if (isset($r_action)) {
 		            //alert('response:'+response);
 		            if(response.trim()=="ok") {
 		                $('#newdevice').dialog('close');
+		                toast('gespeichert');
+		                refreshPage();
+                    } else {
+                        toast('response:'+response);
+                    }
+	            }
+            });
+	    });
+
+
+        $('#editconfigsubmit').click(function (e) {
+            $.ajax({
+	            url: "edit_config.php",
+	            type: "POST",
+	            data: $('#editconfigform').serialize(),
+                async: true,
+	            success: function(response) {
+		            if(response.trim()=="ok") {
 		                toast('gespeichert');
 		                refreshPage();
                     } else {
@@ -1216,7 +1237,7 @@ location.reload();
             <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
             <a href="#rooms" data-role="button" data-theme="e">Räume</a>
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
-            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
@@ -1389,7 +1410,7 @@ location.reload();
             <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
             <a href="#rooms" data-role="button" data-theme="e">Räume</a>
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
-            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
@@ -1593,7 +1614,7 @@ location.reload();
             <a href="#groups" data-role="button" data-theme="e" class="ui-disabled">Gruppen</a>
             <a href="#rooms" data-role="button" data-theme="e">Räume</a>
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
-            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
@@ -1694,7 +1715,7 @@ location.reload();
             <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
             <a href="#rooms" data-role="button" data-theme="e" class="ui-disabled">Räume</a>
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
-            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
@@ -1770,7 +1791,7 @@ location.reload();
             <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
             <a href="#rooms" data-role="button" data-theme="e">Räume</a>
             <a href="#timers" data-role="button" data-theme="e" class="ui-disabled">Timer</a>
-            <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
+            <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
@@ -1949,41 +1970,118 @@ location.reload();
 
    
     <div data-role="content">  
-        <div data-role="controlgroup" data-type="horizontal">
-            <a href="index.html" data-role="button" data-theme="g">I</a>
-            <a href="index.html" data-role="button" data-theme="r">0</a>
-        </div>
-        <div data-role="controlgroup" data-mini="true" data-type="horizontal">
-            <a href="index.html" data-role="button" data-theme="g">I</a>
-            <a href="index.html" data-role="button" data-theme="a">T</a>
-            <a href="index.html" data-role="button" data-theme="r">0</a>
-        </div>
-        <div data-role="controlgroup" data-mini="true" data-type="horizontal">
-            <a href="index.html" data-role="button" data-theme="g">An</a>
-            <a href="index.html" data-role="button" data-theme="e" data-icon="check" data-iconpos="notext"></a>
-            <a href="index.html" data-role="button" data-theme="r">Aus</a>
-        </div>
-        <div data-role="controlgroup" data-mini="true" data-type="horizontal">
-            <a href="index.html" data-role="button" data-theme="g">An</a>
-            <a href="index.html" data-role="button" data-theme="c" data-icon="minus" data-iconpos="notext"></a>
-            <a href="index.html" data-role="button" data-theme="r">Aus</a>
-        </div>
-        <button data-theme="g" data-inline="true" onclick="send_connair('on',1)">Ein</button>
-        <button data-theme="r" data-inline="true" onclick="send_connair('off',1)">Aus</button>
-        <br>
-        <button data-theme="e" data-mini="true" data-inline="true" data-icon="check" data-iconpos="notext"></button>
-        <button data-theme="g" data-mini="true" data-inline="true" onclick="send_connair('on',1)">Ein</button>
-        <button data-theme="r" data-mini="true" data-inline="true" onclick="send_connair('off',1)">Aus</button>
-        <br>
-        <button data-theme="c" data-mini="true" data-inline="true" data-icon="minus" data-iconpos="notext"></button>
-        <button data-theme="g" data-mini="true" data-inline="true" onclick="send_connair('on',1)">Ein</button>
-        <button data-theme="r" data-mini="true" data-inline="true" onclick="send_connair('off',1)">Aus</button>
-        <br>
-        <button data-theme="g"   data-inline="true" onclick="send_connair('on',1)">I</button>
-        <button data-theme="r"   data-inline="true" onclick="send_connair('off',1)">O</button>
-        <br>
-        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on',1)">I</button>
-        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off',1)">O</button>
+        
+        
+<form id="editconfigform" method="post" data-ajax="false">
+<input type="hidden" name="action" id="action" value="edit" />
+    <ul data-role="listview" data-inset="false">
+        <li data-role="list-divider" data-theme="e">
+        Global
+        <li data-role="fieldcontain">
+            <label for="debug">Debug Modus:</label>
+            <select name="debug" id="debug" data-role="slider">
+                <option value="false" <?php if($xml["debug"] == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml["debug"] == "true") { echo "selected"; } ?>>On</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="timezone">Zeitzone:</label>
+            <input name="timezone" id="timezone" value="<?php echo $xml->global->timezone; ?>" data-clear-btn="true" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="longitude">Longitude:</label>
+            <input name="longitude" id="longitude" value="<?php echo $xml->global->longitude; ?>" data-clear-btn="true" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="latitude">Latitude:</label>
+            <input name="latitude" id="latitude" value="<?php echo $xml->global->latitude; ?>" data-clear-btn="true" type="text">
+        </li>
+        <li data-role="list-divider" data-theme="e">
+        GUI
+        </li>
+        <li data-role="fieldcontain">
+            <label for="showDeviceStatus">Zeige Geräte Status:</label>
+            <select name="showDeviceStatus" id="showDeviceStatus">
+                <option value="OFF" <?php if($xml->gui->showDeviceStatus == "OFF") { echo "selected"; } ?>>OFF</option>
+                <option value="ROW_COLOR" <?php if($xml->gui->showDeviceStatus == "ROW_COLOR") { echo "selected"; } ?>>ROW_COLOR</option>
+                <option value="BUTTON_COLOR" <?php if($xml->gui->showDeviceStatus == "BUTTON_COLOR") { echo "selected"; } ?>>BUTTON_COLOR</option>
+                <option value="BUTTON_ICON" <?php if($xml->gui->showDeviceStatus == "BUTTON_ICON") { echo "selected"; } ?>>BUTTON_ICON</option>
+                <option value="BUTTON_SLIDER" <?php if($xml->gui->showDeviceStatus == "BUTTON_SLIDER") { echo "selected"; } ?>>BUTTON_SLIDER (Test)</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="showRoomButtonInDevices">Zeige Raum Schalter in der Geräteübersicht:</label>
+            <select name="showRoomButtonInDevices" id="showRoomButtonInDevices" data-role="slider">
+                <option value="false" <?php if($xml->gui->showRoomButtonInDevices == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml->gui->showRoomButtonInDevices == "true") { echo "selected"; } ?>>On</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="showMenuOnLoad">Zeige das Menu beim Starten:</label>
+            <select name="showMenuOnLoad" id="showMenuOnLoad" data-role="slider">
+                <option value="false" <?php if($xml->gui->showMenuOnLoad == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml->gui->showMenuOnLoad == "true") { echo "selected"; } ?>>On</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="sortOrderDevices" class="select">Sortierung der Geräte:</label>
+            <select name="sortOrderDevices" id="sortOrderDevices">
+                <option value="SORT_BY_NAME" <?php if($xml->gui->sortOrderDevices == "SORT_BY_NAME") { echo "selected"; } ?>>SORT_BY_NAME</option>
+                <option value="SORT_BY_ID" <?php if($xml->gui->sortOrderDevices == "SORT_BY_ID") { echo "selected"; } ?>>SORT_BY_ID</option>
+                <option value="SORT_BY_XML" <?php if($xml->gui->sortOrderDevices != "SORT_BY_NAME" && $xml->gui->sortOrderDevices != "SORT_BY_ID") { echo "selected"; } ?>>SORT_BY_XML</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="sortOrderGroups" class="select">Sortierung der Gruppen:</label>
+            <select name="sortOrderGroups" id="sortOrderGroups">
+                <option value="SORT_BY_NAME" <?php if($xml->gui->sortOrderGroups == "SORT_BY_NAME") { echo "selected"; } ?>>SORT_BY_NAME</option>
+                <option value="SORT_BY_XML" <?php if($xml->gui->sortOrderDevices != "SORT_BY_NAME") { echo "selected"; } ?>>SORT_BY_XML</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="sortOrderRooms" class="select">Sortierung der Räume:</label>
+            <select name="sortOrderRooms" id="sortOrderRooms">
+                <option value="SORT_BY_NAME" <?php if($xml->gui->sortOrderRooms == "SORT_BY_NAME") { echo "selected"; } ?>>SORT_BY_NAME</option>
+                <option value="SORT_BY_XML" <?php if($xml->gui->sortOrderDevices != "SORT_BY_NAME") { echo "selected"; } ?>>SORT_BY_XML</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="sortOrderTimers" class="select">Sortierung der Timer:</label>
+            <select name="sortOrderTimers" id="sortOrderTimers">
+                <option value="SORT_BY_NAME" <?php if($xml->gui->sortOrderTimers == "SORT_BY_NAME") { echo "selected"; } ?>>SORT_BY_NAME</option>
+                <option value="SORT_BY_ID" <?php if($xml->gui->sortOrderTimers == "SORT_BY_ID") { echo "selected"; } ?>>SORT_BY_ID</option>
+                <option value="SORT_BY_TYPE_AND_NAME" <?php if($xml->gui->sortOrderTimers == "SORT_BY_TYPE_AND_NAME") { echo "selected"; } ?>>SORT_BY_TYPE_AND_NAME</option>
+                <option value="SORT_BY_XML" <?php if($xml->gui->sortOrderDevices != "SORT_BY_NAME" && $xml->gui->sortOrderDevices != "SORT_BY_ID" && $xml->gui->sortOrderDevices != "SORT_BY_TYPE_AND_NAME") { echo "selected"; } ?>>SORT_BY_XML</option>
+            </select>
+        </li>
+        <li class="ui-body ui-body-b">
+            <fieldset class="ui-grid-a">
+                    <div class="ui-block-a"><input type="reset" value="Abbrechen"  data-theme="r"/></div>
+                    <div class="ui-block-b"><a href="#" id="editconfigsubmit" data-role="button" data-theme="g">Speichern</a></div>
+            </fieldset>
+        </li>
+        <li data-role="list-divider" data-theme="e">
+        System Informationen
+        </li>
+        <li data-role="fieldcontain">
+            <label for="time">Server Zeit:</label>
+            <input name="time" id="time" disabled="disabled" value="<?php echo date("Y-m-d H:i:s"); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="timezone">Server Zeitzone:</label>
+            <input name="timezone" id="timezone" disabled="disabled" value="<?php echo date_default_timezone_get(); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="phpversion">PHP Version:</label>
+            <input name="phpversion" id="phpversion" disabled="disabled" value="<?php echo phpversion(); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="serversoftware">Server Software:</label>
+            <input name="serversoftware" id="serversoftware" disabled="disabled" value="<?php echo $_SERVER['SERVER_SOFTWARE']; ?>" type="text">
+        </li>
+    </ul>
+</form>
+
 
     </div><!-- /content -->
 </div><!-- /page -->
@@ -2022,6 +2120,215 @@ location.reload();
                     </select>
                 </div>
 	            <br/>
+	            
+	            
+	            
+	            
+	            
+	            
+	        <style type="text/css">
+
+.desc, .titles {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	letter-spacing: 0;
+	font-size: 11px;
+	letter-spacing: 0;
+}
+
+.switch {
+  margin-left: auto ;
+  margin-right: auto ;
+	display: block;
+	float: left;
+	background: #ee0000;
+	width: 260px;
+	#width: 90%;
+	height: 80px;
+	padding: 5px;
+	border: 1px solid #333;
+}
+
+.switch_box {
+  margin-left: auto ;
+  margin-right: auto ;
+	width: 100%;
+}
+
+.titles {
+	display: block;
+	height: 26px;
+	font-weight: bold;
+	color: #fff;
+}
+
+.title_left {
+	float: left;
+	width: 100px;
+}
+
+.title_right {
+	float: right;
+	text-align: right;
+}
+
+.dip {
+	float: left;
+	margin: 0px 5px;
+	width: 16px;
+	#width: 7%;
+	height: 40px;
+	display: block;
+	text-align: center;
+	color: #ffffff;
+	font-weight: bold;
+}
+
+.dip_bar {
+  margin-left: auto ;
+  margin-right: auto ;
+	#width: 89%;
+}
+
+.dip input {
+	border: none;
+}
+
+.on, .off {
+	float: left;
+	display: block;
+	height: 12px;
+	width: 15px;
+	border: 1px solid #999999;
+	background: #ffffff;
+	margin: 0 0 5px 0;
+}
+
+.on  {
+	border-bottom: 15px solid #ee6666;
+}
+
+.off  {
+	border-top: 15px solid #ee6666;
+}
+
+.clear {
+	clear: both;
+}
+</style>
+<script type="text/JavaScript">
+
+function updateDIPTextField () {
+	var masterdip="";
+	masterdip+=$("#dip_switch0").children().val();
+	masterdip+=$("#dip_switch1").children().val();
+	masterdip+=$("#dip_switch2").children().val();
+	masterdip+=$("#dip_switch3").children().val();
+	masterdip+=$("#dip_switch4").children().val();
+    $("#masterdip").val(masterdip);
+
+	var slavedip="";
+	slavedip+=$("#dip_switch5").children().val();
+	slavedip+=$("#dip_switch6").children().val();
+	slavedip+=$("#dip_switch7").children().val();
+	slavedip+=$("#dip_switch8").children().val();
+	slavedip+=$("#dip_switch9").children().val();
+    $("#slavedip").val(slavedip);
+}
+
+
+$(document).ready(function() {
+    $("[name=dip_switch]").each(function() {
+        $(this).click(function() {
+            var input=$(this).children();
+            if ($(this).hasClass('off')) {
+                $(this).removeClass().addClass('on');
+                input.val("1");
+            } else {
+                $(this).removeClass().addClass('off');
+                input.val("0");
+            }
+            updateDIPTextField();
+        });
+    });
+    $("#vendor").change(function() {
+        if ($(this).val() == "Brennenstuhl" || $(this).val() == "Elro") {
+            $("#dip_switch_box").removeClass().addClass('show');
+        } else {
+            $("#dip_switch_box").removeClass().addClass('hide');
+        }
+    });
+    updateDIPTextField();
+});
+            
+
+
+</script>
+
+
+
+<div id="dip_switch_box" class="show">
+	            <br/>
+
+	            
+<div class="switch_box">
+<div class="switch">
+	<div class="titles">
+	    <span class="title_left">ON</span>
+	    <span class="title_right">DIP</span>
+	</div>
+	<div class="dip_bar">
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch0"><input type="hidden" name="b[0]" id="b0" value="1" /></div>
+            <span class="desc">1</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch1"><input type="hidden" name="b[1]" id="b1" value="1" /></div>
+            <span class="desc">2</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch2"><input type="hidden" name="b[2]" id="b2" value="1" /></div>
+            <span class="desc">3</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch3"><input type="hidden" name="b[3]" id="b3" value="1" /></div>
+            <span class="desc">4</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch4"><input type="hidden" name="b[4]" id="b4" value="1" /></div>
+            <span class="desc">5</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch5"><input type="hidden" name="b[5]" id="b5" value="1" /></div>
+            <span class="desc">A</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch6"><input type="hidden" name="b[6]" id="b6" value="1" /></div>
+            <span class="desc">B</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch7"><input type="hidden" name="b[7]" id="b7" value="1" /></div>
+            <span class="desc">C</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch8"><input type="hidden" name="b[8]" id="b8" value="1" /></div>
+            <span class="desc">D</span>
+        </span>
+        <span class="dip">
+            <div class="on" name="dip_switch" id="dip_switch9"><input type="hidden" name="b[9]" id="b9" value="1" /></div>
+            <span class="desc">E</span>
+        </span>
+    </div>
+</div>
+</div>
+<div class="clear"></div>
+	            <br/>
+	            <br/>
+	</div>            
+	            
+	            
+	            
+	            
+	            
 	            <label for="name">Masterdip:</label>
 	            <input type="text" name="masterdip" id="masterdip" value="" />
 	            <br/>
@@ -2051,7 +2358,25 @@ location.reload();
 
 
 
-
+<script type="text/JavaScript">
+$(document).ready(function() {
+    $("#timertype_device").change(function() {
+                $("#typeiddevice_box").removeClass().addClass('show');
+                $("#typeidgroup_box").removeClass().addClass('hide');
+                $("#typeidroom_box").removeClass().addClass('hide');
+    });
+    $("#timertype_group").change(function() {
+                $("#typeiddevice_box").removeClass().addClass('hide');
+                $("#typeidgroup_box").removeClass().addClass('show');
+                $("#typeidroom_box").removeClass().addClass('hide');
+    });
+    $("#timertype_room").change(function() {
+                $("#typeiddevice_box").removeClass().addClass('hide');
+                $("#typeidgroup_box").removeClass().addClass('hide');
+                $("#typeidroom_box").removeClass().addClass('show');
+    });
+});
+</script>
 <div data-role="page" id="newtimer" data-theme="e" data-close-btn="none">
 
     <div data-role="header">
@@ -2059,6 +2384,7 @@ location.reload();
     </div><!-- /header -->
 
     <div data-role="content">
+    <div><h1>Entwurf noch ohne Funktion</h1></div>
         <form id="newtimerform" method="post">
             <div data-role="fieldcontain">
               
@@ -2066,24 +2392,95 @@ location.reload();
             <div data-role="fieldcontain">
                 <fieldset data-role="controlgroup" data-mini="true" data-type="horizontal">
                    <legend>Typ:</legend>
-                        <input type="radio" name="timertype" id="radio-choice-1" value="device" checked="checked" />
-                        <label for="radio-choice-1">Gerät</label>
+                        <input type="radio" name="timertype" id="timertype_device" value="device" checked="checked" />
+                        <label for="timertype_device">Gerät</label>
             
-                        <input type="radio" name="timertype" id="radio-choice-2" value="group"  />
-                        <label for="radio-choice-2">Gruppe</label>
+                        <input type="radio" name="timertype" id="timertype_group" value="group"  />
+                        <label for="timertype_group">Gruppe</label>
             
-                        <input type="radio" name="timertype" id="radio-choice-3" value="room"  />
-                        <label for="radio-choice-3">Raum</label>
+                        <input type="radio" name="timertype" id="timertype_room" value="room"  />
+                        <label for="timertype_room">Raum</label>
             
                 </fieldset>
             </div>
 
               
-              
-               <label for="ID">ID:</label>
-               <input type="text" name="ID" id="ID" value="" />
-               <br/>
-              
+            <div data-role="fieldcontain" id="typeiddevice_box" class="show">
+                <label for="typeiddevice">Gerät:</label>
+                <select name="typeiddevice" id="typeiddevice" data-mini="true">
+                     <?php
+                        $devices = array();
+                        foreach($xml->devices->device as $device) {
+                            $devices[] = $device;
+                        }
+                        switch ($xml->gui->sortOrderDevices){
+                            case "SORT_BY_NAME":
+                                usort($devices, "compareDevicesByName");
+                                break;
+                            case "SORT_BY_ID":
+                                usort($devices, "compareDevicesByID");
+                                break;
+                            default:
+                                break;
+                        }
+                        foreach($devices as $device) {
+                            echo "<option value='".$device->id."'>".$device->name."</option>";
+                        }
+                     ?>
+                </select>
+            </div>
+                        
+            <div data-role="fieldcontain" id="typeidgroup_box" class="hide">
+                <label for="typeidgroup">Gruppe:</label>
+                <select name="typeidgroup" id="typeidgroup" data-mini="true">
+                     <?php
+                        $groups = array();
+                        foreach($xml->groups->group as $group) {
+                            $groups[] = $group;
+                        }
+                        switch ($xml->gui->sortOrderGroups){
+                            case "SORT_BY_NAME":
+                                usort($groups, "compareGroupsByName");
+                                break;
+                            case "SORT_BY_ID":
+                                usort($groups, "compareGroupsByID");
+                                break;
+                            default:
+                                break;
+                        }
+                        foreach($groups as $group) {
+                            echo "<option value='".$group->id."'>".$group->name."</option>";
+                        }
+                     ?>
+                </select>
+            </div>
+                        
+            <div data-role="fieldcontain" id="typeidroom_box" class="hide">
+                <label for="typeidroom">Raum:</label>
+                <select name="typeidroom" id="typeidroom" data-mini="true">
+                     <?php
+                        $roomDevices = array();
+                        foreach($xml->devices->device as $device) {
+                            $curRoom = (string)$device->room;
+                            if(!array_key_exists($curRoom, $roomDevices)) {
+                                $roomDevices[$curRoom] = array();
+                            }
+                            $roomDevices[$curRoom][] = $device;
+                        }
+                        switch ($xml->gui->sortOrderRooms){
+                            case "SORT_BY_NAME":
+                                ksort($roomDevices);
+                                break;
+                            default:
+                                break;
+                        }
+                        foreach($roomDevices as $room => $devices) {
+                            echo "<option value='".$room."'>".$room."</option>";
+                        }
+                     ?>
+                </select>
+            </div>
+                        
                <div data-role="fieldcontain">
                 <fieldset data-role="controlgroup" data-mini="true" data-type="horizontal">
                    <legend>Tage:</legend>
