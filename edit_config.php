@@ -24,6 +24,7 @@ require("config.php");
 
 $r_action = (string)$_POST['action'];
 $r_debug = (string)$_POST['debug'];
+$r_debug_timer = (string)$_POST['debug_timer'];
 $r_timezone = (string)$_POST['timezone'];
 $r_longitude = (string)$_POST['longitude'];
 $r_latitude = (string)$_POST['latitude'];
@@ -39,6 +40,7 @@ switch ($r_action) {
     
     case "edit":
         $xml["debug"] = $r_debug;
+        $xml->timers["debug"] = $r_debug_timer;
         $xml->global->timezone = $r_timezone;
         $xml->global->longitude = $r_longitude;
         $xml->global->latitude = $r_latitude;

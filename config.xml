@@ -99,7 +99,7 @@
             <deviceid>2</deviceid>
         </group>
     </groups>
-    <timers>
+    <timers debug="true">
         <timer>
             <id>1</id>
             <type>device</type>

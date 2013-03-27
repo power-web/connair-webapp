@@ -32,6 +32,13 @@ if (!$xml) {
 //globale variabeln
 $debug=empty($xml["debug"]) ? "false" : $xml["debug"];
 
+// Suppress DateTime warnings
+date_default_timezone_set(@date_default_timezone_get());
+
+//zeitzone geradeziehen
+if(!empty($xml->global->timezone)) {
+    date_default_timezone_set($xml->global->timezone);
+}
 
 function config_save() {
     global $xml;
