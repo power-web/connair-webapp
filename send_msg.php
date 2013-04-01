@@ -461,25 +461,137 @@ function cul_create_msg_intertechno($device, $action) {
 }
 
 
+
+// Schaltet Computer aus und ein
+function switch_computer($device, $action) {
+    debug("switch Computer for device='".(string)$device->id."' action='".(string)$action."'");
+
+    if(empty($device->address->masterdip)) {
+        echo "ERROR: masterdip (PC-IP) ist ungültig für device id ".$device->id;
+        return;
+    }
+    if(empty($device->address->slavedip)) {
+        echo "ERROR: slavedip (MAC Adresse) ist ungültig für device id ".$device->id;
+        return;
+    }
+
+    $IPpc = $device->address->masterdip;
+
+    // MAC Address des lauschenden Computers
+    $mac_addr = $device->address->slavedip;
+
+    if($action == "OFF") {
+         // Shutdown eines Windows-PC, muss in den Computerrichtlinien für remote erlaubt werden   
+         //exec("shutdown.exe -s -f -m \\\\$IPpc -t 30"); // von einem Windowsserver
+         exec("net rpc shutdown -I $IPpc -U gast%");     // von einem LINUXserver   
+
+         echo "Shutdown ausgeführt für $IPpc \n";
+    } else {
+         /* 
+         Port number auf die der Computer hört.
+         Normalerweise zwischen 1-50000. Standard ist 7 or 9.
+         */
+         $socket_number = "7";
+
+         //Broadcast ip ermitteln
+         $pos = strrpos($IPpc,'.');
+         if ($pos !== false) {
+                 $IPpc = substr($IPpc,0, $pos).".255";
+         }
+         WakeOnLan($IPpc, $mac_addr, $socket_number);
+
+         echo "Wake on Lan ausgeführt für $IPpc  $mac_addr \n";
+    }
+
+    return "";
+}
+
+
+
+// Weckt Computer über LAN auf (Diese Funktion muss im Bios aktiviert sein)
+function WakeOnLan($addr, $mac, $socket_number) {
+
+  debug("sende WOL an mac '$mac' IP '$addr'");
+
+  $addr_byte = explode(':', $mac);
+  $hw_addr = '';
+
+  for ($a=0; $a <6; $a++) {
+    $hw_addr .= chr(hexdec($addr_byte[$a]));
+  }
+  $msg = chr(255).chr(255).chr(255).chr(255).chr(255).chr(255);
+  for ($a = 1; $a <= 16; $a++) {
+    $msg .= $hw_addr;
+  }
+
+  // UDP Socket erstellen    
+  $s = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+
+  if ($s == false) {
+    echo "Fehler bei socket_create!\n";
+    echo "Fehlercode ist '".socket_last_error($s)."' - " . socket_strerror(socket_last_error($s));
+    return FALSE;
+  } else {
+    // Socket Optionen setzen:
+    $opt_ret = socket_set_option($s, SOL_SOCKET, SO_BROADCAST, TRUE);
+    if($opt_ret <0) {
+      echo "setsockopt() fehlgeschlagen, Fehler: " . strerror($opt_ret) . "\n";
+      return FALSE;
+    }
+    // Paket abschicken
+    if(socket_sendto($s, $msg, strlen($msg), 0, $addr, $socket_number)) {
+      debug("WOL erfolgreich gesendet!");
+      socket_close($s);
+      return TRUE;
+    } else {
+      echo "WOL fehlerhaft! \n";
+      return FALSE;
+    }
+  }
+}
+function wakeup ($mac_addr, $broadcast) {
+    if (!$fp = fsockopen('udp://' . $broadcast, 2304, $errno, $errstr, 2))
+        return false;
+    $mac_hex = preg_replace('=[^a-f0-9]=i', '', $mac_addr);
+    $mac_bin = pack('H12', $mac_hex);
+    $data = str_repeat("\xFF", 6) . str_repeat($mac_bin, 16);
+    fputs($fp, $data);
+    fclose($fp);
+    return true;
+} 
+
+
+
+
 function send_message($device, $action) {
     debug("Send Message for device='".(string)$device->id."' action='".(string)$action."'");
     global $xml;
     $vendor=strtolower($device->vendor);
+    if ($vendor=="computer") {
+        switch_computer($device, $action);
+        $device->status = $action;
+        return;
+    }
     //wenn connairs configuriert senden
     if(@count($xml->connairs->children()) > 0) {
         $msg="";
-        if ($vendor=="raw") {
-            if ($action=="ON") {
-                $msg = $device->address->rawCodeOn;
-            } else {
-                $msg = $device->address->rawCodeOff;
-            }    
-        } else if ($vendor=="brennenstuhl") {
-            $msg = connair_create_msg_brennenstuhl($device, $action);
-        } else if ($vendor=="intertechno") {
-            $msg = connair_create_msg_intertechno($device, $action);
-        } else if ($vendor=="elro") {
-            $msg = connair_create_msg_elro($device, $action);
+        switch($vendor) {
+            case "raw":
+                if ($action=="ON") {
+                    $msg = $device->address->rawCodeOn;
+                } else {
+                    $msg = $device->address->rawCodeOff;
+                }
+                break;
+            case "brennenstuhl":
+                $msg = connair_create_msg_brennenstuhl($device, $action);
+                break;
+            case "intertechno":
+                $msg = connair_create_msg_intertechno($device, $action);
+                break;
+            case "elro":
+                $msg = connair_create_msg_elro($device, $action);
+                break;
         }
         if(!empty($msg)) {
             connair_send($msg);
@@ -489,8 +601,10 @@ function send_message($device, $action) {
     //wenn CULS Configuriert auch über die senden
     if(@count($xml->culs->children()) > 0) {
         $msg="";
-        if ($vendor=="intertechno" && !empty($device->address->masterdip) && !empty($device->address->slavedip)) {
-            $msg = cul_create_msg_intertechno($device, $action);
+        switch($vendor) {
+            case "intertechno":
+                $msg = cul_create_msg_intertechno($device, $action);
+                break;
         }
         if(!empty($msg)) {
             cul_send($msg);

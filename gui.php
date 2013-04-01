@@ -57,10 +57,6 @@ if((!isset($directaccess)) OR (!$directaccess)) die();
 
 
 
-
-
-
-
 @media (min-width:35em) {
  
 /* wrap on wide viewports once open */
@@ -114,9 +110,13 @@ if((!isset($directaccess)) OR (!$directaccess)) die();
 
 
     $(document).bind("mobileinit", function(){
+        $.support.touchOverflow = true;
+        $.mobile.touchOverflowEnabled = true;
+        //$.mobile.fixedToolbars.setTouchToggleEnabled(false);
         $.mobile.defaultPageTransition = 'none';
         //$.mobile.page.prototype.options.domCache = true;
     });
+    
     $(document).ready(function() {
         $.event.special.swipe.scrollSupressionThreshold=10;
         $.event.special.swipe.durationThreshold=1000;
@@ -149,7 +149,10 @@ if((!isset($directaccess)) OR (!$directaccess)) die();
 	            success: function(response) {
 		            //alert('response:'+response);
 		            if(response.trim()=="ok") {
-		                $('#newdevice').dialog('close');
+		                $.mobile.changePage('#devices', {
+                            transition: "slide",
+                            reverse: true
+                        });
 		                toast('gespeichert');
 		                refreshPage();
                     } else {
@@ -176,24 +179,59 @@ if((!isset($directaccess)) OR (!$directaccess)) die();
 	            }
             });
 	    });
+	    
+	    $('#newtimersubmit').click(function (e) {
+            $.ajax({
+	            url: "edit_timer.php",
+	            type: "POST",
+	            data: $('#newtimerform').serialize(),
+                async: true,
+	            success: function(response) {
+	                alert('response:'+response);
+		            if(response.trim()=="ok") {
+		                $.mobile.changePage('#timers', {
+                            transition: "slide",
+                            reverse: true
+                        });
+		                toast('gespeichert');
+		                refreshPage();
+                    } else {
+                        toast('response:'+response);
+                    }
+	            }
+            });
+	    });
+
+
+
     });
 <?php 
     $menuAnimated="true";
 
-	if ($xml->gui->showMenuOnLoad=="xxx") {
+	//if ($xml->gui->showMenuOnLoad=="xxx") {
 ?>
  
 //if (isMedia("screen and (min-width:35em)")){
-  
-    $(document).delegate('.ui-page', 'pageshow', function () {
-    //        setTimeout(function() {
-                $.mobile.activePage.find('#mypanel').panel( "open" );
-    //        }, 100);
+  /*    $(document).delegate('.ui-page', 'pagebeforeshow', function () {
+        if($(window).width() > 640) {
+            $.mobile.activePage.find('#mypanel').panel( "open" );
+            $.mobile.activePage.trigger('updatelayout');
+            $.mobile.activePage.find('#content').trigger('updatelayout');
+        }
     });
+ */  /*
+    $(document).delegate('.ui-page', 'pageshow', function () {
+        if($(window).width() >= 640) {
+            //$.mobile.activePage.find('#mypanel').panel( "option", "animate", false );
+            $.mobile.activePage.find('#mypanel').panel( "open");
+            //$.mobile.activePage.find('#mypanel').panel( "option", "animate", true );
+        }
+    });
+    */
 //}
 <?php
-        	$menuAnimated="false";
-	}
+     //   	$menuAnimated="false";
+	//}
 ?>
 </script>
 <script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0.min.js"></script>
@@ -201,11 +239,10 @@ if((!isset($directaccess)) OR (!$directaccess)) die();
 
 
 <!-- WebApp -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scaleable=no">
-<!--
-<meta name="viewport" content="320.1, initial-scale=1.0">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scaleable=no">
--->
+<!-- standard viewport tag to set the viewport to the device's width -->
+<meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+<!-- width=device-width causes the iPhone 5  to exclude it for iPhone 5 to allow full screen apps -->
+<meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1" media="(device-width: 320px) and (device-height: 568px)" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <!-- iPhone -->
@@ -235,6 +272,11 @@ if((!isset($directaccess)) OR (!$directaccess)) die();
                 async: true,
                 success: function(response) {
                     toast(response);
+<?php if($xml->gui->showDeviceStatus != 'OFF') { ?>
+                    if(action == 'allon' || action == 'alloff' || type == 'room' || type =='group') {
+                        refreshPage();
+                    }
+<?php } ?>
                 },
                 error: function(response) {
                     toast(response);
@@ -358,6 +400,10 @@ location.reload();
         }
     </script>
 </head>
+
+
+
+
 <body>
 
 
@@ -369,7 +415,7 @@ location.reload();
 
 
 
-<div data-role="page" id="favorites" class="ui-responsive-panel">
+<div data-role="page" id="favorites" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
         <center>
@@ -381,11 +427,13 @@ location.reload();
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
             <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
+<?php if($xml->gui->showAllOnOffBtnInMenu == "true") { ?>
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
                 <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
+<?php } ?>
             <a href="#favorites" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
@@ -395,10 +443,10 @@ location.reload();
         <h1>Favoriten</h1>
     </div><!-- /header -->
 
-    <div data-role="content">  
-        <ul data-role="listview" data-divider-theme="e" data-inset="false">
+    <div data-role="content" id="content">  
+        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
 
-            <li data-role="list-divider" role="heading" data-theme="a">
+            <li data-role="list-divider" role="heading">
                 Gruppen
             </li>
  
@@ -417,12 +465,12 @@ location.reload();
         foreach($groupsFound as $group) {
 ?>
 
-            <li data-theme="c">
+            <li>
                 <div class="ui-grid-a">
 	                <div class="ui-block-a" style="text-align:left"><?php echo $group->name; ?></div>
 	                <div class="ui-block-b" style="text-align:right">
-                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')">Ein</button>
-                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')">Aus</button>
+                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
 	                </div>
                 </div>
                 
@@ -440,7 +488,7 @@ location.reload();
     }
 ?>
 
-            <li data-role="list-divider" role="heading" data-theme="a">
+            <li data-role="list-divider" role="heading">
                 Geräte
             </li>
 
@@ -474,7 +522,7 @@ location.reload();
                     $btnOffJS="send_connair('off','device','".$device->id."'); switchRowTheme('off','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
                 break;
                 case "BUTTON_COLOR":
-                    $rowDataTheme="c";
+                    $rowDataTheme=$theme_row;
                     $btnOnColor="g";
                     $btnOffColor="r";
                     $btnCurColor="e";
@@ -492,7 +540,7 @@ location.reload();
                 case "BUTTON_ICON":
                     $onIcon="check";
                     $offIcon="off";
-                    $rowDataTheme="c";
+                    $rowDataTheme=$theme_row;
                     $btnOnDataTheme="g";
                     $btnOffDataTheme="r";
                     if($device->status=='ON') {
@@ -504,7 +552,7 @@ location.reload();
                     $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonIcon('off','".$device->id."','".$onIcon."','".$offIcon."')";
                 break;
                 default:
-                    $rowDataTheme="c";
+                    $rowDataTheme=$theme_row;
                     $btnOnDataTheme="g";
                     $btnOffDataTheme="r";
                     $btnOnIcon="";
@@ -519,8 +567,8 @@ location.reload();
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $device->name; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>">Ein</button>
-	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>">Aus</button>
+	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
 	                    </div>
                     </div>
                     <p><?php echo $device->room; ?></p>
@@ -543,7 +591,7 @@ location.reload();
 
 
 
-<div data-role="page" id="devices" class="ui-responsive-panel">
+<div data-role="page" id="devices" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
 	    <center>
@@ -554,11 +602,13 @@ location.reload();
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
             <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
+<?php if($xml->gui->showAllOnOffBtnInMenu == "true") { ?>
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
                 <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
+<?php } ?>
             <a href="#devices" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
@@ -567,12 +617,12 @@ location.reload();
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Geräte</h1>
-        <a href="#newdevice" data-rel="dialog" data-transition="slidedown">+</a>
+        <a href="#newdevice" data-transition="slide">Neu</a>
     </div><!-- /header -->
 
 
     <div data-role="content">  
-        <ul data-role="listview" data-divider-theme="e" data-inset="false" data-filter="true" data-filter-placeholder="Geräte suchen...">
+        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-filter-theme="<?php echo $theme_divider; ?>" data-inset="false" data-filter="true" data-filter-placeholder="Geräte suchen...">
 
 <?php
     $roomDevices = array();
@@ -603,15 +653,15 @@ location.reload();
         }
 ?>
 
-            <li data-role="list-divider" role="heading" data-theme="a">
+            <li data-role="list-divider" role="heading">
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
 <?php
     if($xml->gui->showRoomButtonInDevices == "true") {
 ?>
-	                        <button data-theme="a"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
-	                        <button data-theme="a"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
+	                        <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
+	                        <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
 <?php
     }
 ?>
@@ -638,7 +688,7 @@ location.reload();
                 $btnOffJS="send_connair('off','device','".$device->id."'); switchRowTheme('off','".$device->id."','".$rowOnDataTheme."','".$rowOffDataTheme."')";
             break;
             case "BUTTON_COLOR":
-                $rowDataTheme="c";
+                $rowDataTheme=$theme_row;
                 $btnOnColor="g";
                 $btnOffColor="r";
                 $btnCurColor="e";
@@ -656,7 +706,7 @@ location.reload();
             case "BUTTON_ICON":
                 $onIcon="check";
                 $offIcon="off";
-                $rowDataTheme="c";
+                $rowDataTheme=$theme_row;
                 $btnOnDataTheme="g";
                 $btnOffDataTheme="r";
                 if($device->status=='ON') {
@@ -668,7 +718,7 @@ location.reload();
                 $btnOffJS="send_connair('off','device','".$device->id."'); switchButtonIcon('off','".$device->id."','".$onIcon."','".$offIcon."')";
             break;
             default:
-                $rowDataTheme="c";
+                $rowDataTheme=$theme_row;
                 $btnOnDataTheme="g";
                 $btnOffDataTheme="r";
                 $btnOnIcon="";
@@ -692,32 +742,8 @@ location.reload();
 	                    ?>
 	                    </div>
 	                    <div class="ui-block-b" style="text-align:right">
-
-<?php 
-    if($xml->gui->showDeviceStatus == "BUTTON_SLIDER") {
-?>
-
-                            <select name="btn<?php echo $device->id; ?>" id="btn<?php echo $device->id; ?>" data-role="slider" data-mini="true">
-                                <option value="off" <?php if($device->status == "OFF") { echo "selected"; } ?>>Aus</option>
-                                <option value="on" <?php if($device->status == "ON") { echo "selected"; } ?>>An</option>
-                            </select>
-                            <script type="text/javascript">
-                                $('#btn<?php echo $device->id; ?>').on('slidestop', function(){
-                                    send_connair($(this).slider().val(),'device',<?php echo $device->id; ?>);
-                                });
-                            </script>
-
-<?php
-    } else {
-?>
-
-	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>">Ein</button>
-	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>">Aus</button>
-
-<?php
-    }
-?>
-
+	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
                         </div>
                     </div>
                 </li>
@@ -726,16 +752,7 @@ location.reload();
         }
     }
 ?>
-   
-            <li data-role="list-divider" role="heading" data-theme="a">
-                Alle
-            </li>
-            <li data-theme="c">
-                <div class="ui-grid-a">
-                    <div class="ui-block-a"><button data-theme="g" data-rel="close" onclick="send_connair('allon')">An</button></div>
-                    <div class="ui-block-b"><button data-theme="r" data-rel="close" onclick="send_connair('alloff')">Aus</button></div>     
-                </div>
-            </li>
+
          </ul>
     </div><!-- /content -->
 </div><!-- /page -->
@@ -747,7 +764,7 @@ location.reload();
 
 
 
-<div data-role="page" id="groups" class="ui-responsive-panel">
+<div data-role="page" id="groups" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
     
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
         <center>
@@ -758,11 +775,13 @@ location.reload();
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
             <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
+<?php if($xml->gui->showAllOnOffBtnInMenu == "true") { ?>
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
                 <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
+<?php } ?>
             <a href="#groups" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
@@ -774,7 +793,7 @@ location.reload();
 
     <div data-role="content">  
 
-        <ul data-role="listview" data-divider-theme="e" data-inset="false">
+        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
  
 <?php
     $groups = array();
@@ -794,12 +813,12 @@ location.reload();
     foreach($groups as $group) {
 ?>
 
-            <li data-theme="c">
+            <li>
                 <div class="ui-grid-a">
 	                <div class="ui-block-a" style="text-align:left"><?php echo $group->name; ?></div>
 	                <div class="ui-block-b" style="text-align:right">
-                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')">Ein</button>
-                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')">Aus</button>
+                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
 	                </div>
                 </div>
                 
@@ -848,7 +867,7 @@ location.reload();
 
 
 
-<div data-role="page" id="rooms" class="ui-responsive-panel">
+<div data-role="page" id="rooms" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
 	    <center>
@@ -859,11 +878,13 @@ location.reload();
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
             <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
+<?php if($xml->gui->showAllOnOffBtnInMenu == "true") { ?>
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
                 <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
+<?php } ?>
             <a href="#rooms" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
@@ -876,7 +897,7 @@ location.reload();
 
 
     <div data-role="content">  
-        <ul data-role="listview" data-divider-theme="e" data-inset="false">
+        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
 
 <?php
     $roomDevices = array();
@@ -897,12 +918,12 @@ location.reload();
     foreach($roomDevices as $room => $devices) {
 ?>
 
-                <li data-theme="c">
+                <li>
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">Ein</button>
-	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">Aus</button>
+	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
+	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
 	                    </div>
                     </div>
                 </li>
@@ -923,8 +944,18 @@ location.reload();
 
 
 
+<style type="text/css">
 
-<div data-role="page" id="timers" class="ui-responsive-panel">
+.timer_activ_on  {
+	color: #6AB638;
+}
+
+.timer_activ_off  {
+	color: #B63737;
+}
+
+</style>
+<div data-role="page" id="timers" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
        <center>
@@ -935,11 +966,13 @@ location.reload();
             <a href="#timers" data-role="button" data-theme="e" class="ui-disabled">Timer</a>
             <a href="#configurations" data-role="button" data-theme="e">Einstellungen</a>
             <br />
+<?php if($xml->gui->showAllOnOffBtnInMenu == "true") { ?>
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
                 <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
+<?php } ?>
             <a href="#timers" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
@@ -948,12 +981,12 @@ location.reload();
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Timer</h1>
-        <a href="#newtimer" data-rel="dialog" data-transition="slidedown">+</a>
+        <a href="#newtimer" data-transition="slide" onclick="sessionStorage.TimerID=''">Neu</a>
     </div><!-- /header -->
 
 
     <div data-role="content"> 
-        <ul data-role="listview" data-divider-theme="e" data-inset="false">
+        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
 
 <?php
     $timers = array();
@@ -976,9 +1009,19 @@ location.reload();
     foreach($timers as $timer) {
 ?>
 
-                <li data-theme="c">
-                    <div class="ui-grid-a">
-                       <div class="ui-block-a" style="text-align:left">
+               <!-- <li><a href="#newtimer" data-transition="slide" onclick="sessionStorage.TimerID=<?php echo $timer->id; ?>"> -->
+                <li>
+<?php
+    switch ($timer->active) {
+        case "on":
+            echo "<h2 class='timer_activ_on'>";
+            break;
+        case "off":
+        default:
+            echo "<h2 class='timer_activ_off'>";
+            break;
+    }
+?>
 <?php
     if($timer->type=="device") {
         foreach($xml->devices->device as $tmp_device) {
@@ -1001,12 +1044,20 @@ location.reload();
         echo $timer->typeid;
     }
 ?>
-                        </div>
-                        <div class="ui-block-b" style="text-align:right">
-                            <a href="#newtimer" data-role="button" data-mini="true" data-inline="true" data-theme="r" data-rel="dialog" data-transition="slidedown">Edit</a>
-                        </div>
-                    </div>
-                    <p></p>
+</h2>
+                     <p><b>Aktiv: </b>
+<?php
+    switch ($timer->active) {
+        case "on":
+            echo "Ja";
+            break;
+        case "off":
+        default:
+            echo "Nein";
+            break;
+    }
+?>
+                    </p>
                     <p><b>Typ: </b>
 <?php
     switch ($timer->type) {
@@ -1040,11 +1091,11 @@ location.reload();
     switch ($timer->timerOn) {
         case "SD":
             echo "Sonnenuntergang";
-            if(!empty($timer->timerOn["offset"])) { echo "  mit einem Versatz von ".$timer->timerOn["offset"]." Minuten"; }
+            if(!empty($timer->timerOn["offset"])) { echo "  <i>(".$timer->timerOn["offset"]." Minuten)</i>"; }
             break;
         case "SU":
             echo "Sonnenaufgang";
-            if(!empty($timer->timerOn["offset"])) { echo "  mit einem Versatz von ".$timer->timerOn["offset"]." Minuten"; }
+            if(!empty($timer->timerOn["offset"])) { echo "  <i>(".$timer->timerOn["offset"]." Minuten)</i>"; }
             break;
         default:
             echo $timer->timerOn." Uhr";
@@ -1070,6 +1121,7 @@ location.reload();
 ?>
                     </p>
                 </li>
+                <!-- </a></li> -->
 
 <?php
     }
@@ -1088,8 +1140,12 @@ location.reload();
 
 
 
-
-<div data-role="page" id="configurations" class="ui-responsive-panel">
+<script type="text/JavaScript">
+function resetEditConfigForm() {
+    $('#editconfigform')[0].reset();
+}
+</script>
+<div data-role="page" id="configurations" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
         <center>
@@ -1100,18 +1156,21 @@ location.reload();
             <a href="#timers" data-role="button" data-theme="e">Timer</a>
             <a href="#configurations" data-role="button" data-theme="e" class="ui-disabled">Einstellungen</a>
             <br />
+<?php if($xml->gui->showAllOnOffBtnInMenu == "true") { ?>
             <div class="ui-grid-a">
                 <div class="ui-block-a"><button data-theme="g" data-mini="true" data-rel="close" onclick="send_connair('allon')">Alle an</button></div>
                 <div class="ui-block-b"><button data-theme="r" data-mini="true" data-rel="close" onclick="send_connair('alloff')">Alle aus</button></div>     
             </div>
             <br />
+<?php } ?>
             <a href="#configurations" data-role="button" data-mini="true" data-theme="a" data-rel="close">Schliessen</a>
         </center>
     </div><!-- /panel -->
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
-        <a href="#mypanel">Menu</a>
+        <a href="#mypanel" data-role="button" onClick="resetEditConfigForm();">Menu</a>
         <h1>Einstellungen</h1>
+        <a href="#" id="editconfigsubmit" data-role="button" data-theme="g">Speichern</a>
     </div><!-- /header -->
 
    
@@ -1120,8 +1179,8 @@ location.reload();
         
 <form id="editconfigform" method="post" data-ajax="false">
 <input type="hidden" name="action" id="action" value="edit" />
-    <ul data-role="listview" data-inset="false">
-        <li data-role="list-divider" data-theme="e">
+    <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
+        <li data-role="list-divider">
         Debug
         </li>
         <li data-role="fieldcontain">
@@ -1139,7 +1198,7 @@ location.reload();
             </select>
             <div>Ausgaben in die debug.log erscheinen nur wenn der globale Debug-Schalter auch an ist.</div>
         </li>
-        <li data-role="list-divider" data-theme="e">
+        <li data-role="list-divider">
         Global
         </li>
         <li data-role="fieldcontain">
@@ -1154,8 +1213,19 @@ location.reload();
             <label for="latitude">Latitude:</label>
             <input name="latitude" id="latitude" value="<?php echo $xml->global->latitude; ?>" data-clear-btn="true" type="text">
         </li>
-        <li data-role="list-divider" data-theme="e">
+        <li data-role="fieldcontain">
+            <label for="multiDeviceSleep">Wartezeit beim Senden (ms):</label>
+            <input type="range" name="multiDeviceSleep" id="multiDeviceSleep" value="<?php echo $xml->global->multiDeviceSleep; ?>" min="200" max="5000" step="50" />
+        </li>
+        <li data-role="list-divider">
         GUI
+        </li>
+        <li data-role="fieldcontain">
+            <label for="theme">Theme:</label>
+            <select name="theme" id="theme">
+                <option value="LIGHT" <?php if($xml->gui->theme == "LIGHT") { echo "selected"; } ?>>Hell</option>
+                <option value="DARK" <?php if($xml->gui->theme == "DARK") { echo "selected"; } ?>>Dunkel</option>
+            </select>
         </li>
         <li data-role="fieldcontain">
             <label for="showDeviceStatus">Zeige Geräte Status:</label>
@@ -1164,7 +1234,6 @@ location.reload();
                 <option value="ROW_COLOR" <?php if($xml->gui->showDeviceStatus == "ROW_COLOR") { echo "selected"; } ?>>ROW_COLOR</option>
                 <option value="BUTTON_COLOR" <?php if($xml->gui->showDeviceStatus == "BUTTON_COLOR") { echo "selected"; } ?>>BUTTON_COLOR</option>
                 <option value="BUTTON_ICON" <?php if($xml->gui->showDeviceStatus == "BUTTON_ICON") { echo "selected"; } ?>>BUTTON_ICON</option>
-                <option value="BUTTON_SLIDER" <?php if($xml->gui->showDeviceStatus == "BUTTON_SLIDER") { echo "selected"; } ?>>BUTTON_SLIDER (Test)</option>
             </select>
         </li>
         <li data-role="fieldcontain">
@@ -1179,6 +1248,13 @@ location.reload();
             <select name="showMenuOnLoad" id="showMenuOnLoad" data-role="slider">
                 <option value="false" <?php if($xml->gui->showMenuOnLoad == "false") { echo "selected"; } ?>>Off</option>
                 <option value="true" <?php if($xml->gui->showMenuOnLoad == "true") { echo "selected"; } ?>>On</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="showAllOnOffBtnInMenu">Zeige Alle EIN/AUS Button im Menu:</label>
+            <select name="showAllOnOffBtnInMenu" id="showAllOnOffBtnInMenu" data-role="slider">
+                <option value="false" <?php if($xml->gui->showAllOnOffBtnInMenu == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml->gui->showAllOnOffBtnInMenu == "true") { echo "selected"; } ?>>On</option>
             </select>
         </li>
         <li data-role="fieldcontain">
@@ -1212,13 +1288,8 @@ location.reload();
                 <option value="SORT_BY_XML" <?php if($xml->gui->sortOrderDevices != "SORT_BY_NAME" && $xml->gui->sortOrderDevices != "SORT_BY_ID" && $xml->gui->sortOrderDevices != "SORT_BY_TYPE_AND_NAME") { echo "selected"; } ?>>SORT_BY_XML</option>
             </select>
         </li>
-        <li class="ui-body ui-body-b">
-            <fieldset class="ui-grid-a">
-                    <div class="ui-block-a"><input type="reset" value="Abbrechen"  data-theme="r"/></div>
-                    <div class="ui-block-b"><a href="#" id="editconfigsubmit" data-role="button" data-theme="g">Speichern</a></div>
-            </fieldset>
-        </li>
-        <li data-role="list-divider" data-theme="e">
+
+        <li data-role="list-divider">
         System Informationen
         </li>
         <li data-role="fieldcontain">
@@ -1228,6 +1299,22 @@ location.reload();
         <li data-role="fieldcontain">
             <label for="timezone">Server Zeitzone:</label>
             <input name="timezone" id="timezone" disabled="disabled" value="<?php echo date_default_timezone_get(); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="longitude">Longitude:</label>
+            <input name="longitude" id="longitude" disabled="disabled" value="<?php echo $longitude; ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="latitude">Latitude:</label>
+            <input name="latitude" id="latitude" disabled="disabled" value="<?php echo $latitude; ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="sunrise">Sonnenaufgang:</label>
+            <input name="sunrise" id="sunrise" disabled="disabled" value="<?php echo date('H:i', $sunrise); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="sunset">Sonnenuntergang:</label>
+            <input name="sunset" id="sunset" disabled="disabled" value="<?php echo date('H:i', $sunset); ?>" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="phpversion">PHP Version:</label>
@@ -1252,37 +1339,49 @@ location.reload();
 
 
 
+<script type="text/JavaScript">
+$(document).ready(function() {
+    $("#vendor").change(function() {
+        if ($(this).val() == "Brennenstuhl" || $(this).val() == "Elro") {
+            $("#dip_switch_box").removeClass().addClass('show');
+        } else {
+            $("#dip_switch_box").removeClass().addClass('hide');
+        }
+    });
+});
+function resetNewDeviceForm() {
+    $('#newdeviceform')[0].reset();
+    $("#vendor").trigger('change');
+}
+</script>
+<div data-role="page" id="newdevice" data-theme="<?php echo $theme_page; ?>">
 
-<div data-role="page" id="newdevice" data-theme="e" data-close-btn="none">
-
-    <div data-role="header">
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#devices" data-transition="slide" data-direction="reverse" data-role="button" data-theme="r" onClick="resetNewDeviceForm();">Abbrechen</a>
         <h1>Neues Gerät</h1>
+        <a href="#" id="newdevicesubmit" data-role="button" data-theme="g">Speichern</a>
     </div><!-- /header -->
 
     <div data-role="content">
         <form id="newdeviceform" method="post" data-ajax="false">
             <input type="hidden" name="action" id="action" value="add" />
-            <div data-role="fieldcontain">
+    <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
+        <li data-role="fieldcontain">
 	            <label for="name">Name:</label>
 	            <input type="text" name="name" id="name" value="" />
-	            <br/>
-	            <label for="name">Raum:</label>
+        </li>
+        <li data-role="fieldcontain">
+	            <label for="room">Raum:</label>
 	            <input type="text" name="room" id="room" value="" />
-	            <br/>
-	            <div data-role="fieldcontain">
+        </li>
+        <li data-role="fieldcontain">
                     <label for="vendor">Hersteller:</label>
                     <select name="vendor" id="vendor">
                         <option value="Brennenstuhl">Brennenstuhl</option>
                         <option value="Elro">Elro</option>
                         <option value="Intertechno">Intertechno</option>
                     </select>
-                </div>
-	            <br/>
-	            
-	            
-	            
-	            
-	            
+        </li>
 	            
 	        <style type="text/css">
 
@@ -1408,13 +1507,6 @@ $(document).ready(function() {
             updateDIPTextField();
         });
     });
-    $("#vendor").change(function() {
-        if ($(this).val() == "Brennenstuhl" || $(this).val() == "Elro") {
-            $("#dip_switch_box").removeClass().addClass('show');
-        } else {
-            $("#dip_switch_box").removeClass().addClass('hide');
-        }
-    });
     updateDIPTextField();
 });
             
@@ -1423,10 +1515,10 @@ $(document).ready(function() {
 </script>
 
 
+        <li data-role="fieldcontain">
 
 <div id="dip_switch_box" class="show">
-	            <br/>
-
+	            
 	            
 <div class="switch_box">
 <div class="switch">
@@ -1479,39 +1571,51 @@ $(document).ready(function() {
 </div>
 </div>
 <div class="clear"></div>
-	            <br/>
-	            <br/>
 	</div>            
 	            
 	            
 	            
 	            
-	            
-	            <label for="name">Masterdip:</label>
+	                </li>
+        <li data-role="fieldcontain">
+    
+	            <label for="masterdip">Masterdip:</label>
 	            <input type="text" name="masterdip" id="masterdip" value="" />
-	            <br/>
-	            <label for="name">Slavedip:</label>
+	           </li>
+        <li data-role="fieldcontain">
+         <label for="slavedip">Slavedip:</label>
 	            <input type="text" name="slavedip" id="slavedip" value="" />
-	            <br/>
-	            <label for="name">Version:</label>
+	                 </li>
+        <li data-role="fieldcontain">
+                <label for="tx433version">Version:</label>
 	            <input type="text" name="tx433version" id="tx433version" value="" />
-	            <br/>
-	            <div data-role="fieldcontain">
+	                  </li>
+        <li data-role="fieldcontain">
+                        <label for="btnLabelOn">Schalter-Beschriftung EIN:</label>
+                        <input type="text" name="btnLabelOn" id="btnLabelOn" value="" placeholder="EIN"/>
+	                  </li>
+        <li data-role="fieldcontain">
+                        <label for="btnLabelOn">Schalter-Beschriftung AUS:</label>
+                        <input type="text" name="btnLabelOff" id="btnLabelOff" value="" placeholder="AUS"/>
+	                  </li>
+        <li data-role="fieldcontain">
                     <label for="favorite">Favorit:</label>
                     <select name="favorite" id="favorite" data-role="slider">
 	                    <option value="false">Nein</option>
 	                    <option value="true">Ja</option>
                     </select> 
-                </div>
-	        </div>
-            <a href="#" id="newdevicesubmit" data-role="button" data-theme="g">Speichern</a>
-            <a href="#" data-role="button" data-rel="back" data-theme="r">Abbrechen</a>
+           </li>
+    </ul>
+            
         </form>
     </div><!-- /content -->
 </div><!-- /page -->
-<script type="text/javascript">
 
-</script>
+
+
+
+
+
 
 
 
@@ -1533,22 +1637,112 @@ $(document).ready(function() {
                 $("#typeidgroup_box").removeClass().addClass('hide');
                 $("#typeidroom_box").removeClass().addClass('show');
     });
-});
-</script>
-<div data-role="page" id="newtimer" data-theme="e" data-close-btn="none">
 
-    <div data-role="header">
-        <h1>Neuer Timer</h1>
+    $("#OnTimerType").change(function() {
+        var $this = $(this);
+        switch($this.val()) {
+            case "M":
+                $("#timeronmanuell_box").removeClass().addClass('show');
+                $("#timerontime_box").removeClass().addClass('hide');
+                $("#timeronoffset_box").removeClass().addClass('hide');
+                break;
+            case "A":
+                $("#timeronmanuell_box").removeClass().addClass('hide');
+                $("#timerontime_box").removeClass().addClass('show');
+                $("#timeronoffset_box").removeClass().addClass('hide');
+                break;
+            case "SU":
+                $("#timeronmanuell_box").removeClass().addClass('hide');
+                $("#timerontime_box").removeClass().addClass('hide');
+                $("#timeronoffset_box").removeClass().addClass('show');
+                break;
+            case "SD":
+                $("#timeronmanuell_box").removeClass().addClass('hide');
+                $("#timerontime_box").removeClass().addClass('hide');
+                $("#timeronoffset_box").removeClass().addClass('show');
+                break;
+        }
+    });
+    $("#OffTimerType").change(function() {
+        var $this = $(this);
+        switch($this.val()) {
+            case "M":
+                $("#timeroffmanuell_box").removeClass().addClass('show');
+                $("#timerofftime_box").removeClass().addClass('hide');
+                $("#timeroffoffset_box").removeClass().addClass('hide');
+                break;
+            case "A":
+                $("#timeroffmanuell_box").removeClass().addClass('hide');
+                $("#timerofftime_box").removeClass().addClass('show');
+                $("#timeroffoffset_box").removeClass().addClass('hide');
+                break;
+            case "SU":
+                $("#timeroffmanuell_box").removeClass().addClass('hide');
+                $("#timerofftime_box").removeClass().addClass('hide');
+                $("#timeroffoffset_box").removeClass().addClass('show');
+                break;
+            case "SD":
+                $("#timeroffmanuell_box").removeClass().addClass('hide');
+                $("#timerofftime_box").removeClass().addClass('hide');
+                $("#timeroffoffset_box").removeClass().addClass('show');
+                break;
+        }
+    });
+});
+
+function resetNewTimerForm() {
+    $('#newtimerform')[0].reset();
+    $("#timertype_device").trigger('change');
+    $("#timertype_group").trigger('change');
+    $("#timertype_room").trigger('change');
+    $("#OnTimerType").trigger('change');
+    $("#OffTimerType").trigger('change');
+}
+
+/*
+    $(document).delegate('#newtimer', 'pagebeforeshow', function () {
+        var timerid = sessionStorage.TimerID;
+        //alert(timerid);
+        
+        if(timerid) {
+            // jetzt ajax
+            
+            $("#newtimer #timertitle").text("Timer ändern ["+timerid+"]");
+            $("#newtimer #active").val('on').slider('refresh');
+        } else {
+            //neuer Timer
+            $("#newtimer #timertitle").text("Timer anlegen");
+            $("#newtimer #active").val('off').slider('refresh');
+            $("#newtimer #timertype_device").attr('checked', true);
+            $("#newtimer #timertype_group").attr('checked');
+            $("#newtimer #timertype_room").attr('checked');
+            //$("#newtimer #timertypecontrolgroup").controlgroup("refresh");
+            $("input[type='radio']").checkboxradio("refresh");
+        }
+    });
+*/
+</script>
+<div data-role="page" id="newtimer" data-theme="<?php echo $theme_page; ?>">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#timers" data-transition="slide" data-direction="reverse" data-role="button" data-theme="r" onClick="resetNewTimerForm();">Abbrechen</a>
+        <h1 id="timertitle">Neuer Timer</h1>
+        <a href="#" id="newtimersubmit" data-role="button" data-theme="g">Speichern</a>
     </div><!-- /header -->
 
     <div data-role="content">
-    <div><h1>Entwurf noch ohne Funktion</h1></div>
         <form id="newtimerform" method="post">
-            <div data-role="fieldcontain">
-              
-              
-            <div data-role="fieldcontain">
-                <fieldset data-role="controlgroup" data-mini="true" data-type="horizontal">
+        <input type="hidden" name="action" id="action" value="add" />
+    <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
+        <li data-role="fieldcontain">
+            <label for="active">Aktiv:</label>
+            <select name="active" id="active" data-role="slider">
+                <option value="off">Nein</option>
+                <option value="on">Ja</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+                <fieldset id="timertypecontrolgroup" data-role="controlgroup" data-mini="false" data-type="horizontal">
                    <legend>Typ:</legend>
                         <input type="radio" name="timertype" id="timertype_device" value="device" checked="checked" />
                         <label for="timertype_device">Gerät</label>
@@ -1560,12 +1754,11 @@ $(document).ready(function() {
                         <label for="timertype_room">Raum</label>
             
                 </fieldset>
-            </div>
-
-              
+        </li>
+        <li data-role="fieldcontain">
             <div data-role="fieldcontain" id="typeiddevice_box" class="show">
                 <label for="typeiddevice">Gerät:</label>
-                <select name="typeiddevice" id="typeiddevice" data-mini="true">
+                <select name="typeiddevice" id="typeiddevice" data-mini="false">
                      <?php
                         $devices = array();
                         foreach($xml->devices->device as $device) {
@@ -1590,7 +1783,7 @@ $(document).ready(function() {
                         
             <div data-role="fieldcontain" id="typeidgroup_box" class="hide">
                 <label for="typeidgroup">Gruppe:</label>
-                <select name="typeidgroup" id="typeidgroup" data-mini="true">
+                <select name="typeidgroup" id="typeidgroup" data-mini="false">
                      <?php
                         $groups = array();
                         foreach($xml->groups->group as $group) {
@@ -1615,7 +1808,7 @@ $(document).ready(function() {
                         
             <div data-role="fieldcontain" id="typeidroom_box" class="hide">
                 <label for="typeidroom">Raum:</label>
-                <select name="typeidroom" id="typeidroom" data-mini="true">
+                <select name="typeidroom" id="typeidroom" data-mini="false">
                      <?php
                         $roomDevices = array();
                         foreach($xml->devices->device as $device) {
@@ -1638,47 +1831,52 @@ $(document).ready(function() {
                      ?>
                 </select>
             </div>
-                        
-               <div data-role="fieldcontain">
+        </li>
+        <li data-role="fieldcontain">
                 <fieldset data-role="controlgroup" data-mini="true" data-type="horizontal">
                    <legend>Tage:</legend>
-                        <input type="checkbox" name="timertype" id="radio-choice-1" value="0" />
-                        <label for="radio-choice-1">M</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-1" value="0" />
+                        <label for="timerday-1">M</label>
             
-                        <input type="checkbox" name="timertype" id="radio-choice-2" value="1" />
-                        <label for="radio-choice-2">D</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-2" value="1" />
+                        <label for="timerday-2">D</label>
             
-                        <input type="checkbox" name="timertype" id="radio-choice-3" value="2" />
-                        <label for="radio-choice-3">M</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-3" value="2" />
+                        <label for="timerday-3">M</label>
             
-                        <input type="checkbox" name="timertype" id="radio-choice-4" value="3" />
-                        <label for="radio-choice-4">D</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-4" value="3" />
+                        <label for="timerday-4">D</label>
             
-                        <input type="checkbox" name="timertype" id="radio-choice-5" value="4" />
-                        <label for="radio-choice-5">F</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-5" value="4" />
+                        <label for="timerday-5">F</label>
             
-                        <input type="checkbox" name="timertype" id="radio-choice-6" value="5" />
-                        <label for="radio-choice-6">S</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-6" value="5" />
+                        <label for="timerday-6">S</label>
             
-                        <input type="checkbox" name="timertype" id="radio-choice-7" value="6" />
-                        <label for="radio-choice-7">S</label>
+                        <input type="checkbox" name="timerday[]" id="timerday-7" value="6" />
+                        <label for="timerday-7">S</label>
             
                 </fieldset>
-            </div>
-              
-           <div data-role="fieldcontain">
-                <label for="OnTimerSun">An:</label>
-                <select name="OnTimerSun" id="OnTimerSun" data-mini="true">
-                    <option>Automatik</option>
-                    <option>Sonnenaufgang</option>
-                    <option>Sonnenuntergang</option>
+        </li>
+        <li data-role="fieldcontain">
+                <label for="OnTimerType">An:</label>
+                <select name="OnTimerType" id="OnTimerType" data-mini="false">
+                    <option value="M" selected>Manuell</option>
+                    <option value="A">Automatik</option>
+                    <option value="SU">Sonnenaufgang (<?php echo date('H:i', $sunrise); ?>)</option>
+                    <option value="SD">Sonnenuntergang (<?php echo date('H:i', $sunset); ?>)</option>
                 </select>
-                                   
-                <fieldset id="timer-an-zeit" data-role="controlgroup" data-type="horizontal">
-                    <legend> </legend>
+        </li>
+        <li data-role="fieldcontain">
+            <div id="timeronmanuell_box" class="show">
+                Dieser Timer schaltet nicht ein.
+            </div>
+            <div data-role="fieldcontain" id="timerontime_box" class="hide">
+                <fieldset id="timerontime" data-role="controlgroup" data-type="horizontal">
+                    <legend>Uhrzeit:</legend>
                
                     <label for="OnTimerHH">Stunden</label>
-                    <select name="OnTimerHH" id="OnTimerHH" data-mini="true">
+                    <select name="OnTimerHH" id="OnTimerHH" data-mini="false">
                         <option>Stunden</option>
                         <?php
                         for ($i = 0; $i <= 23; $i++) {
@@ -1688,31 +1886,40 @@ $(document).ready(function() {
                     </select>
                
                     <label for="OnTimerMM">Minuten</label>
-                    <select name="OnTimerMM" id="OnTimerMM" data-mini="true">
+                    <select name="OnTimerMM" id="OnTimerMM" data-mini="false">
                         <option>Minuten</option>
                         <?php
-                        for ($i = 0; $i <= 59; $i++) {
+                        for ($i = 0; $i <= 55; $i+=5) {
                          echo "<option value='".sprintf ("%02d", $i)."'>".sprintf ("%02d", $i)."</option>";
                      }
                      ?>
                     </select>
-
                 </fieldset>
             </div>
-
-            <div data-role="fieldcontain">
-                <label for="OffTimerSun">Aus:</label>
-                <select name="OffTimerSun" id="OffTimerSun" data-mini="true">
-                    <option>Automatik</option>
-                    <option>Sonnenaufgang</option>
-                    <option>Sonnenuntergang</option>
+            <div data-role="fieldcontain" id="timeronoffset_box" class="hide">
+                       <label for="timeronoffset">Offset:</label>
+                       <input type="range" name="timeronoffset" id="timeronoffset" value="0" min="-240" max="240" step="5" />
+            </div>
+        </li>
+        <li data-role="fieldcontain">
+                <label for="OffTimerType">Aus:</label>
+                <select name="OffTimerType" id="OffTimerType" data-mini="false">
+                    <option value="M" selected>Manuell</option>
+                    <option value="A">Automatik</option>
+                    <option value="SU">Sonnenaufgang (<?php echo date('H:i', $sunrise); ?>)</option>
+                    <option value="SD">Sonnenuntergang (<?php echo date('H:i', $sunset); ?>)</option>
                 </select>
- 
-                 <fieldset id="timer-aus-zeit" data-role="controlgroup" data-type="horizontal">
-                    <legend> </legend>
+        </li>
+        <li data-role="fieldcontain">
+            <div id="timeroffmanuell_box" class="show">
+                Dieser Timer schaltet nicht aus.
+            </div>
+            <div data-role="fieldcontain" id="timerofftime_box" class="hide">
+                 <fieldset id="timerofftime" data-role="controlgroup" data-type="horizontal">
+                    <legend>Uhrzeit:</legend>
                
                     <label for="OffTimerHH">Stunden</label>
-                    <select name="OffTimerHH" id="OffTimerHH" data-mini="true">
+                    <select name="OffTimerHH" id="OffTimerHH" data-mini="false">
                         <option>Stunden</option>
                         <?php
                         for ($i = 0; $i <= 23; $i++) {
@@ -1722,10 +1929,10 @@ $(document).ready(function() {
                     </select>
                
                     <label for="OffTimerMM">Minuten</label>
-                    <select name="OffTimerMM" id="OffTimerMM" data-mini="true">
+                    <select name="OffTimerMM" id="OffTimerMM" data-mini="false">
                         <option>Minuten</option>
                         <?php
-                        for ($i = 0; $i <= 59; $i++) {
+                        for ($i = 0; $i <= 55; $i+=5) {
                          echo "<option value='".sprintf ("%02d", $i)."'>".sprintf ("%02d", $i)."</option>";
                      }
                      ?>
@@ -1733,11 +1940,13 @@ $(document).ready(function() {
                   
                 </fieldset>
             </div>
+            <div data-role="fieldcontain" id="timeroffoffset_box" class="hide">
+                       <label for="timeroffoffset">Offset:</label>
+                       <input type="range" name="timeroffoffset" id="timeroffoffset" value="0" min="-240" max="240" step="5" />
+            </div>
+        </li>
+    </ul>
               
-
-           </div>
-           <input type="submit" value="Speichern" data-theme="g"/>
-            <a href="#" data-role="button" data-rel="back" data-theme="r">Abbrechen</a>
         </form>
     </div><!-- /content -->
 </div><!-- /page -->

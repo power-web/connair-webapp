@@ -170,14 +170,14 @@ if (isset($r_action)) {
     if (($r_action)=="alloff") {
         foreach($xml->devices->device as $device) {
             send_message($device, "OFF");
-            usleep(300000);
+            usleep($multiDeviceSleep);
         }
         echo $errormessage;
 
     } else if (($r_action)=="allon") {
         foreach($xml->devices->device as $device) {
             send_message($device, "ON");
-            usleep(300000);
+            usleep($multiDeviceSleep);
         }
         echo $errormessage;
 
@@ -197,7 +197,7 @@ if (isset($r_action)) {
             $devicesFound = $xml->xpath("//devices/device/room[text()='".$r_id."']/parent::*");
             foreach($devicesFound as $device) {
                 send_message($device, $action);
-                usleep(300000);
+                usleep($multiDeviceSleep);
             }
 
         } else if (($r_type)=="group") { 
@@ -236,7 +236,7 @@ if (isset($r_action)) {
                         }
                     }
                 }
-                usleep(300000);
+                usleep($multiDeviceSleep);
             }
         }
         echo $errormessage;

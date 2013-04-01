@@ -28,13 +28,16 @@ $r_debug_timer = (string)$_POST['debug_timer'];
 $r_timezone = (string)$_POST['timezone'];
 $r_longitude = (string)$_POST['longitude'];
 $r_latitude = (string)$_POST['latitude'];
+$r_multiDeviceSleep = intval($_POST['multiDeviceSleep']);
 $r_showDeviceStatus = (string)$_POST['showDeviceStatus'];
 $r_showRoomButtonInDevices = (string)$_POST['showRoomButtonInDevices'];
 $r_showMenuOnLoad = (string)$_POST['showMenuOnLoad'];
+$r_showAllOnOffBtnInMenu = (string)$_POST['showAllOnOffBtnInMenu'];
 $r_sortOrderDevices = (string)$_POST['sortOrderDevices'];
 $r_sortOrderGroups = (string)$_POST['sortOrderGroups'];
 $r_sortOrderRooms = (string)$_POST['sortOrderRooms'];
 $r_sortOrderTimers = (string)$_POST['sortOrderTimers'];
+$r_theme = (string)$_POST['theme'];
 
 switch ($r_action) {
     
@@ -44,13 +47,16 @@ switch ($r_action) {
         $xml->global->timezone = $r_timezone;
         $xml->global->longitude = $r_longitude;
         $xml->global->latitude = $r_latitude;
+        $xml->global->multiDeviceSleep = $r_multiDeviceSleep;
         $xml->gui->showDeviceStatus = $r_showDeviceStatus;
         $xml->gui->showRoomButtonInDevices = $r_showRoomButtonInDevices;
         $xml->gui->showMenuOnLoad = $r_showMenuOnLoad;
+        $xml->gui->showAllOnOffBtnInMenu = $r_showAllOnOffBtnInMenu;
         $xml->gui->sortOrderDevices = $r_sortOrderDevices;
         $xml->gui->sortOrderGroups = $r_sortOrderGroups;
         $xml->gui->sortOrderRooms = $r_sortOrderRooms;
         $xml->gui->sortOrderTimers = $r_sortOrderTimers;
+        $xml->gui->theme = $r_theme;
         if(check_config_global()) {
             echo "ok";
             config_save();

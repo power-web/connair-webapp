@@ -31,6 +31,8 @@ $r_vendor = (string)$_POST['vendor'];
 $r_masterdip = (string)$_POST['masterdip'];
 $r_slavedip = (string)$_POST['slavedip'];
 $r_tx433version = (string)$_POST['tx433version'];
+$r_btnLabelOn = (string)$_POST['btnLabelOn'];
+$r_btnLabelOff = (string)$_POST['btnLabelOff'];
 $r_favorite = (string)$_POST['favorite'];
 
 switch ($r_action) {
@@ -46,6 +48,14 @@ switch ($r_action) {
         }
 
         $newdevice = $xml->devices->addChild('device');
+        
+        if(!empty($r_btnLabelOn)) {
+            $newdevice->addAttribute('buttonLabelOn', $r_btnLabelOn);
+        }
+        if(!empty($r_btnLabelOff)) {
+            $newdevice->addAttribute('buttonLabelOff', $r_btnLabelOff);
+        }
+        
         $newdevice->addChild('id', $newid);
         $newdevice->addChild('name', $r_name);
         $newdevice->addChild('vendor', $r_vendor);

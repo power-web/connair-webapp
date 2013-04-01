@@ -40,6 +40,59 @@ if(!empty($xml->global->timezone)) {
     date_default_timezone_set($xml->global->timezone);
 }
 
+$latitude=(float)$xml->global->latitude;
+if(empty($latitude)) {
+    $latitude=ini_get("date.default_latitude");
+    if(empty($latitude)) {
+        $latitude=(float)48.64727;
+    }
+}
+$longitude=(float)$xml->global->longitude;
+if(empty($longitude)) {
+    $longitude=ini_get("date.default_longitude");
+    if(empty($longitude)) {
+        $longitude=(float)9.44858;
+    }
+}
+
+// Sonnenauf- und -untergang für den Timer
+$sunrise = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90+5/6, date("O")/100);
+$sunset = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90+5/6, date("O")/100);
+
+
+if(empty($xml->global->multiDeviceSleep) || $xml->global->multiDeviceSleep<200) {
+    if(!isset($xml->global->multiDeviceSleep)) {
+        $xml->global->addChild('multiDeviceSleep',500);
+    } else {
+        $xml->global->multiDeviceSleep=500;
+    }
+    $multiDeviceSleep = 500000;
+} else {
+    $multiDeviceSleep = intval($xml->global->multiDeviceSleep)*1000;
+}
+
+
+switch ($xml->gui->theme) {
+    case "DARK":
+        $theme_page = "a";
+        $theme_divider = "a";
+        $theme_row = "a";
+        break;
+    default:
+        if(!isset($xml->gui->theme)) {
+            $xml->gui->addChild('theme',"LIGHT");
+        } else {
+            $xml->gui->theme="LIGHT";
+        }
+    case "LIGHT":
+        $theme_divider = "c";
+        $theme_divider = "e";
+        $theme_row = "c";
+        break;
+}
+
+
+
 function config_save() {
     global $xml;
     global $CONFIG_FILENAME;
@@ -116,6 +169,10 @@ function check_device($device) {
             }        
             break;
     }
+    return true;
+}
+
+function check_timer($timer) {
     return true;
 }
 
