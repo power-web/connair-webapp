@@ -2,6 +2,8 @@
 
 if((!isset($directaccess)) OR (!$directaccess)) die();
 
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+
 $debug_timer=empty($xml->timers["debug"]) ? "false" : $xml->timers["debug"];
 header("Content-Type: text/plain; charset=utf-8");
 
@@ -145,10 +147,12 @@ function timer_switch($timer, $action) {
         foreach($groupsFound[0]->deviceid as $deviceid) {
             $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
             $device = $devicesFound[0];
-            if(empty($deviceid['offaction'])) {
+            $deviceaction = strtolower($action)."action";
+            debug_timer("Device ".$deviceid." mit Action '".$deviceaction."' ist '".$deviceid[$deviceaction]."'");
+            if(empty($deviceid[$deviceaction])) {
                 send_message($device, $action);
             } else {
-                switch ($deviceid['offaction']) {
+                switch ($deviceid[$deviceaction]) {
                     case "on":
                         send_message($device, "ON");
                         break;

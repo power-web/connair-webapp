@@ -2,6 +2,8 @@
 
 $directaccess = true;
 
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+
 require("config.php");
 
 /*
@@ -92,12 +94,12 @@ foreach ($_POST['timerday'] as $keyday) {
 }
 switch($_POST['OnTimerType']) {
     case "A":
-        $onHH=intval($_POST['OnTimerHH']);
+        $onHH=$_POST['OnTimerHH'];
         if($onHH<0 && $onHH>23) {
             echo "Falsche Stunden";
             exit;
         }
-        $onMM=intval($_POST['OnTimerMM']);
+        $onMM=$_POST['OnTimerMM'];
         if($onHH<0 && $onHH>59) {
             echo "Falsche Minuten";
             exit;
@@ -118,12 +120,12 @@ switch($_POST['OnTimerType']) {
 $r_timeronoffset=intval($_POST['timeronoffset']);
 switch($_POST['OffTimerType']) {
     case "A":
-        $offHH=intval($_POST['OffTimerHH']);
+        $offHH=$_POST['OffTimerHH'];
         if($offHH<0 && $offHH>23) {
             echo "Falsche Stunden";
             exit;
         }
-        $offMM=intval($_POST['OffTimerMM']);
+        $offMM=$_POST['OffTimerMM'];
         if($offHH<0 && $offHH>59) {
             echo "Falsche Minuten";
             exit;

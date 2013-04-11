@@ -2,6 +2,8 @@
 
 if((!isset($directaccess)) OR (!$directaccess)) die();
 
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+
 $CONFIG_FILENAME="config.xml";
 
 //config.xml dateisystem rechte überprüfen
@@ -85,7 +87,7 @@ switch ($xml->gui->theme) {
             $xml->gui->theme="LIGHT";
         }
     case "LIGHT":
-        $theme_divider = "c";
+        $theme_page = "c";
         $theme_divider = "e";
         $theme_row = "c";
         break;

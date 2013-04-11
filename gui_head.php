@@ -35,12 +35,6 @@ header("Content-Type: text/html; charset=utf-8");
 	background-image: url("app-icon-off.png");
 }
 
-/*
-.ui-grid-a .ui-block-a { width: 66.95%; }
-.ui-grid-a .ui-block-b { width: 32.925%; }
-.ui-grid-a .ui-block-a { clear: left; }
-*/
-
 .hide {
     visibility:hidden;
     display:none;
@@ -50,59 +44,38 @@ header("Content-Type: text/html; charset=utf-8");
     display:inline;
 }
 
-
-
-
-
-
-
-
-
-
-
 @media (min-width:35em) {
  
-/* wrap on wide viewports once open */
- 
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-left,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-left,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-left,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-left {
-    margin-right: 17em;
-}
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-right,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-right,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-right,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-right {
-    margin-left: 17em;
-}
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal {
-    width: auto;	
-}
- 
-/* disable "dismiss" on wide viewports */
-.ui-responsive-panel .ui-panel-dismiss-display-push {
-    display: none;
-}
- 
-}
+    /* wrap on wide viewports once open */
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-left,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-left,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-left,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-left {
+        margin-right: 17em;
+    }
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-right,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-right,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-right,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-right {
+        margin-left: 17em;
+    }
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal {
+        width: auto;	
+    }
+     
+    /* disable "dismiss" on wide viewports */
+    .ui-responsive-panel .ui-panel-dismiss-display-push {
+        display: none;
+    }
 
-
-
-
+}
 </style>
+
     
 <script type="text/javascript" charset="utf-8" src="jquery-1.9.0.min.js"></script>
 <script type="text/javascript">
-
-
-
-
-    $(document).bind("mobileinit", function(){
-        $.support.touchOverflow = true;
-        $.mobile.touchOverflowEnabled = true;
-        //$.mobile.fixedToolbars.setTouchToggleEnabled(false);
+   $(document).bind("mobileinit", function(){
         $.mobile.defaultPageTransition = 'none';
         //$.mobile.page.prototype.options.domCache = true;
     });
@@ -130,71 +103,9 @@ header("Content-Type: text/html; charset=utf-8");
 	}
 ?>
 
-        $('#newdevicesubmit').click(function (e) {
-            $.ajax({
-	            url: "edit_device.php",
-	            type: "POST",
-	            data: $('#newdeviceform').serialize(),
-                async: true,
-	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                $.mobile.changePage('#devices', {
-                            transition: "slide",
-                            reverse: true
-                        });
-		                toast('gespeichert');
-		                resetNewDeviceForm();
-		                refreshPage();
-                    } else {
-                        toast('response:'+response);
-                    }
-	            }
-            });
-	    });
-
-
-        $('#editconfigsubmit').click(function (e) {
-            $.ajax({
-	            url: "edit_config.php",
-	            type: "POST",
-	            data: $('#editconfigform').serialize(),
-                async: true,
-	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                toast('gespeichert');
-		                refreshPage();
-                    } else {
-                        toast('response:'+response);
-                    }
-	            }
-            });
-	    });
-	    
-	    $('#newtimersubmit').click(function (e) {
-            $.ajax({
-	            url: "edit_timer.php",
-	            type: "POST",
-	            data: $('#newtimerform').serialize(),
-                async: true,
-	            success: function(response) {
-	                if(response.trim()=="ok") {
-		                $.mobile.changePage('#timers', {
-                            transition: "slide",
-                            reverse: true
-                        });
-		                toast('gespeichert');
-		                resetNewTimerForm();
-		                refreshPage();
-                    } else {
-                        toast('response:'+response);
-                    }
-	            }
-            });
-	    });
 
 
 
-    });
 <?php 
     $menuAnimated="true";
 
@@ -1134,15 +1045,6 @@ location.reload();
 function resetEditConfigForm() {
     $('#editconfigform')[0].reset();
 }
-
-$(document).ready(function() {
-    $("#currentPosition").click(function() {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            $.mobile.activePage.find('#latitude').val(position.coords.latitude);
-	        $.mobile.activePage.find('#longitude').val(position.coords.longitude);
-        });
-    });
-});
 </script>
 <div data-role="page" id="configurations" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
@@ -1197,9 +1099,6 @@ $(document).ready(function() {
             </select>
             <div>Ausgaben in die debug.log erscheinen nur wenn der globale Debug-Schalter auch an ist.</div>
         </li>
-        <li>
-            <a href="#debug">show debug.log</a>
-        </li>
         <li data-role="list-divider">
         Global
         </li>
@@ -1214,9 +1113,6 @@ $(document).ready(function() {
         <li data-role="fieldcontain">
             <label for="latitude">Latitude:</label>
             <input name="latitude" id="latitude" value="<?php echo $xml->global->latitude; ?>" data-clear-btn="true" type="text">
-        </li>
-        <li data-role="fieldcontain">
-            <input name="currentPosition" id="currentPosition" value="Aktuelle Position verwenden" type="button">
         </li>
         <li data-role="fieldcontain">
             <label for="multiDeviceSleep">Wartezeit beim Senden (ms):</label>
@@ -1298,40 +1194,36 @@ $(document).ready(function() {
         System Informationen
         </li>
         <li data-role="fieldcontain">
-            <label for="mcversion">Mobile Connair Version:</label>
-            <input name="mcversion" id="mcversion"  value="0.6.5" type="text">
-        </li>
-        <li data-role="fieldcontain">
-            <label for="serversoftware">Server Software:</label>
-            <input name="serversoftware" id="serversoftware"  value="<?php echo $_SERVER['SERVER_SOFTWARE']; ?>" type="text">
-        </li>
-        <li data-role="fieldcontain">
-            <label for="phpversion">PHP Version:</label>
-            <input name="phpversion" id="phpversion"  value="<?php echo phpversion(); ?>" type="text">
-        </li>
-        <li data-role="fieldcontain">
             <label for="time">Server Zeit:</label>
-            <input name="time" id="time"  value="<?php echo date("Y-m-d H:i:s"); ?>" type="text">
+            <input name="time" id="time" disabled="disabled" value="<?php echo date("Y-m-d H:i:s"); ?>" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="timezone">Server Zeitzone:</label>
-            <input name="timezone" id="timezone"  value="<?php echo date_default_timezone_get(); ?>" type="text">
+            <input name="timezone" id="timezone" disabled="disabled" value="<?php echo date_default_timezone_get(); ?>" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="longitude">Longitude:</label>
-            <input name="longitude" id="longitude"  value="<?php echo $longitude; ?>" type="text">
+            <input name="longitude" id="longitude" disabled="disabled" value="<?php echo $longitude; ?>" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="latitude">Latitude:</label>
-            <input name="latitude" id="latitude"  value="<?php echo $latitude; ?>" type="text">
+            <input name="latitude" id="latitude" disabled="disabled" value="<?php echo $latitude; ?>" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="sunrise">Sonnenaufgang:</label>
-            <input name="sunrise" id="sunrise"  value="<?php echo date('H:i', $sunrise); ?>" type="text">
+            <input name="sunrise" id="sunrise" disabled="disabled" value="<?php echo date('H:i', $sunrise); ?>" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="sunset">Sonnenuntergang:</label>
-            <input name="sunset" id="sunset"  value="<?php echo date('H:i', $sunset); ?>" type="text">
+            <input name="sunset" id="sunset" disabled="disabled" value="<?php echo date('H:i', $sunset); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="phpversion">PHP Version:</label>
+            <input name="phpversion" id="phpversion" disabled="disabled" value="<?php echo phpversion(); ?>" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="serversoftware">Server Software:</label>
+            <input name="serversoftware" id="serversoftware" disabled="disabled" value="<?php echo $_SERVER['SERVER_SOFTWARE']; ?>" type="text">
         </li>
     </ul>
 </form>
@@ -1406,7 +1298,7 @@ function resetNewDeviceForm() {
   margin-right: auto ;
 	display: block;
 	float: left;
-	background: #AD2929;
+	background: #ee0000;
 	width: 260px;
 	#width: 90%;
 	height: 80px;
@@ -1470,11 +1362,11 @@ function resetNewDeviceForm() {
 }
 
 .on  {
-	border-bottom: 15px solid #C24949;
+	border-bottom: 15px solid #ee6666;
 }
 
 .off  {
-	border-top: 15px solid #C24949;
+	border-top: 15px solid #ee6666;
 }
 
 .clear {
@@ -1706,10 +1598,6 @@ function resetNewTimerForm() {
     $("#timertype_room").trigger('change');
     $("#OnTimerType").trigger('change');
     $("#OffTimerType").trigger('change');
-    $("input[name='timerday[]']").attr({
-            checked: $(this).is(':checked')
-    });
-    $("input[name='timerday[]']").checkboxradio("refresh");
 }
 
 /*
@@ -1966,60 +1854,6 @@ function resetNewTimerForm() {
 
 
 
-
-
-
-
-
-
-
-
-<script type="text/javascript">
-    function load_debug() {
-        $.ajax({
-            type:'GET', 
-            url: 'gui_debug.php?taillog=yes', 
-            async: true,
-            success: function(response) {
-                $('#debugtext').val(response);
-            },
-            error: function(response) {
-                $('#debugtext').val(response);
-            }
-        });
-    }
-    $(document).ready(function() {
-        $(document).delegate('#debug', 'pageshow', function () {
-            load_debug();
-        });
-        $("#reloadbtn").click(function() {
-            load_debug();
-        });
-    });
-</script>
-<div data-role="page" id="debug" data-theme="<?php echo $theme_page; ?>">
-
-    <div data-role="header" data-position="fixed" data-tap-toggle="false">
-        <a href="#configurations" data-transition="slide" data-direction="reverse">Einstellungen</a>
-        <h1>Debug</h1>
-        <a href="#" id="reloadbtn">Reload</a>
-    </div><!-- /header -->
-
-    <div data-role="content" id="content">  
-        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
-
-            <li data-role="list-divider" role="heading">
-                debug.log
-            </li>
-
-            <li>
-                <textarea id="debugtext">
-                </textarea>
-            </li>     
-
-        </ul>
-    </div><!-- /content -->
-</div><!-- /page -->
 
 </body>
 </html>

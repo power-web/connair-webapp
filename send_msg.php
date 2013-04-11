@@ -3,8 +3,8 @@
 if((!isset($directaccess)) OR (!$directaccess)) die();
 
 
-function connair_send($msg) {
-    debug("Sending Message to ConnAir");
+function connair_send($device, $msg) {
+    debug("Sending Message to ConnAir with id '".$device->senderid."'");
     global $debug;
     global $xml;
     global $errormessage;
@@ -15,15 +15,32 @@ function connair_send($msg) {
         $errormessage="Couldn't create socket: [$errorcode] $errormsg \n";
         return;
     }
+    $devicesenderid=(string)$device->senderid;
     foreach($xml->connairs->connair as $connair) {
+        if(!empty($devicesenderid) && (string)$device->senderid != (string)$connair->id) {
+            debug("NOT Sending Message to ConnAir [".$connair->id."] ".$connair->address.":".(integer)$connair->port);
+            continue;
+        }
         if ((string)$connair["type"]=="itgw") {
             $newmsg=str_replace("TXP:","",$msg);
             $newmsg=str_replace("#baud#","26,0",$newmsg);
         } else {
             $newmsg=str_replace("#baud#","25",$msg);
         }
-        debug("Sending Message '".$newmsg."' to ConnAir ".(string)$connair->address.":".(integer)$connair->port);
-        if( ! socket_sendto ( $sock , $newmsg, $len , 0, (string)$connair->address , (integer)$connair->port)) {
+        $connairIP = trim((string)$connair->address);
+        if(!filter_var($connairIP, FILTER_VALIDATE_IP)) {
+            $connairIPCheck = @gethostbyname(trim((string)$connair->address));
+            if($connairIP == $connairIPCheck) {
+                $errormessage="ConnAir ".$connairIP." is not availible. Check IP or Hostname.";
+                debug($errormessage);
+                continue;
+            } else {
+                debug("Found this IPAddress ".$connairIPCheck." for ConnAir ".$connairIP);
+                $connairIP = $connairIPCheck;
+            }
+        }
+        debug("Sending Message '".$newmsg."' to ConnAir ".$connairIP.":".(integer)$connair->port);
+        if( ! socket_sendto ( $sock , $newmsg, $len , 0, $connairIP , (integer)$connair->port)) {
 	        $errorcode = socket_last_error();
 	        if($errorcode>0) {
                 $errormsg = socket_strerror($errorcode);
@@ -118,11 +135,11 @@ function connair_create_msg_intertechno($device, $action) {
     }
     $sA=0;
     $sG=0;
-    $sRepeat=6;
+    $sRepeat=12;
     $sPause=11125;
     $sTune=89;
     $sBaud="#baud#";
-    $sSpeed=125;
+    $sSpeed=4;
     $uSleep=800000;
     $HEAD="TXP:$sA,$sG,$sRepeat,$sPause,$sTune,$sBaud,";
     $TAIL=",1,$sSpeed,;";
@@ -312,14 +329,19 @@ function connair_create_msg_elro($device, $action) {
 }
 
 
-function cul_send($msg) {
+function cul_send($device, $msg) {
     debug("Sending Message to CUL");
     global $debug;
     global $xml;
     global $errormessage;
     $len = strlen($msg);
+    $devicesenderid=(string)$device->senderid;
     foreach($xml->culs->cul as $cul) {
-        debug("Sending Message '".$msg."' to CUL ".(string)$cul->device);
+        if(!empty($devicesenderid) && (string)$device->senderid != (string)$cul->id) {
+            debug("NOT Sending Message to CUL [".$cul->id."]".(string)$cul->device);
+            continue;
+        }
+        debug("Sending Message '".$msg."' to CUL [".$cul->id."]".(string)$cul->device);
         if(is_writable((string)$cul->device)) {
             $handle = fopen((string)$cul->device, "wb");
             if(!$handle) {
@@ -594,7 +616,7 @@ function send_message($device, $action) {
                 break;
         }
         if(!empty($msg)) {
-            connair_send($msg);
+            connair_send($device, $msg);
             $device->status = $action;
         }
     }
@@ -607,7 +629,7 @@ function send_message($device, $action) {
                 break;
         }
         if(!empty($msg)) {
-            cul_send($msg);
+            cul_send($device, $msg);
             $device->status = $action;
         }
     }

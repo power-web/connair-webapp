@@ -2,12 +2,18 @@
 
 if((!isset($directaccess)) OR (!$directaccess)) die();
 
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+
 $DEBUG_FILENAME="debug.log";
 
 //debug.log dateisystem rechte überprüfen
+if($debug == "true" && !touch($DEBUG_FILENAME)) {
+    echo "Kann die Log (".$DEBUG_FILENAME.") nicht anlegen!\n";
+    exit(5);
+}
 if($debug == "true" && !is_writable($DEBUG_FILENAME)) {
     echo "Kann die Log (".$DEBUG_FILENAME.") nicht schreiben!\n";
-    exit(5);
+    exit(6);
 }
 
 //funktion um in das debug log zu schreiben

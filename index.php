@@ -2,6 +2,8 @@
 
 $directaccess = true;
 
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+
 /*
 Hilfreiche Links:
 
@@ -9,6 +11,8 @@ Dev:
 http://developer.apple.com/library/safari/#documentation/iPhone/Conceptual/SafariJSDatabaseGuide/OfflineApplicationCache/OfflineApplicationCache.html
 http://jquerymobile.com/demos/1.0rc2/docs/pages/page-cache.html
 http://code.google.com/p/jqueryrotate/
+http://zsprawl.com/iOS/2012/03/css-for-iphone-ipad-and-retina-displays/
+http://appcropolis.com/blog/advanced-customization-jquery-mobile-buttons/
 
 Config:
 http://www.fhemwiki.de/wiki/Intertechno_Code_Berechnung
