@@ -13,6 +13,7 @@ http://jquerymobile.com/demos/1.0rc2/docs/pages/page-cache.html
 http://code.google.com/p/jqueryrotate/
 http://zsprawl.com/iOS/2012/03/css-for-iphone-ipad-and-retina-displays/
 http://appcropolis.com/blog/advanced-customization-jquery-mobile-buttons/
+http://webdesignerwall.com/tutorials/jquery-tutorials-for-designers
 
 Config:
 http://www.fhemwiki.de/wiki/Intertechno_Code_Berechnung

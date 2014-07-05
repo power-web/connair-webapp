@@ -46,10 +46,10 @@ function connair_send($device, $msg) {
                 $errormsg = socket_strerror($errorcode);
                 $errormessage="Could not send data: [$errorcode] $errormsg \n";
             } else {
-                $errormessage="Befehl an Connair gesendet \n";
+                $errormessage="Befehl gesendet \n";
             }
         } else {
-            $errormessage="Befehl an Connair gesendet \n";
+            $errormessage="Befehl gesendet \n";
         }
     }
     if($sock) {
@@ -484,6 +484,41 @@ function cul_create_msg_intertechno($device, $action) {
 
 
 
+// Schaltet Geräte via URL Aufruf aus und ein
+function switch_url($device, $action) {
+    global $debug;
+    debug("switch URL for device='".(string)$device->id."' action='".(string)$action."'");
+
+    if(empty($device->address->rawCodeOn)) {
+        echo "ERROR: rawCodeOn (URL An) ist ungültig für device id ".$device->id;
+        return;
+    }
+    if(empty($device->address->rawCodeOff)) {
+        echo "ERROR: rawCodeOff (URL Aus) ist ungültig für device id ".$device->id;
+        return;
+    }
+
+    if($action == "OFF") {
+        $url = $device->address->rawCodeOff;
+    } else {
+        $url = $device->address->rawCodeOn;
+    }
+    
+    debug("calling url: ".$url);
+    $payload = file_get_contents($url);
+    debug("response from url: ".$payload);
+    
+    echo "Befehl ausgeführt \n";
+
+    if($debug == "true") {
+        echo "<br>Antwort: ".$payload;
+    }
+    
+    return "";
+}
+
+
+
 // Schaltet Computer aus und ein
 function switch_computer($device, $action) {
     debug("switch Computer for device='".(string)$device->id."' action='".(string)$action."'");
@@ -589,10 +624,17 @@ function send_message($device, $action) {
     debug("Send Message for device='".(string)$device->id."' action='".(string)$action."'");
     global $xml;
     $vendor=strtolower($device->vendor);
-    if ($vendor=="computer") {
-        switch_computer($device, $action);
-        $device->status = $action;
-        return;
+    switch($vendor) {
+        case "computer":
+            switch_computer($device, $action);
+            $device->status = $action;
+            //hier nicht connair und cul ansprechen
+            return;
+        case "url":
+            switch_url($device, $action);
+            $device->status = $action;
+            //hier nicht connair und cul ansprechen
+            return;
     }
     //wenn connairs configuriert senden
     if(@count($xml->connairs->children()) > 0) {

@@ -84,7 +84,13 @@ switch ($r_action) {
         break;
     
     case "delete":
-        break;    
+        $xpath='//device/id[.="'.$r_id.'"]/parent::*';
+        $res = $xml->xpath($xpath); 
+        $parent = $res[0]; 
+        unset($parent[0]);
+        echo "ok";
+        config_save();
+	break;
     
     default:
         echo "unsupported";

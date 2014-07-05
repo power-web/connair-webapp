@@ -47,107 +47,112 @@ exit;
 */
 $r_action = (string)$_POST['action'];
 $r_id = (string)$_POST['id'];
-$r_active = (string)$_POST['active'];
-$r_type = (string)$_POST['timertype'];
-switch($_POST['timertype']) {
-    case "device":
-        $typeid = (string)$_POST['typeiddevice'];
-        break;
-        
-    case "group":
-        $typeid = (string)$_POST['typeidgroup'];
-        break;
-        
-    case "room":
-        $typeid = (string)$_POST['typeidroom'];
-        break;
-        
-    default:
-        echo "Ungültiger Typer Typ!";
-        exit;
-}
-$day = '_______';
-foreach ($_POST['timerday'] as $keyday) {
-    switch($keyday) {
-        case 0:
-            $day[$keyday]='M';
-            break;
-        case 1:
-            $day[$keyday]='D';
-            break;
-        case 2:
-            $day[$keyday]='M';
-            break;
-        case 3:
-            $day[$keyday]='D';
-            break;
-        case 4:
-            $day[$keyday]='F';
-            break;
-        case 5:
-            $day[$keyday]='S';
-            break;
-        case 6:
-            $day[$keyday]='S';
-            break;
-    }
-}
-switch($_POST['OnTimerType']) {
-    case "A":
-        $onHH=$_POST['OnTimerHH'];
-        if($onHH<0 && $onHH>23) {
-            echo "Falsche Stunden";
-            exit;
-        }
-        $onMM=$_POST['OnTimerMM'];
-        if($onHH<0 && $onHH>59) {
-            echo "Falsche Minuten";
-            exit;
-        }
-        $timerOn = $onHH.':'.$onMM;
-        break;
-        
-    case "SU":
-    case "SD":
-        $timerOn = (string)$_POST['OnTimerType'];
-        break;
-        
-    default:
-    case "M":
-        $timerOn = "";
-        break;   
-}
-$r_timeronoffset=intval($_POST['timeronoffset']);
-switch($_POST['OffTimerType']) {
-    case "A":
-        $offHH=$_POST['OffTimerHH'];
-        if($offHH<0 && $offHH>23) {
-            echo "Falsche Stunden";
-            exit;
-        }
-        $offMM=$_POST['OffTimerMM'];
-        if($offHH<0 && $offHH>59) {
-            echo "Falsche Minuten";
-            exit;
-        }
-        $timerOff = $offHH.':'.$offMM;
-        break;
-        
-    case "SU":
-    case "SD":
-        $timerOff = (string)$_POST['OffTimerType'];
-        break;
-        
-    default:
-    case "M":
-        $timerOff = "";
-        break;   
-}
-$r_timeroffoffset=intval($_POST['timeroffoffset']);
 
 switch ($r_action) {
 
     case "add":
+
+
+	$r_active = (string)$_POST['active'];
+	$r_type = (string)$_POST['timertype'];
+	switch($_POST['timertype']) {
+	    case "device":
+		$typeid = (string)$_POST['typeiddevice'];
+		break;
+	
+	    case "group":
+		$typeid = (string)$_POST['typeidgroup'];
+		break;
+	
+	    case "room":
+		$typeid = (string)$_POST['typeidroom'];
+		break;
+	
+	    default:
+		echo "Ungültiger Typer Typ!";
+		exit;
+	}
+	$day = '_______';
+	foreach ($_POST['timerday'] as $keyday) {
+	    switch($keyday) {
+		case 0:
+		    $day[$keyday]='M';
+		    break;
+		case 1:
+		    $day[$keyday]='D';
+		    break;
+		case 2:
+		    $day[$keyday]='M';
+		    break;
+		case 3:
+		    $day[$keyday]='D';
+		    break;
+		case 4:
+		    $day[$keyday]='F';
+		    break;
+		case 5:
+		    $day[$keyday]='S';
+		    break;
+		case 6:
+		    $day[$keyday]='S';
+		    break;
+	    }
+	}
+	switch($_POST['OnTimerType']) {
+	    case "A":
+		$onHH=$_POST['OnTimerHH'];
+		if($onHH<0 && $onHH>23) {
+		    echo "Falsche Stunden";
+		    exit;
+		}
+		$onMM=$_POST['OnTimerMM'];
+		if($onHH<0 && $onHH>59) {
+		    echo "Falsche Minuten";
+		    exit;
+		}
+		$timerOn = $onHH.':'.$onMM;
+		break;
+	
+	    case "SU":
+	    case "SD":
+		$timerOn = (string)$_POST['OnTimerType'];
+		break;
+	
+	    default:
+	    case "M":
+		$timerOn = "";
+		break;   
+	}
+	$r_timeronoffset=intval($_POST['timeronoffset']);
+	switch($_POST['OffTimerType']) {
+	    case "A":
+		$offHH=$_POST['OffTimerHH'];
+		if($offHH<0 && $offHH>23) {
+		    echo "Falsche Stunden";
+		    exit;
+		}
+		$offMM=$_POST['OffTimerMM'];
+		if($offHH<0 && $offHH>59) {
+		    echo "Falsche Minuten";
+		    exit;
+		}
+		$timerOff = $offHH.':'.$offMM;
+		break;
+	
+	    case "SU":
+	    case "SD":
+		$timerOff = (string)$_POST['OffTimerType'];
+		break;
+	
+	    default:
+	    case "M":
+		$timerOff = "";
+		break;   
+	}
+	$r_timeroffoffset=intval($_POST['timeroffoffset']);
+
+
+
         $newid=1;
         foreach($xml->timers->timer as $timer) {
             $oldid=(integer)$timer->id;
@@ -178,10 +183,34 @@ switch ($r_action) {
         break;
     
     case "edit":
-      //  break;
+        break;
+    
+    case "on":
+        $xpath='//timer/id[.="'.$r_id.'"]/parent::*';
+        $res = $xml->xpath($xpath); 
+        $parent = $res[0]; 
+        $parent[0]->active="on";
+        echo "ok";
+        config_save();
+	break;
+    
+    case "off":
+        $xpath='//timer/id[.="'.$r_id.'"]/parent::*';
+        $res = $xml->xpath($xpath); 
+        $parent = $res[0]; 
+        $parent[0]->active="off";
+        echo "ok";
+        config_save();
+	break;
     
     case "delete":
-      //  break;    
+        $xpath='//timer/id[.="'.$r_id.'"]/parent::*';
+        $res = $xml->xpath($xpath); 
+        $parent = $res[0]; 
+        unset($parent[0]);
+        echo "ok";
+        config_save();
+	break;
     
     default:
         echo "unsupported";

@@ -14,7 +14,7 @@ header("Content-Type: text/html; charset=utf-8");
 <meta charset="UTF-8">
 <title>Mobile Connair</title>
 
-<link rel="stylesheet" href="jquery.mobile-1.3.0.min.css" />
+<link rel="stylesheet" href="jquery.mobile-1.3.1.min.css" />
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
 <style type="text/css">
@@ -49,6 +49,15 @@ header("Content-Type: text/html; charset=utf-8");
     visibility:visible;
     display:inline;
 }
+
+
+/*
+.ui-grid-a .ui-block-a { width: 66.95%; }
+.ui-grid-a .ui-block-b { width: 32.925%; }
+.ui-grid-a .ui-block-a { clear: left; }
+*/
+
+
 
 
 
@@ -90,10 +99,58 @@ header("Content-Type: text/html; charset=utf-8");
 
 
 
+.box-btn-switch .ui-btn, .box-btn-edit .ui-btn { 
+    height: 45px; 
+    min-width: 55px; 
+    max-width: 116px;
+    margin: 0 auto;
+}
+.box-btn-edit .ui-btn-icon-notext .ui-btn-inner .ui-icon { 
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 7px;
+}
+
+.box-btn-switch .ui-btn-corner-all, .box-btn-edit .ui-btn-corner-all, [data-role="header"] .ui-btn-corner-all, [data-role="panel"] .ui-btn-corner-all {
+    -moz-border-radius:             .5em;
+    -webkit-border-radius:          .5em;
+    border-radius:                  .5em;
+}​
+.box-btn-hide {
+    visibility:hidden;
+    display:none;
+}
+.box-btn-show {
+    visibility:visible;
+    display:inline;
+}
+
+.box-btn-switch {
+    /*display: block;
+    white-space: nowrap;*/
+}
+.box-btn-edit {
+    /*display: none;
+    white-space: nowrap;*/
+}
+
+
+
+
+/*
+Zeilenumbruch in der Listview
+*/
+.ui-page .ui-content .ui-listview .ui-li-heading {
+    white-space: normal;
+}
+.ui-page .ui-content .ui-listview .ui-li-desc {
+    white-space: normal;
+}
 
 </style>
     
-<script type="text/javascript" charset="utf-8" src="jquery-1.9.0.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery-1.9.1.min.js"></script>
 <script type="text/javascript">
 
 
@@ -135,22 +192,22 @@ header("Content-Type: text/html; charset=utf-8");
 	            url: "edit_device.php",
 	            type: "POST",
 	            data: $('#newdeviceform').serialize(),
-                async: true,
+                    async: true,
 	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                $.mobile.changePage('#devices', {
-                            transition: "slide",
-                            reverse: true
-                        });
-		                toast('gespeichert');
-		                resetNewDeviceForm();
-		                refreshPage();
-                    } else {
-                        toast('response:'+response);
-                    }
+		        if(response.trim()=="ok") {
+                            setTimeout(function(){refreshPage()}, 1500);
+		            $.mobile.changePage('#devices', {
+                            	transition: "slide",
+                            	reverse: true
+                            });
+	                    toast('gespeichert');
+	                    resetNewDeviceForm();
+		        } else {
+		            toast('response:'+response);
+		        }
 	            }
             });
-	    });
+	});
 
 
         $('#editconfigsubmit').click(function (e) {
@@ -158,39 +215,39 @@ header("Content-Type: text/html; charset=utf-8");
 	            url: "edit_config.php",
 	            type: "POST",
 	            data: $('#editconfigform').serialize(),
-                async: true,
+                    async: true,
 	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                toast('gespeichert');
-		                refreshPage();
-                    } else {
-                        toast('response:'+response);
-                    }
+		        if(response.trim()=="ok") {
+	                    setTimeout(function(){refreshPage()}, 1500);
+	                    toast('gespeichert');
+                        } else {
+                            toast('response:'+response);
+                        }
 	            }
             });
-	    });
+	});
 	    
-	    $('#newtimersubmit').click(function (e) {
+	$('#newtimersubmit').click(function (e) {
             $.ajax({
 	            url: "edit_timer.php",
 	            type: "POST",
 	            data: $('#newtimerform').serialize(),
-                async: true,
+                    async: true,
 	            success: function(response) {
-	                if(response.trim()=="ok") {
-		                $.mobile.changePage('#timers', {
-                            transition: "slide",
-                            reverse: true
-                        });
-		                toast('gespeichert');
-		                resetNewTimerForm();
-		                refreshPage();
-                    } else {
-                        toast('response:'+response);
-                    }
+		        if(response.trim()=="ok") {
+	                    setTimeout(function(){refreshPage()}, 1500);
+		            $.mobile.changePage('#timers', {
+                            	transition: "slide",
+                            	reverse: true
+                            });
+                            toast('gespeichert');
+	                    resetNewTimerForm();
+                        } else {
+                            toast('response:'+response);
+                        }
 	            }
             });
-	    });
+	});
 
 
 
@@ -224,7 +281,7 @@ header("Content-Type: text/html; charset=utf-8");
 	//}
 ?>
 </script>
-<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="jquery.toast.mobile.js"></script>
 
 
@@ -388,6 +445,177 @@ location.reload();
                 });
             }
         }
+        
+        
+        function showEditButtonsA() { 
+            zeit=100;
+            if($('#editButton').hasClass("l3x-active")) {
+                $('#editButton').removeClass("ui-btn-active"); 
+                $('#editButton').removeClass("l3x-active"); 
+
+                $('.box-btn-edit').each(function() {
+                    $(this).animate({ opacity: "hide" }, zeit, function() {
+                        $(this).siblings(".box-btn-switch").animate({ opacity: "show" }, zeit);
+                    });
+                });
+            } else {
+                $('#editButton').addClass("ui-btn-active");
+                $('#editButton').addClass("l3x-active"); 
+                
+                $('.box-btn-switch').each(function() {
+                    $(this).animate({ opacity: "hide" }, zeit, function() {
+                        $(this).siblings(".box-btn-edit").animate({ opacity: "show" }, zeit);
+                    });
+                });
+            }
+        }       
+        
+        function showEditButtons() {
+            var editButton = $.mobile.activePage.find('#editButton');
+            if(editButton.hasClass("l3x-active")) {
+                editButton.removeClass("ui-btn-active");
+                editButton.removeClass("l3x-active");
+                
+                $.mobile.activePage.find(".box-btn-edit").each(function() {
+                    $(this).removeClass('show').addClass('hide');
+                });
+                $.mobile.activePage.find(".box-btn-switch").each(function() {
+                    $(this).removeClass('hide').addClass('show');
+                });
+            } else {
+                editButton.addClass("ui-btn-active");
+                editButton.addClass("l3x-active"); 
+                
+                $.mobile.activePage.find(".box-btn-switch").each(function() {
+                    $(this).removeClass('show').addClass('hide');
+                });
+                $.mobile.activePage.find(".box-btn-edit").each(function() {
+                    $(this).removeClass('hide').addClass('show');
+                });
+            }
+        }
+                
+        function showEditButtonsAlle() { 
+            if($('#editButton').hasClass("l3x-active")) {
+                $('#editButton').each(function() {
+                    $(this).removeClass("ui-btn-active");
+                    $(this).removeClass("l3x-active");
+                }); 
+                
+                $(".box-btn-edit").css("display","none");
+                $(".box-btn-switch").css("display","block");
+            } else {
+                $('#editButton').each(function() {
+                    $(this).addClass("ui-btn-active");
+                    $(this).addClass("l3x-active"); 
+                });
+                
+                $(".box-btn-switch").css("display","none");
+                $(".box-btn-edit").css("display","block");
+            }
+        }
+        
+        
+        function edit_device(id) {
+            alert('edit_device '+id);
+        }
+        function delete_device(id) {
+            $.ajax({
+	            url: "edit_device.php",
+	            type: "POST",
+	            data: "action=delete&id="+id,
+                async: true,
+	            success: function(response) {
+		            if(response.trim()=="ok") {
+		                $.mobile.changePage('#devices', {
+                            transition: "slide",
+                            reverse: true
+                        });
+		                toast('gelöscht');
+		                refreshPage();
+                    } else {
+                        toast('response:'+response);
+                    }
+	            }
+            });
+        }
+        function edit_group(id) {
+            alert('edit_group '+id);
+        }
+        function delete_group(id) {
+            $.ajax({
+	            url: "edit_group.php",
+	            type: "POST",
+	            data: "action=delete&id="+id,
+                async: true,
+	            success: function(response) {
+		            if(response.trim()=="ok") {
+		                $.mobile.changePage('#groups', {
+                            transition: "slide",
+                            reverse: true
+                        });
+		                toast('gelöscht');
+		                refreshPage();
+                    } else {
+                        toast('response:'+response);
+                    }
+	            }
+            });
+        }
+        function edit_timer(id, action) {
+            if(action=="EIN") {
+                $.ajax({
+                    url: "edit_timer.php",
+                    type: "POST",
+                    data: "action=on&id="+id,
+                    async: true,
+	            success: function(response) {
+		        if(response.trim()=="ok") {
+		                toast('gespeichert');
+		                refreshPage();
+                        } else {
+                            toast('response:'+response);
+                        }
+	            }
+                });
+            }
+            if(action=="AUS") {
+                $.ajax({
+	            url: "edit_timer.php",
+	            type: "POST",
+	            data: "action=off&id="+id,
+                    async: true,
+	            success: function(response) {
+		        if(response.trim()=="ok") {
+		                toast('gespeichert');
+		                refreshPage();
+                        } else {
+                            toast('response:'+response);
+                        }
+	            }
+                });
+            }
+        }
+        function delete_timer(id) {
+            $.ajax({
+	            url: "edit_timer.php",
+	            type: "POST",
+	            data: "action=delete&id="+id,
+                async: true,
+	            success: function(response) {
+		            if(response.trim()=="ok") {
+		                $.mobile.changePage('#timer', {
+                            transition: "slide",
+                            reverse: true
+                        });
+		                toast('gelöscht');
+		                refreshPage();
+                    } else {
+                        toast('response:'+response);
+                    }
+	            }
+            });
+        }
     </script>
 </head>
 
@@ -431,10 +659,14 @@ location.reload();
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Favoriten</h1>
+        <div data-type="horizontal" data-role="controlgroup"  class="ui-btn-right"> 
+            <a href="#" id="editButton" data-role="button" data-iconpos="notext" data-icon="edit" onClick="showEditButtons();"></a>
+            <a href="#newdevice" id="newButton" data-transition="slide" data-role="button" data-iconpos="notext" data-icon="plus"></a>
+        </div>              
     </div><!-- /header -->
 
     <div data-role="content" id="content">  
-        <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
+        <ul id="favlist" data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
 
             <li data-role="list-divider" role="heading">
                 Gruppen
@@ -457,21 +689,26 @@ location.reload();
 
             <li>
                 <div class="ui-grid-a">
-	                <div class="ui-block-a" style="text-align:left"><?php echo $group->name; ?></div>
+	                <div class="ui-block-a" style="text-align:left">
+	                    <h2><?php echo $group->name; ?></h2>
+<?php
+                        foreach($group->deviceid as $deviceid) {
+                            $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
+                            echo "<p>".$devicesFound[0]->name."</p>";
+                        }
+?>
+	                </div>
 	                <div class="ui-block-b" style="text-align:right">
-                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
-                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+                        <div class="box-btn-switch">
+                            <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+                            <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+	                    </div>
+	                    <div class="box-btn-edit hide">
+	                        <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_group('<?php echo $group->id; ?>')">Bearbeiten</button>
+	                        <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_group('<?php echo $group->id; ?>')">Löschen</button>
+	                     </div>
 	                </div>
                 </div>
-                
-<?php
-            
-            foreach($group->deviceid as $deviceid) {
-                $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
-            echo "<p>".$devicesFound[0]->name."</p>";
-        }
-?>
-
             </li>
      
 <?php
@@ -555,13 +792,27 @@ location.reload();
 
                 <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
-	                    <div class="ui-block-a" style="text-align:left"><?php echo $device->name; ?></div>
+	                    <div class="ui-block-a" style="text-align:left">
+	                        <h2><?php echo $device->name; ?></h2>
+                            <p><?php echo $device->room; ?></p>
+	                    </div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
-	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+                            <div class="box-btn-switch">
+	                            <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+<?php
+    if($device["hideButtonOff"] != "yes") {
+?>
+	                            <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+<?php
+    }
+?>
+	                        </div>
+	                        <div class="box-btn-edit hide">
+	                            <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_device('<?php echo $device->id; ?>')">Bearbeiten</button>
+	                            <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_device('<?php echo $device->id; ?>')">Löschen</button>
+	                        </div>
 	                    </div>
                     </div>
-                    <p><?php echo $device->room; ?></p>
                 </li>
 
 <?php
@@ -607,7 +858,10 @@ location.reload();
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Geräte</h1>
-        <a href="#newdevice" data-transition="slide">Neu</a>
+        <div data-type="horizontal" data-role="controlgroup"  class="ui-btn-right"> 
+            <a href="#" id="editButton" data-role="button" data-iconpos="notext" data-icon="edit" onClick="showEditButtons();"></a>
+            <a href="#newdevice" id="newDeviceButton" data-transition="slide" data-role="button" data-iconpos="notext" data-icon="plus"></a>
+        </div>
     </div><!-- /header -->
 
 
@@ -650,8 +904,10 @@ location.reload();
 <?php
     if($xml->gui->showRoomButtonInDevices == "true") {
 ?>
-	                        <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
-	                        <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
+                            <div class="box-btn-switch">
+	                            <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
+	                            <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
+	                        </div>
 <?php
     }
 ?>
@@ -722,19 +978,33 @@ location.reload();
                 <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left">
+	                    	<h2><?php echo $device->name; php?></h2>
 	                    <?php 
 	                    	if($debug == "true") {
-	                    		echo "<h3>".$device->name."</h3>";
 	                    		echo "<p><i>".$device->id." ".$device->vendor." ".$device->address->masterdip." ".$device->address->slavedip."</i></p>";
-	                    	} else {
-	                    		echo $device->name;
 	                    	}
 	                    ?>
 	                    </div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
-	                        <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
-                        </div>
+                            <div class="box-btn-switch">
+<?php
+    if($device["hideButtonOn"] != "yes") {
+?>
+	                            <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+<?php
+    }
+    if($device["hideButtonOff"] != "yes") {
+?>
+	                            <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+<?php
+    }
+?>
+	                        </div>
+	                        <div class="box-btn-edit hide">
+	                            <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_device('<?php echo $device->id; ?>')">Bearbeiten</button>
+	                            <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_device('<?php echo $device->id; ?>')">Löschen</button>
+	                        </div>
+	                    </div>
                     </div>
                 </li>
 
@@ -779,6 +1049,10 @@ location.reload();
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Gruppen</h1>
+        <div data-type="horizontal" data-role="controlgroup"  class="ui-btn-right"> 
+            <a href="#" id="editButton" data-role="button" data-iconpos="notext" data-icon="edit" onClick="showEditButtons();"></a>
+            <a href="#newgroup" id="newGroupButton" data-rel="dialog" data-role="button" data-iconpos="notext" data-icon="plus"></a>
+        </div>
     </div><!-- /header -->
 
     <div data-role="content">  
@@ -805,13 +1079,8 @@ location.reload();
 
             <li>
                 <div class="ui-grid-a">
-	                <div class="ui-block-a" style="text-align:left"><?php echo $group->name; ?></div>
-	                <div class="ui-block-b" style="text-align:right">
-                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
-                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
-	                </div>
-                </div>
-                
+	                <div class="ui-block-a" style="text-align:left">
+	                    <h2><?php echo $group->name; ?></h2>
 <?php
         foreach($group->deviceid as $deviceid) {
             $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
@@ -838,7 +1107,18 @@ location.reload();
             echo "<p>".$text."</p>";
         }
 ?>
-
+	                </div>
+	                <div class="ui-block-b" style="text-align:right">
+	                    <div class="box-btn-switch">
+                            <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+                            <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+                        </div>
+	                    <div class="box-btn-edit hide">
+	                        <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_group('<?php echo $group->id; ?>')">Bearbeiten</button>
+	                        <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_group('<?php echo $group->id; ?>')">Löschen</button>
+	                     </div>
+	                </div>
+                </div>
             </li>
      
 <?php
@@ -912,8 +1192,10 @@ location.reload();
                     <div class="ui-grid-a">
 	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
 	                    <div class="ui-block-b" style="text-align:right">
-	                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
-	                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
+	                        <div class="box-btn-switch">
+	                            <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
+	                            <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
+	                        </div>
 	                    </div>
                     </div>
                 </li>
@@ -971,7 +1253,10 @@ location.reload();
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#mypanel">Menu</a>
         <h1>Timer</h1>
-        <a href="#newtimer" data-transition="slide" onclick="sessionStorage.TimerID=''">Neu</a>
+        <div data-type="horizontal" data-role="controlgroup"  class="ui-btn-right"> 
+            <a href="#" id="editButton" data-role="button" data-iconpos="notext" data-icon="edit" onClick="showEditButtons();"></a>
+            <a href="#newtimer" id="newTimerButton" data-transition="slide" data-role="button" data-iconpos="notext" data-icon="plus" onclick="sessionStorage.TimerID=''"></a>
+        </div>
     </div><!-- /header -->
 
 
@@ -1001,6 +1286,8 @@ location.reload();
 
                <!-- <li><a href="#newtimer" data-transition="slide" onclick="sessionStorage.TimerID=<?php echo $timer->id; ?>"> -->
                 <li>
+                <div class="ui-grid-a">
+                <div class="ui-block-a" style="text-align:left">
 <?php
     switch ($timer->active) {
         case "on":
@@ -1110,6 +1397,19 @@ location.reload();
     }
 ?>
                     </p>
+                    
+                </div>
+                <div class="ui-block-b" style="text-align:right">
+                    <div class="box-btn-switch">
+                        <button data-theme="g"  data-mini="true" data-inline="true" onclick="edit_timer('<?php echo $timer->id; ?>','EIN')">EIN</button>
+                        <button data-theme="r"  data-mini="true" data-inline="true" onclick="edit_timer('<?php echo $timer->id; ?>','AUS')">AUS</button>
+                    </div>
+                    <div class="box-btn-edit hide">
+                        <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_timer('<?php echo $timer->id; ?>')">Bearbeiten</button>
+                        <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_timer('<?php echo $timer->id; ?>')">Löschen</button>
+                     </div>
+                </div>
+                </div>
                 </li>
                 <!-- </a></li> -->
 
@@ -1180,25 +1480,15 @@ $(document).ready(function() {
 <input type="hidden" name="action" id="action" value="edit" />
     <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
         <li data-role="list-divider">
-        Debug
+        ConnAir
         </li>
         <li data-role="fieldcontain">
-            <label for="debug">Global:</label>
-            <select name="debug" id="debug" data-role="slider">
-                <option value="false" <?php if($xml["debug"] == "false") { echo "selected"; } ?>>Off</option>
-                <option value="true" <?php if($xml["debug"] == "true") { echo "selected"; } ?>>On</option>
-            </select>
+            <label for="connairIP">IP-Adresse:</label>
+            <input name="connairIP" id="connairIP" value="<?php echo $xml->connairs->connair->address; ?>" data-clear-btn="true" type="text">
         </li>
-        <li data-role="fieldcontain">
-            <label for="debug_timer">Timer:</label>
-            <select name="debug_timer" id="debug_timer" data-role="slider">
-                <option value="false" <?php if($xml->timers["debug"] == "false") { echo "selected"; } ?>>Off</option>
-                <option value="true" <?php if($xml->timers["debug"] == "true") { echo "selected"; } ?>>On</option>
-            </select>
-            <div>Ausgaben in die debug.log erscheinen nur wenn der globale Debug-Schalter auch an ist.</div>
-        </li>
-        <li>
-            <a href="#debug">show debug.log</a>
+		<li data-role="fieldcontain">
+            <label for="connairPort">Port:</label>
+            <input name="connairPort" id="connairPort" value="<?php echo $xml->connairs->connair->port; ?>" data-clear-btn="true" type="text">
         </li>
         <li data-role="list-divider">
         Global
@@ -1298,8 +1588,18 @@ $(document).ready(function() {
         System Informationen
         </li>
         <li data-role="fieldcontain">
+            <label for="mcversion">Entwickler:</label>
+            <input name="mcversion" id="mcversion"  value="mentox" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <input name="mcsite" id="mcsite" value="Webseite besuchen" type="button" data-theme="g" onClick="(window.open('http://www.l3x.de/connair/','mcsite'))">
+        </li>
+        <li data-role="fieldcontain">
+            <input name="mcsite" id="mcsite" value="E-Mail schreiben" type="button" onClick="location='mailto:connair@l3x.de?subject=Mobile%20Connair'">
+        </li>
+        <li data-role="fieldcontain">
             <label for="mcversion">Mobile Connair Version:</label>
-            <input name="mcversion" id="mcversion"  value="0.6.5" type="text">
+            <input name="mcversion" id="mcversion"  value="0.6.6" type="text">
         </li>
         <li data-role="fieldcontain">
             <label for="serversoftware">Server Software:</label>
@@ -1332,6 +1632,27 @@ $(document).ready(function() {
         <li data-role="fieldcontain">
             <label for="sunset">Sonnenuntergang:</label>
             <input name="sunset" id="sunset"  value="<?php echo date('H:i', $sunset); ?>" type="text">
+        </li>
+        <li data-role="list-divider">
+        Debug
+        </li>
+        <li data-role="fieldcontain">
+            <label for="debug">Global:</label>
+            <select name="debug" id="debug" data-role="slider">
+                <option value="false" <?php if($xml["debug"] == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml["debug"] == "true") { echo "selected"; } ?>>On</option>
+            </select>
+        </li>
+        <li data-role="fieldcontain">
+            <label for="debug_timer">Timer:</label>
+            <select name="debug_timer" id="debug_timer" data-role="slider">
+                <option value="false" <?php if($xml->timers["debug"] == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml->timers["debug"] == "true") { echo "selected"; } ?>>On</option>
+            </select>
+            <div>Ausgaben in die debug.log erscheinen nur wenn der globale Debug-Schalter auch an ist.</div>
+        </li>
+        <li>
+            <a href="#debug">show debug.log</a>
         </li>
     </ul>
 </form>
@@ -1755,7 +2076,7 @@ function resetNewTimerForm() {
             </select>
         </li>
         <li data-role="fieldcontain">
-                <fieldset id="timertypecontrolgroup" data-role="controlgroup" data-mini="false" data-type="horizontal">
+                <fieldset id="timertypecontrolgroup" data-role="controlgroup" data-mini="true" data-type="horizontal">
                    <legend>Typ:</legend>
                         <input type="radio" name="timertype" id="timertype_device" value="device" checked="checked" />
                         <label for="timertype_device">Gerät</label>
