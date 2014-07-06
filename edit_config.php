@@ -72,6 +72,17 @@ switch ($r_action) {
         }
         break;
     
+    case "rebootconnair":
+        foreach($xml->connairs->connair as $connair) {
+            $address = (string)$connair->address;
+            $page = file_get_contents("http://".$address."/rebooting.cgi?restart=true&Submit=REBOOT");
+            if(strpos($page,"Rebooting")!==false) {
+                //alles gut
+            }
+        }
+        echo "ok";
+        break;
+
     default:
         echo "action unsupported";
         break;

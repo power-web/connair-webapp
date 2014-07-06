@@ -335,6 +335,26 @@ Zeilenumbruch in der Listview
             });
         }
         
+        function reboot_connair(address) {
+            $.ajax({
+                type:'POST', 
+                url: 'edit_config.php',
+                data: 'action=rebootconnair',
+                async: true,
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        toast("Connair wird neugestartet");
+                    } else {
+                        toast('Neustart fehlgeschlagen: ' + response);
+                    }
+                },
+                error: function(jqXHR, exception) {
+                    toast('Uncaught Error: ' + jqXHR.responseText);
+                }
+            });
+        }
+        
+        
         function refreshPage()
 {
 location.reload();
@@ -1494,6 +1514,9 @@ $(document).ready(function() {
             <label for="connairPort">Port:</label>
             <input name="connairPort" id="connairPort" value="<?php echo $xml->connairs->connair->port; ?>" data-clear-btn="true" type="text">
         </li>
+		<li data-role="fieldcontain">
+            <input name="connairreboot" id="connairreboot" value="Connair neustarten" data-mini="true" data-theme="r" type="button" data-icon="refresh" onclick="reboot_connair('<?php echo $xml->connairs->connair->address; ?>')">
+        </li>
         <li data-role="list-divider">
         Global
         </li>
@@ -1600,7 +1623,7 @@ $(document).ready(function() {
         </li>
         <li data-role="fieldcontain">
             <label for="mcversion">Entwickler:</label>
-            <input name="mcversion" id="mcversion"  value="mentox" type="text">
+            <input name="mcversion" id="mcversion"  value="mentox" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <input name="mcsite" id="mcsite" value="Webseite besuchen" type="button" data-theme="g" onClick="(window.open('http://www.l3x.de/connair/','mcsite'))">
@@ -1610,39 +1633,39 @@ $(document).ready(function() {
         </li>
         <li data-role="fieldcontain">
             <label for="mcversion">Mobile Connair Version:</label>
-            <input name="mcversion" id="mcversion"  value="0.6.6" type="text">
+            <input name="mcversion" id="mcversion"  value="<?php echo file_get_contents('VERSION'); ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="serversoftware">Server Software:</label>
-            <input name="serversoftware" id="serversoftware"  value="<?php echo $_SERVER['SERVER_SOFTWARE']; ?>" type="text">
+            <input name="serversoftware" id="serversoftware"  value="<?php echo $_SERVER['SERVER_SOFTWARE']; ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="phpversion">PHP Version:</label>
-            <input name="phpversion" id="phpversion"  value="<?php echo phpversion(); ?>" type="text">
+            <input name="phpversion" id="phpversion"  value="<?php echo phpversion(); ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="time">Server Zeit:</label>
-            <input name="time" id="time"  value="<?php echo date("Y-m-d H:i:s"); ?>" type="text">
+            <input name="time" id="time"  value="<?php echo date("Y-m-d H:i:s"); ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="timezone">Server Zeitzone:</label>
-            <input name="timezone" id="timezone"  value="<?php echo date_default_timezone_get(); ?>" type="text">
+            <input name="timezone" id="timezone"  value="<?php echo date_default_timezone_get(); ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="longitude">Longitude:</label>
-            <input name="longitude" id="longitude"  value="<?php echo $longitude; ?>" type="text">
+            <input name="longitude" id="longitude"  value="<?php echo $longitude; ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="latitude">Latitude:</label>
-            <input name="latitude" id="latitude"  value="<?php echo $latitude; ?>" type="text">
+            <input name="latitude" id="latitude"  value="<?php echo $latitude; ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="sunrise">Sonnenaufgang:</label>
-            <input name="sunrise" id="sunrise"  value="<?php echo date('H:i', $sunrise); ?>" type="text">
+            <input name="sunrise" id="sunrise"  value="<?php echo date('H:i', $sunrise); ?>" type="text" readonly="readonly">
         </li>
         <li data-role="fieldcontain">
             <label for="sunset">Sonnenuntergang:</label>
-            <input name="sunset" id="sunset"  value="<?php echo date('H:i', $sunset); ?>" type="text">
+            <input name="sunset" id="sunset"  value="<?php echo date('H:i', $sunset); ?>" type="text" readonly="readonly">
         </li>
         <li data-role="list-divider">
         Debug
