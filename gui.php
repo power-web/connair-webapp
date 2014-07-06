@@ -14,6 +14,10 @@ header("Content-Type: text/html; charset=utf-8");
 <meta charset="UTF-8">
 <title>Mobile Connair</title>
 
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<link type="image/x-icon" href="favicon.ico">
+
 <link rel="stylesheet" href="jquery.mobile-1.3.1.min.css" />
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
@@ -1660,6 +1664,12 @@ $(document).ready(function() {
         </li>
         <li>
             <a href="#debug">show debug.log</a>
+        </li>
+        <li data-role="list-divider">
+        Editor
+        </li>
+        <li>
+            <a href="editor.php" rel="external">Open config.xml</a>
         </li>
     </ul>
 </form>

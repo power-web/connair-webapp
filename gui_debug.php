@@ -53,10 +53,10 @@ if (isset($_GET['taillog'])) {
 <meta charset="UTF-8">
 <title>Mobile Connair</title>
 
-<link rel="stylesheet" href="jquery.mobile-1.3.0.min.css" />
+<link rel="stylesheet" href="jquery.mobile-1.3.1.min.css" />
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
-<script type="text/javascript" charset="utf-8" src="jquery-1.9.0.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery-1.9.1.min.js"></script>
 <script type="text/javascript">
     function load_debug() {
         alert('load_debug');
@@ -87,7 +87,7 @@ if (isset($_GET['taillog'])) {
         });
     });
 </script>
-<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.0.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="jquery.toast.mobile.js"></script>
 
 <!-- WebApp -->
