@@ -131,13 +131,13 @@ function timer_switch($timer, $action) {
     if (($timer->type)=="device") {
         $devicesFound = $xml->xpath("//devices/device/id[text()='".$timer->typeid."']/parent::*");
         $device = $devicesFound[0];
-        send_message($device, $action);
+        timer_send_message($device, $action);
     }
     // Timer mit Room
     if (($timer->type)=="room") {
         $devicesFound = $xml->xpath("//devices/device/room[text()='".$timer->typeid."']/parent::*");
         foreach($devicesFound as $device) {
-            send_message($device, $action);
+            timer_send_message($device, $action);
             usleep(300000);
         }
     }
@@ -150,14 +150,14 @@ function timer_switch($timer, $action) {
             $deviceaction = strtolower($action)."action";
             debug_timer("Device ".$deviceid." mit Action '".$deviceaction."' ist '".$deviceid[$deviceaction]."'");
             if(empty($deviceid[$deviceaction])) {
-                send_message($device, $action);
+                timer_send_message($device, $action);
             } else {
                 switch ($deviceid[$deviceaction]) {
                     case "on":
-                        send_message($device, "ON");
+                        timer_send_message($device, "ON");
                         break;
                     case "off":
-                        send_message($device, "OFF");
+                        timer_send_message($device, "OFF");
                         break;
                     case "none":
                         break;
@@ -171,5 +171,14 @@ function timer_switch($timer, $action) {
 
 
 
+function timer_send_message($device, $action) {
+    global $xml;
+    global $debug_timer;
+    if($xml->global->timerRunOnce == "false" || ($xml->global->timerRunOnce == "true" && $action != $device->status)) {
+        send_message($device, $action);
+    } else if($debug_timer=="true") {
+        debug_timer("Schalte nicht da vermutlich schon im richtigen status.  Device ".$device->id." mit Action '".$action."'  timerRunOnce=".$xml->global->timerRunOnce);
+    }
+}
 
 ?>

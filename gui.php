@@ -1512,6 +1512,13 @@ $(document).ready(function() {
             <label for="multiDeviceSleep">Wartezeit beim Senden (ms):</label>
             <input type="range" name="multiDeviceSleep" id="multiDeviceSleep" value="<?php echo $xml->global->multiDeviceSleep; ?>" min="200" max="5000" step="50" />
         </li>
+        <li data-role="fieldcontain">
+            <label for="timerRunOnce">Timer schaltet nur wenn nötig:</label>
+            <select name="timerRunOnce" id="timerRunOnce" data-role="slider">
+                <option value="false" <?php if($xml->global->timerRunOnce == "false") { echo "selected"; } ?>>Off</option>
+                <option value="true" <?php if($xml->global->timerRunOnce == "true") { echo "selected"; } ?>>On</option>
+            </select>
+        </li>
         <li data-role="list-divider">
         GUI
         </li>

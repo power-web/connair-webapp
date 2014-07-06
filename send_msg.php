@@ -139,7 +139,7 @@ function connair_create_msg_intertechno($device, $action) {
     $sPause=11125;
     $sTune=89;
     $sBaud="#baud#";
-    $sSpeed=4;
+    $sSpeed=4; //erfahrung aus dem Forum auf 32 stellen http://forum.power-switch.eu/viewtopic.php?f=15&t=146
     $uSleep=800000;
     $HEAD="TXP:$sA,$sG,$sRepeat,$sPause,$sTune,$sBaud,";
     $TAIL=",1,$sSpeed,;";

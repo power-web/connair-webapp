@@ -12,6 +12,7 @@ require("config.php");
     <timezone>Europe/Berlin</timezone>
     <longitude>10.237894</longitude>
     <latitude>52.347423</latitude>
+    <timerRunOnce>false</timerRunOnce>
   </global>
   <gui>
     <showDeviceStatus>OFF</showDeviceStatus>
@@ -30,6 +31,7 @@ $r_debug_timer = (string)$_POST['debug_timer'];
 $r_timezone = (string)$_POST['timezone'];
 $r_longitude = (string)$_POST['longitude'];
 $r_latitude = (string)$_POST['latitude'];
+$r_timerRunOnce = (string)$_POST['timerRunOnce'];
 $r_connairPort = (string)$_POST['connairPort'];
 $r_connairIP = (string)$_POST['connairIP'];
 $r_multiDeviceSleep = intval($_POST['multiDeviceSleep']);
@@ -51,6 +53,7 @@ switch ($r_action) {
         $xml->global->timezone = $r_timezone;
         $xml->global->longitude = $r_longitude;
         $xml->global->latitude = $r_latitude;
+        $xml->global->timerRunOnce = $r_timerRunOnce;
 		$xml->connairs->connair->port = $r_connairPort;
 		$xml->connairs->connair->address = $r_connairIP;
         $xml->global->multiDeviceSleep = $r_multiDeviceSleep;
