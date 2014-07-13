@@ -2004,6 +2004,29 @@ $(document).ready(function() {
                         <option value="true">Ja</option>
                     </select> 
            </li>
+<?php
+    $sendercount=@count($xml->connairs->children()) + @count($xml->culs->children());
+    if($sendercount > 1) {
+?>
+        <li data-role="fieldcontain">
+            <label for="senderid">Sender:</label>
+            <select name="senderid" id="senderid">
+                <option value="">Alle</option>
+            <?php
+                foreach($xml->connairs->connair as $connair) {
+                    echo '<option value="'.$connair->id.'">['.$connair->id.'] Connair '.$connair->address.'</option>';
+                }
+            ?>
+            <?php
+                foreach($xml->culs->cul as $cul) {
+                    echo '<option value="'.$cul->id.'">['.$cul->id.'] CUL '.$cul->device.'</option>';
+                }
+            ?>
+            </select>
+        </li>
+<?php
+    }
+?>
     </ul>
             
         </form>

@@ -38,6 +38,7 @@ $r_tx433version = (string)$_POST['tx433version'];
 $r_btnLabelOn = (string)$_POST['btnLabelOn'];
 $r_btnLabelOff = (string)$_POST['btnLabelOff'];
 $r_favorite = (string)$_POST['favorite'];
+$r_senderid = (string)$_POST['senderid'];
 
 switch ($r_action) {
 
@@ -79,6 +80,7 @@ switch ($r_action) {
         
         $newdevice->addChild('room', $r_room);
         $newdevice->addChild('favorite', $r_favorite);
+        $newdevice->addChild('senderid', $r_senderid);
         $newdevice->addChild('status', 'OFF');
     
         if(check_device($newdevice)) {
