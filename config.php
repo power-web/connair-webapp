@@ -149,6 +149,18 @@ function check_device($device) {
             }        
             break;
         case "raw":
+        case "computer":
+        case "url":
+            break;
+        case "fbdect200":
+            if(empty($masterdip)) {
+                echo "Device-masterdip darf nicht leer sein!";
+                return false;
+            }        
+            if(!preg_match('/^[0-9]+$/',$masterdip)) {
+                echo "Device-masterdip muss eine Zahl sein!";
+                return false;
+            }        
             break;
         case "brennenstuhl":
         case "elro":

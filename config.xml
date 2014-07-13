@@ -17,6 +17,11 @@
         <sortOrderTimers>SORT_BY_TYPE_AND_NAME</sortOrderTimers>
         <theme>LIGHT</theme>
     </gui>
+    <fritzbox>
+        <address>fritz.box</address>
+        <username/>
+        <password>passwort</password>
+    </fritzbox>
     <connairs>
         <connair>
             <address>192.168.1.3</address>
@@ -101,6 +106,21 @@
             </address>
             <room>Wohnzimmer</room>
             <favorite>false</favorite>
+            <status>ON</status>
+        </device>
+        <device>
+            <id>6</id>
+            <name>Pool Pumpe</name>
+            <vendor>fbdect200</vendor>
+            <address>
+                <masterdip>17</masterdip>
+                <slavedip/>
+                <tx433version/>
+                <rawCodeOn/>
+                <rawCodeOff/>
+            </address>
+            <room>Garage</room>
+            <favorite>true</favorite>
             <status>ON</status>
         </device>
     </devices>

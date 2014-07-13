@@ -18,7 +18,7 @@ header("Content-Type: text/html; charset=utf-8");
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 <link type="image/x-icon" href="favicon.ico">
 
-<link rel="stylesheet" href="jquery.mobile-1.3.1.min.css" />
+<link rel="stylesheet" href="jquery.mobile-1.3.2.min.css" />
 <link rel="stylesheet" href="jquery-mobile-red-button-theme.css" />
 <link rel="stylesheet" href="jquery-mobile-green-button-theme.css" />
 <style type="text/css">
@@ -33,10 +33,10 @@ header("Content-Type: text/html; charset=utf-8");
 }
 
 .ui-icon-on {
-	background-image: url("app-icon-on.png");
+    background-image: url("app-icon-on.png");
 }
 .ui-icon-off {
-	background-image: url("app-icon-off.png");
+    background-image: url("app-icon-off.png");
 }
 
 /*
@@ -74,32 +74,35 @@ header("Content-Type: text/html; charset=utf-8");
 
 
 @media (min-width:35em) {
- 
-/* wrap on wide viewports once open */
- 
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-left,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-left,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-left,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-left {
-    margin-right: 17em;
+     
+    /* wrap on wide viewports once open */
+     
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-left,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-left,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-left,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-left {
+        margin-right: 17em;
+    }
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-right,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-right,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-right,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-right {
+        margin-left: 17em;
+    }
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push,
+    .ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal {
+        width: auto;    
+    }
+     
+    /* disable "dismiss" on wide viewports */
+    .ui-responsive-panel .ui-panel-dismiss-display-push {
+        display: none;
+    }
+
 }
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push.ui-panel-content-fixed-toolbar-position-right,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal.ui-panel-content-fixed-toolbar-position-right,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-push.ui-panel-content-wrap-position-right,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-wrap-display-reveal.ui-panel-content-wrap-position-right {
-    margin-left: 17em;
-}
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-push,
-.ui-responsive-panel.ui-page-panel-open .ui-panel-content-fixed-toolbar-display-reveal {
-    width: auto;	
-}
- 
-/* disable "dismiss" on wide viewports */
-.ui-responsive-panel .ui-panel-dismiss-display-push {
-    display: none;
-}
- 
-}
+
+
+
 
 
 
@@ -182,76 +185,76 @@ Zeilenumbruch in der Listview
             $.mobile.activePage.find('#mypanel').panel( "close" );
         }
 <?php 
-	if ($xml->gui->showMenuOnLoad=="true") {
+    if ($xml->gui->showMenuOnLoad=="true") {
 ?>
             setTimeout(function() {
                 $.mobile.activePage.find('#mypanel').panel( "open" );
             }, 500);
 <?php 
-	}
+    }
 ?>
 
         $('#newdevicesubmit').click(function (e) {
             $.ajax({
-	            url: "edit_device.php",
-	            type: "POST",
-	            data: $('#newdeviceform').serialize(),
-                    async: true,
-	            success: function(response) {
-		        if(response.trim()=="ok") {
-                            setTimeout(function(){refreshPage()}, 1500);
-		            $.mobile.changePage('#devices', {
-                            	transition: "slide",
-                            	reverse: true
-                            });
-	                    toast('gespeichert');
-	                    resetNewDeviceForm();
-		        } else {
-		            toast('response:'+response);
-		        }
-	            }
+                url: "edit_device.php",
+                type: "POST",
+                data: $('#newdeviceform').serialize(),
+                async: true,
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        setTimeout(function(){refreshPage()}, 2000);
+                        $.mobile.changePage('#devices', {
+                            transition: "slide",
+                            reverse: true
+                        });
+                        toast('gespeichert');
+                        resetNewDeviceForm();
+                    } else {
+                        toast('response:'+response);
+                    }
+                }
             });
-	});
+        });
 
 
         $('#editconfigsubmit').click(function (e) {
             $.ajax({
-	            url: "edit_config.php",
-	            type: "POST",
-	            data: $('#editconfigform').serialize(),
-                    async: true,
-	            success: function(response) {
-		        if(response.trim()=="ok") {
-	                    setTimeout(function(){refreshPage()}, 1500);
-	                    toast('gespeichert');
-                        } else {
-                            toast('response:'+response);
-                        }
-	            }
+                url: "edit_config.php",
+                type: "POST",
+                data: $('#editconfigform').serialize(),
+                async: true,
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        setTimeout(function(){refreshPage()}, 2000);
+                        toast('gespeichert');
+                    } else {
+                       toast('response:'+response);
+                    }
+                }
             });
-	});
-	    
-	$('#newtimersubmit').click(function (e) {
+        });
+        
+        $('#newtimersubmit').click(function (e) {
             $.ajax({
-	            url: "edit_timer.php",
-	            type: "POST",
-	            data: $('#newtimerform').serialize(),
-                    async: true,
-	            success: function(response) {
-		        if(response.trim()=="ok") {
-	                    setTimeout(function(){refreshPage()}, 1500);
-		            $.mobile.changePage('#timers', {
-                            	transition: "slide",
-                            	reverse: true
-                            });
-                            toast('gespeichert');
-	                    resetNewTimerForm();
-                        } else {
-                            toast('response:'+response);
-                        }
-	            }
+                url: "edit_timer.php",
+                type: "POST",
+                data: $('#newtimerform').serialize(),
+                async: true,
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        setTimeout(function(){refreshPage()}, 2000);
+                        $.mobile.changePage('#timers', {
+                            transition: "slide",
+                            reverse: true
+                        });
+                        toast('gespeichert');
+                        resetNewTimerForm();
+                    } else {
+                        toast('response:'+response);
+                    }
+                }
             });
-	});
+        });
 
 
 
@@ -259,7 +262,7 @@ Zeilenumbruch in der Listview
 <?php 
     $menuAnimated="true";
 
-	//if ($xml->gui->showMenuOnLoad=="xxx") {
+    //if ($xml->gui->showMenuOnLoad=="xxx") {
 ?>
  
 //if (isMedia("screen and (min-width:35em)")){
@@ -281,11 +284,11 @@ Zeilenumbruch in der Listview
     */
 //}
 <?php
-     //   	$menuAnimated="false";
-	//}
+     //       $menuAnimated="false";
+    //}
 ?>
 </script>
-<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.3.2.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="jquery.toast.mobile.js"></script>
 
 
@@ -545,22 +548,22 @@ location.reload();
         }
         function delete_device(id) {
             $.ajax({
-	            url: "edit_device.php",
-	            type: "POST",
-	            data: "action=delete&id="+id,
+                url: "edit_device.php",
+                type: "POST",
+                data: "action=delete&id="+id,
                 async: true,
-	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                $.mobile.changePage('#devices', {
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        $.mobile.changePage('#devices', {
                             transition: "slide",
                             reverse: true
                         });
-		                toast('gelöscht');
-		                refreshPage();
+                        toast('gelöscht');
+                        refreshPage();
                     } else {
                         toast('response:'+response);
                     }
-	            }
+                }
             });
         }
         function edit_group(id) {
@@ -568,22 +571,22 @@ location.reload();
         }
         function delete_group(id) {
             $.ajax({
-	            url: "edit_group.php",
-	            type: "POST",
-	            data: "action=delete&id="+id,
+                url: "edit_group.php",
+                type: "POST",
+                data: "action=delete&id="+id,
                 async: true,
-	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                $.mobile.changePage('#groups', {
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        $.mobile.changePage('#groups', {
                             transition: "slide",
                             reverse: true
                         });
-		                toast('gelöscht');
-		                refreshPage();
+                        toast('gelöscht');
+                        refreshPage();
                     } else {
                         toast('response:'+response);
                     }
-	            }
+                }
             });
         }
         function edit_timer(id, action) {
@@ -593,51 +596,51 @@ location.reload();
                     type: "POST",
                     data: "action=on&id="+id,
                     async: true,
-	            success: function(response) {
-		        if(response.trim()=="ok") {
-		                toast('gespeichert');
-		                refreshPage();
+                success: function(response) {
+                if(response.trim()=="ok") {
+                        toast('gespeichert');
+                        refreshPage();
                         } else {
                             toast('response:'+response);
                         }
-	            }
+                }
                 });
             }
             if(action=="AUS") {
                 $.ajax({
-	            url: "edit_timer.php",
-	            type: "POST",
-	            data: "action=off&id="+id,
+                url: "edit_timer.php",
+                type: "POST",
+                data: "action=off&id="+id,
                     async: true,
-	            success: function(response) {
-		        if(response.trim()=="ok") {
-		                toast('gespeichert');
-		                refreshPage();
+                success: function(response) {
+                if(response.trim()=="ok") {
+                        toast('gespeichert');
+                        refreshPage();
                         } else {
                             toast('response:'+response);
                         }
-	            }
+                }
                 });
             }
         }
         function delete_timer(id) {
             $.ajax({
-	            url: "edit_timer.php",
-	            type: "POST",
-	            data: "action=delete&id="+id,
+                url: "edit_timer.php",
+                type: "POST",
+                data: "action=delete&id="+id,
                 async: true,
-	            success: function(response) {
-		            if(response.trim()=="ok") {
-		                $.mobile.changePage('#timer', {
+                success: function(response) {
+                    if(response.trim()=="ok") {
+                        $.mobile.changePage('#timer', {
                             transition: "slide",
                             reverse: true
                         });
-		                toast('gelöscht');
-		                refreshPage();
+                        toast('gelöscht');
+                        refreshPage();
                     } else {
                         toast('response:'+response);
                     }
-	            }
+                }
             });
         }
     </script>
@@ -713,25 +716,25 @@ location.reload();
 
             <li>
                 <div class="ui-grid-a">
-	                <div class="ui-block-a" style="text-align:left">
-	                    <h2><?php echo $group->name; ?></h2>
+                    <div class="ui-block-a" style="text-align:left">
+                        <h2><?php echo $group->name; ?></h2>
 <?php
                         foreach($group->deviceid as $deviceid) {
                             $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
                             echo "<p>".$devicesFound[0]->name."</p>";
                         }
 ?>
-	                </div>
-	                <div class="ui-block-b" style="text-align:right">
+                    </div>
+                    <div class="ui-block-b" style="text-align:right">
                         <div class="box-btn-switch">
                             <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
                             <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
-	                    </div>
-	                    <div class="box-btn-edit hide">
-	                        <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_group('<?php echo $group->id; ?>')">Bearbeiten</button>
-	                        <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_group('<?php echo $group->id; ?>')">Löschen</button>
-	                     </div>
-	                </div>
+                        </div>
+                        <div class="box-btn-edit hide">
+                            <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_group('<?php echo $group->id; ?>')">Bearbeiten</button>
+                            <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_group('<?php echo $group->id; ?>')">Löschen</button>
+                         </div>
+                    </div>
                 </div>
             </li>
      
@@ -816,26 +819,26 @@ location.reload();
 
                 <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
-	                    <div class="ui-block-a" style="text-align:left">
-	                        <h2><?php echo $device->name; ?></h2>
+                        <div class="ui-block-a" style="text-align:left">
+                            <h2><?php echo $device->name; ?></h2>
                             <p><?php echo $device->room; ?></p>
-	                    </div>
-	                    <div class="ui-block-b" style="text-align:right">
+                        </div>
+                        <div class="ui-block-b" style="text-align:right">
                             <div class="box-btn-switch">
-	                            <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+                                <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
 <?php
     if($device["hideButtonOff"] != "yes") {
 ?>
-	                            <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+                                <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
 <?php
     }
 ?>
-	                        </div>
-	                        <div class="box-btn-edit hide">
-	                            <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_device('<?php echo $device->id; ?>')">Bearbeiten</button>
-	                            <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_device('<?php echo $device->id; ?>')">Löschen</button>
-	                        </div>
-	                    </div>
+                            </div>
+                            <div class="box-btn-edit hide">
+                                <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_device('<?php echo $device->id; ?>')">Bearbeiten</button>
+                                <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_device('<?php echo $device->id; ?>')">Löschen</button>
+                            </div>
+                        </div>
                     </div>
                 </li>
 
@@ -859,7 +862,7 @@ location.reload();
 <div data-role="page" id="devices" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
-	    <center>
+        <center>
             <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
             <a href="#devices" data-role="button" data-theme="e" class="ui-disabled">Geräte</a>
             <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
@@ -923,19 +926,19 @@ location.reload();
 
             <li data-role="list-divider" role="heading">
                     <div class="ui-grid-a">
-	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
-	                    <div class="ui-block-b" style="text-align:right">
+                        <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
+                        <div class="ui-block-b" style="text-align:right">
 <?php
     if($xml->gui->showRoomButtonInDevices == "true") {
 ?>
                             <div class="box-btn-switch">
-	                            <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
-	                            <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
-	                        </div>
+                                <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
+                                <button data-theme="<?php echo $theme_row; ?>" data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
+                            </div>
 <?php
     }
 ?>
-	                    </div>
+                        </div>
                     </div>
             </li>
 
@@ -1001,34 +1004,34 @@ location.reload();
 
                 <li id="deviceRow<?php echo $device->id; ?>" data-theme="<?php echo $rowDataTheme; ?>">
                     <div class="ui-grid-a">
-	                    <div class="ui-block-a" style="text-align:left">
-	                    	<h2><?php echo $device->name; php?></h2>
-	                    <?php 
-	                    	if($debug == "true") {
-	                    		echo "<p><i>".$device->id." ".$device->vendor." ".$device->address->masterdip." ".$device->address->slavedip."</i></p>";
-	                    	}
-	                    ?>
-	                    </div>
-	                    <div class="ui-block-b" style="text-align:right">
+                        <div class="ui-block-a" style="text-align:left">
+                            <h2><?php echo $device->name; php?></h2>
+                        <?php 
+                            if($debug == "true") {
+                                echo "<p><i>".$device->id." ".$device->vendor." ".$device->address->masterdip." ".$device->address->slavedip."</i></p>";
+                            }
+                        ?>
+                        </div>
+                        <div class="ui-block-b" style="text-align:right">
                             <div class="box-btn-switch">
 <?php
     if($device["hideButtonOn"] != "yes") {
 ?>
-	                            <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
+                                <button id="btnOn<?php echo $device->id; ?>" data-theme="<?php echo $btnOnDataTheme; ?>" data-mini="true" data-inline="true" <?php if(!empty($btnOnIcon)) { echo 'data-icon="'.$btnOnIcon.'"'; } ?> onclick="<?php echo $btnOnJS; ?>"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
 <?php
     }
     if($device["hideButtonOff"] != "yes") {
 ?>
-	                            <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
+                                <button id="btnOff<?php echo $device->id; ?>" data-theme="<?php echo $btnOffDataTheme; ?>" data-mini="true" data-inline="true" onclick="<?php echo $btnOffJS; ?>"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
 <?php
     }
 ?>
-	                        </div>
-	                        <div class="box-btn-edit hide">
-	                            <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_device('<?php echo $device->id; ?>')">Bearbeiten</button>
-	                            <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_device('<?php echo $device->id; ?>')">Löschen</button>
-	                        </div>
-	                    </div>
+                            </div>
+                            <div class="box-btn-edit hide">
+                                <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_device('<?php echo $device->id; ?>')">Bearbeiten</button>
+                                <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_device('<?php echo $device->id; ?>')">Löschen</button>
+                            </div>
+                        </div>
                     </div>
                 </li>
 
@@ -1103,8 +1106,8 @@ location.reload();
 
             <li>
                 <div class="ui-grid-a">
-	                <div class="ui-block-a" style="text-align:left">
-	                    <h2><?php echo $group->name; ?></h2>
+                    <div class="ui-block-a" style="text-align:left">
+                        <h2><?php echo $group->name; ?></h2>
 <?php
         foreach($group->deviceid as $deviceid) {
             $devicesFound = $xml->xpath("//devices/device/id[text()='".$deviceid."']/parent::*");
@@ -1131,17 +1134,17 @@ location.reload();
             echo "<p>".$text."</p>";
         }
 ?>
-	                </div>
-	                <div class="ui-block-b" style="text-align:right">
-	                    <div class="box-btn-switch">
+                    </div>
+                    <div class="ui-block-b" style="text-align:right">
+                        <div class="box-btn-switch">
                             <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOn']) ? 'EIN' : $device['buttonLabelOn']; ?></button>
                             <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','group','<?php echo $group->id; ?>')"><?php echo empty($device['buttonLabelOff']) ? 'AUS' : $device['buttonLabelOff']; ?></button>
                         </div>
-	                    <div class="box-btn-edit hide">
-	                        <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_group('<?php echo $group->id; ?>')">Bearbeiten</button>
-	                        <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_group('<?php echo $group->id; ?>')">Löschen</button>
-	                     </div>
-	                </div>
+                        <div class="box-btn-edit hide">
+                            <button data-theme="b" data-iconpos="notext" data-icon="edit" data-mini="true" data-inline="true" onclick="edit_group('<?php echo $group->id; ?>')">Bearbeiten</button>
+                            <button data-theme="r" data-iconpos="notext" data-icon="delete" data-mini="true" data-inline="true" onclick="delete_group('<?php echo $group->id; ?>')">Löschen</button>
+                         </div>
+                    </div>
                 </div>
             </li>
      
@@ -1164,7 +1167,7 @@ location.reload();
 <div data-role="page" id="rooms" class="ui-responsive-panel" data-theme="<?php echo $theme_page; ?>">
 
     <div data-role="panel" id="mypanel" data-position="left" data-display="push" data-animate="<?php echo $menuAnimated; ?>" data-theme="a" data-position-fixed="true">
-	    <center>
+        <center>
             <a href="#favorites" data-role="button" data-theme="e">Favoriten</a>
             <a href="#devices" data-role="button" data-theme="e">Geräte</a>
             <a href="#groups" data-role="button" data-theme="e">Gruppen</a>
@@ -1214,13 +1217,13 @@ location.reload();
 
                 <li>
                     <div class="ui-grid-a">
-	                    <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
-	                    <div class="ui-block-b" style="text-align:right">
-	                        <div class="box-btn-switch">
-	                            <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
-	                            <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
-	                        </div>
-	                    </div>
+                        <div class="ui-block-a" style="text-align:left"><?php echo $room; ?></div>
+                        <div class="ui-block-b" style="text-align:right">
+                            <div class="box-btn-switch">
+                                <button data-theme="g"  data-mini="true" data-inline="true" onclick="send_connair('on','room','<?php echo $room; ?>')">EIN</button>
+                                <button data-theme="r"  data-mini="true" data-inline="true" onclick="send_connair('off','room','<?php echo $room; ?>')">AUS</button>
+                            </div>
+                        </div>
                     </div>
                 </li>
 
@@ -1243,11 +1246,11 @@ location.reload();
 <style type="text/css">
 
 .timer_activ_on  {
-	color: #6AB638;
+    color: #6AB638;
 }
 
 .timer_activ_off  {
-	color: #B63737;
+    color: #B63737;
 }
 
 </style>
@@ -1463,7 +1466,7 @@ $(document).ready(function() {
     $("#currentPosition").click(function() {
         navigator.geolocation.getCurrentPosition(function(position) {
             $.mobile.activePage.find('#latitude').val(position.coords.latitude);
-	        $.mobile.activePage.find('#longitude').val(position.coords.longitude);
+            $.mobile.activePage.find('#longitude').val(position.coords.longitude);
         });
     });
 });
@@ -1510,12 +1513,27 @@ $(document).ready(function() {
             <label for="connairIP">IP-Adresse:</label>
             <input name="connairIP" id="connairIP" value="<?php echo $xml->connairs->connair->address; ?>" data-clear-btn="true" type="text">
         </li>
-		<li data-role="fieldcontain">
+        <li data-role="fieldcontain">
             <label for="connairPort">Port:</label>
             <input name="connairPort" id="connairPort" value="<?php echo $xml->connairs->connair->port; ?>" data-clear-btn="true" type="text">
         </li>
-		<li data-role="fieldcontain">
+        <li data-role="fieldcontain">
             <input name="connairreboot" id="connairreboot" value="Connair neustarten" data-mini="true" data-theme="r" type="button" data-icon="refresh" onclick="reboot_connair('<?php echo $xml->connairs->connair->address; ?>')">
+        </li>
+        <li data-role="list-divider">
+        Fritz Box
+        </li>
+        <li data-role="fieldcontain">
+            <label for="fritzboxAddress">Adresse:</label>
+            <input name="fritzboxAddress" id="fritzboxAddress" value="<?php echo $xml->fritzbox->address; ?>" data-clear-btn="true" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="fritzboxUsername">Username:</label>
+            <input name="fritzboxUsername" id="fritzboxUsername" value="<?php echo $xml->fritzbox->username; ?>" data-clear-btn="true" type="text">
+        </li>
+        <li data-role="fieldcontain">
+            <label for="fritzboxPassword">Passwort:</label>
+            <input name="fritzboxPassword" id="fritzboxPassword" value="<?php echo $xml->fritzbox->password; ?>" data-clear-btn="true" type="text">
         </li>
         <li data-role="list-divider">
         Global
@@ -1737,12 +1755,12 @@ function resetNewDeviceForm() {
             <input type="hidden" name="action" id="action" value="add" />
     <ul data-role="listview" data-theme="<?php echo $theme_row; ?>" data-divider-theme="<?php echo $theme_divider; ?>" data-inset="false">
         <li data-role="fieldcontain">
-	            <label for="name">Name:</label>
-	            <input type="text" name="name" id="name" value="" />
+                <label for="name">Name:</label>
+                <input type="text" name="name" id="name" value="" />
         </li>
         <li data-role="fieldcontain">
-	            <label for="room">Raum:</label>
-	            <input type="text" name="room" id="room" value="" />
+                <label for="room">Raum:</label>
+                <input type="text" name="room" id="room" value="" />
         </li>
         <li data-role="fieldcontain">
                     <label for="vendor">Hersteller:</label>
@@ -1750,115 +1768,118 @@ function resetNewDeviceForm() {
                         <option value="Brennenstuhl">Brennenstuhl</option>
                         <option value="Elro">Elro</option>
                         <option value="Intertechno">Intertechno</option>
+                        <option value="computer">Computer</option>
+                        <option value="url">URL</option>
+                        <option value="fbdect200">FritzBox DECT200</option>
                     </select>
         </li>
-	            
-	        <style type="text/css">
+                
+            <style type="text/css">
 
 .desc, .titles {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	letter-spacing: 0;
-	font-size: 11px;
-	letter-spacing: 0;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    letter-spacing: 0;
+    font-size: 11px;
+    letter-spacing: 0;
 }
 
 .switch {
   margin-left: auto ;
   margin-right: auto ;
-	display: block;
-	float: left;
-	background: #AD2929;
-	width: 260px;
-	#width: 90%;
-	height: 80px;
-	padding: 5px;
-	border: 1px solid #333;
+    display: block;
+    float: left;
+    background: #AD2929;
+    width: 260px;
+    #width: 90%;
+    height: 80px;
+    padding: 5px;
+    border: 1px solid #333;
 }
 
 .switch_box {
   margin-left: auto ;
   margin-right: auto ;
-	width: 100%;
+    width: 100%;
 }
 
 .titles {
-	display: block;
-	height: 26px;
-	font-weight: bold;
-	color: #fff;
+    display: block;
+    height: 26px;
+    font-weight: bold;
+    color: #fff;
 }
 
 .title_left {
-	float: left;
-	width: 100px;
+    float: left;
+    width: 100px;
 }
 
 .title_right {
-	float: right;
-	text-align: right;
+    float: right;
+    text-align: right;
 }
 
 .dip {
-	float: left;
-	margin: 0px 5px;
-	width: 16px;
-	#width: 7%;
-	height: 40px;
-	display: block;
-	text-align: center;
-	color: #ffffff;
-	font-weight: bold;
+    float: left;
+    margin: 0px 5px;
+    width: 16px;
+    #width: 7%;
+    height: 40px;
+    display: block;
+    text-align: center;
+    color: #ffffff;
+    font-weight: bold;
 }
 
 .dip_bar {
   margin-left: auto ;
   margin-right: auto ;
-	#width: 89%;
+    #width: 89%;
 }
 
 .dip input {
-	border: none;
+    border: none;
 }
 
 .on, .off {
-	float: left;
-	display: block;
-	height: 12px;
-	width: 15px;
-	border: 1px solid #999999;
-	background: #ffffff;
-	margin: 0 0 5px 0;
+    float: left;
+    display: block;
+    height: 12px;
+    width: 15px;
+    border: 1px solid #999999;
+    background: #ffffff;
+    margin: 0 0 5px 0;
 }
 
 .on  {
-	border-bottom: 15px solid #C24949;
+    border-bottom: 15px solid #C24949;
 }
 
 .off  {
-	border-top: 15px solid #C24949;
+    border-top: 15px solid #C24949;
 }
 
 .clear {
-	clear: both;
+    clear: both;
 }
 </style>
 <script type="text/JavaScript">
 
 function updateDIPTextField () {
-	var masterdip="";
-	masterdip+=$("#dip_switch0").children().val();
-	masterdip+=$("#dip_switch1").children().val();
-	masterdip+=$("#dip_switch2").children().val();
-	masterdip+=$("#dip_switch3").children().val();
-	masterdip+=$("#dip_switch4").children().val();
+    var masterdip="";
+    masterdip+=$("#dip_switch0").children().val();
+    masterdip+=$("#dip_switch1").children().val();
+    masterdip+=$("#dip_switch2").children().val();
+    masterdip+=$("#dip_switch3").children().val();
+    masterdip+=$("#dip_switch4").children().val();
     $("#masterdip").val(masterdip);
 
-	var slavedip="";
-	slavedip+=$("#dip_switch5").children().val();
-	slavedip+=$("#dip_switch6").children().val();
-	slavedip+=$("#dip_switch7").children().val();
-	slavedip+=$("#dip_switch8").children().val();
-	slavedip+=$("#dip_switch9").children().val();
+    var slavedip="";
+    slavedip+=$("#dip_switch5").children().val();
+    slavedip+=$("#dip_switch6").children().val();
+    slavedip+=$("#dip_switch7").children().val();
+    slavedip+=$("#dip_switch8").children().val();
+    slavedip+=$("#dip_switch9").children().val();
     $("#slavedip").val(slavedip);
 }
 
@@ -1888,15 +1909,15 @@ $(document).ready(function() {
         <li data-role="fieldcontain">
 
 <div id="dip_switch_box" class="show">
-	            
-	            
+                
+                
 <div class="switch_box">
 <div class="switch">
-	<div class="titles">
-	    <span class="title_left">ON</span>
-	    <span class="title_right">DIP</span>
-	</div>
-	<div class="dip_bar">
+    <div class="titles">
+        <span class="title_left">ON</span>
+        <span class="title_right">DIP</span>
+    </div>
+    <div class="dip_bar">
         <span class="dip">
             <div class="on" name="dip_switch" id="dip_switch0"><input type="hidden" name="b[0]" id="b0" value="1" /></div>
             <span class="desc">1</span>
@@ -1941,38 +1962,46 @@ $(document).ready(function() {
 </div>
 </div>
 <div class="clear"></div>
-	</div>            
-	            
-	            
-	            
-	            
-	                </li>
+    </div>            
+                
+                
+                
+                
+                    </li>
         <li data-role="fieldcontain">
     
-	            <label for="masterdip">Masterdip:</label>
-	            <input type="text" name="masterdip" id="masterdip" value="" />
-	           </li>
+                <label for="masterdip">Masterdip:</label>
+                <input type="text" name="masterdip" id="masterdip" value="" />
+               </li>
         <li data-role="fieldcontain">
          <label for="slavedip">Slavedip:</label>
-	            <input type="text" name="slavedip" id="slavedip" value="" />
-	                 </li>
+                <input type="text" name="slavedip" id="slavedip" value="" />
+                     </li>
+        <li data-role="fieldcontain">
+         <label for="rawCodeOn">RAW On:</label>
+                <input type="text" name="rawCodeOn" id="rawCodeOn" value="" />
+                     </li>
+        <li data-role="fieldcontain">
+         <label for="rawCodeOff">RAW Off:</label>
+                <input type="text" name="rawCodeOff" id="rawCodeOff" value="" />
+                     </li>
         <li data-role="fieldcontain">
                 <label for="tx433version">Version:</label>
-	            <input type="text" name="tx433version" id="tx433version" value="" />
-	                  </li>
+                <input type="text" name="tx433version" id="tx433version" value="" />
+                      </li>
         <li data-role="fieldcontain">
                         <label for="btnLabelOn">Schalter-Beschriftung EIN:</label>
                         <input type="text" name="btnLabelOn" id="btnLabelOn" value="" placeholder="EIN"/>
-	                  </li>
+                      </li>
         <li data-role="fieldcontain">
                         <label for="btnLabelOn">Schalter-Beschriftung AUS:</label>
                         <input type="text" name="btnLabelOff" id="btnLabelOff" value="" placeholder="AUS"/>
-	                  </li>
+                      </li>
         <li data-role="fieldcontain">
                     <label for="favorite">Favorit:</label>
                     <select name="favorite" id="favorite" data-role="slider">
-	                    <option value="false">Nein</option>
-	                    <option value="true">Ja</option>
+                        <option value="false">Nein</option>
+                        <option value="true">Ja</option>
                     </select> 
            </li>
     </ul>
@@ -2381,6 +2410,48 @@ function resetNewTimerForm() {
         </ul>
     </div><!-- /content -->
 </div><!-- /page -->
+
+
+<!--
+<script type="text/javascript">
+
+            window.onresize = function (event) {
+                if (window.innerWidth > 800) {
+                    window.setTimeout(openPanel, 1);
+                }
+                if (window.innerWidth < 800) {
+                    window.setTimeout(closePanel, 1);
+                }
+            };
+
+            function closePanel() {
+                $("#mypanel").panel("close");
+            }
+            function openPanel() {
+                $("#mypanel").panel("open");
+            }
+
+            $( "#mypanel" ).on( "panelcreate", function( event, ui ) {
+                if (window.innerWidth > 800) {
+                    openPanel();
+                }
+                if (window.innerWidth < 800) {
+                    closePanel();
+                }
+
+            });
+            $( document ).on( "pageshow", function( event, ui ) {
+                if (window.innerWidth > 800) {
+                    openPanel();
+                }
+                if (window.innerWidth < 800) {
+                    closePanel();
+                }
+
+            });
+</script>
+-->
+
 
 </body>
 </html>

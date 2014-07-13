@@ -2,6 +2,8 @@
 
 if((!isset($directaccess)) OR (!$directaccess)) die();
 
+//require("config.php");
+require("fritzbox.inc.php");
 
 function connair_send($device, $msg) {
     debug("Sending Message to ConnAir with id '".$device->senderid."'");
@@ -620,6 +622,40 @@ function wakeup ($mac_addr, $broadcast) {
 
 
 
+
+// Schaltet FritzBox DECT 200 aus und ein
+function switch_fbdect200($device, $action) {
+    debug("switch FritzBox DECT 200 for device='".(string)$device->id."' action='".(string)$action."'");
+
+    if(empty($device->address->masterdip)) {
+        echo "ERROR: masterdip (FB DECT ID) ist ungültig für device id ".$device->id;
+        return;
+    }
+
+    $wert=-1;
+    if($action == "ON") {
+        $wert=1;
+    } else if($action == "OFF") {
+        $wert=0;
+    }
+    $newwert=Fritzbox_DECT200_Switch($device->address->masterdip, $wert);
+    if($newwert == 1) {
+        $newwert="ON";
+    } else if($newwert == 0) {
+        $newwert="OFF";
+    }
+    if($newwert == $action) {
+        echo "FritzBox DECT 200 wurde geschaltet.";
+    } else {
+        echo "FritzBox DECT 200 wurde nicht geschaltet: ".$newwert;
+    }
+    //neuer wert wird zurückgegeben und dann in status gespeichert
+    return ($newwert);
+}
+
+
+
+
 function send_message($device, $action) {
     debug("Send Message for device='".(string)$device->id."' action='".(string)$action."'");
     global $xml;
@@ -633,6 +669,10 @@ function send_message($device, $action) {
         case "url":
             switch_url($device, $action);
             $device->status = $action;
+            //hier nicht connair und cul ansprechen
+            return;
+        case "fbdect200":
+            $device->status = switch_fbdect200($device, $action);
             //hier nicht connair und cul ansprechen
             return;
     }

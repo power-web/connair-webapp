@@ -32,6 +32,8 @@ $r_room = (string)$_POST['room'];
 $r_vendor = (string)$_POST['vendor'];
 $r_masterdip = (string)$_POST['masterdip'];
 $r_slavedip = (string)$_POST['slavedip'];
+$r_rawCodeOn = (string)$_POST['rawCodeOn'];
+$r_rawCodeOff = (string)$_POST['rawCodeOff'];
 $r_tx433version = (string)$_POST['tx433version'];
 $r_btnLabelOn = (string)$_POST['btnLabelOn'];
 $r_btnLabelOff = (string)$_POST['btnLabelOff'];
@@ -66,9 +68,15 @@ switch ($r_action) {
         $newdeviceaddress->addChild('masterdip', $r_masterdip);
         $newdeviceaddress->addChild('slavedip', $r_slavedip);
         $newdeviceaddress->addChild('tx433version', $r_tx433version);
-        $newdeviceaddress->addChild('rawCodeOn');
-        $newdeviceaddress->addChild('rawCodeOff');
-
+        
+        if($r_vendor == "url") {
+            $newdeviceaddress->addChild('rawCodeOn', str_replace('&','&amp;',$r_rawCodeOn));
+            $newdeviceaddress->addChild('rawCodeOff', str_replace('&','&amp;',$r_rawCodeOff));
+        } else {
+            $newdeviceaddress->addChild('rawCodeOn', $r_rawCodeOn);
+            $newdeviceaddress->addChild('rawCodeOff', $r_rawCodeOff);
+        }
+        
         $newdevice->addChild('room', $r_room);
         $newdevice->addChild('favorite', $r_favorite);
         $newdevice->addChild('status', 'OFF');
