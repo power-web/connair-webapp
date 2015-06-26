@@ -1,0 +1,1655 @@
+<html>
+<head>
+<title>Conn-Air Mobile WebApp</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<META NAME="Description" CONTENT="Funk-Haussteuerung mit iPhone iPad Android MacOSX Linux Windows">
+<style type="text/css">
+body {
+    background:#ffffff;
+}
+
+a:link, a:active, a:visited, a:hover {
+    color: #000000;
+    #text-decoration: none;
+    border:0px; 
+}
+
+.screenshotbox {
+    overflow:scroll;
+    padding:5px; 
+    margin:5px; 
+}
+.screenshot {
+    float:left;
+    border:2px solid #cecece; 
+    padding:40px 5px 10px 5px; 
+    margin:5px; 
+    text-align:center;
+    background-color:#000000;
+    -moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+	border-radius: 15px;
+
+	behavior: url(ie-css3.htc);
+}
+.screenshot img {
+    width:160;
+    height:240;
+    border:0px; 
+}
+.screenshot p {
+	font-family:Verdana,Arial;
+	font-size:12px;
+	font-weight:bold;
+	color: #FFFFFF;
+    text-decoration: none; 
+}
+
+.foto {
+    float:left;
+	overflow:auto;
+    border:2px solid #cecece; 
+    padding:10px; 
+    margin:10px; 
+    text-align:center;
+    background-color:#000000;
+    -moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+	border-radius: 15px;
+
+	behavior: url(ie-css3.htc);
+}
+
+.codebox {
+	margin:10px;
+	padding:10px; 
+	border:1px inset; 
+	overflow:auto;
+	background:#F1F1F1;
+	font-size:12px;
+	color:#000000;
+
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+	border-radius: 15px;
+
+	behavior: url(ie-css3.htc);
+}
+
+.titlezeile {
+	font-family:"arial";
+	margin: 30px 0px 30px 0px;
+    padding:0px 0px 0px 40px; 
+    
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+	border-radius: 15px;
+	
+	overflow:auto;
+	color:#000000;
+
+background:#FBBA03;
+filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFE400', endColorstr='#F78009');
+background-image: -webkit-linear-gradient(#FFE400 0%, #F78009 100%); 
+background-image: -moz-linear-gradient(#FFE400 0%, #F78009 100%); 
+background-image: -o-linear-gradient(#FFE400 0%, #F78009 100%); 
+background-image: linear-gradient(#FFE400 0%, #F78009 100%);
+
+	behavior: url(ie-css3.htc);
+}
+.titlezeile a {
+    color: #000000;
+    text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+
+<table border=0 width=100%>
+<tr>
+<td align=left>
+<img src="images/l3x_small.png" style="margin:10px;padding:10px;">
+</td>
+<td align=center>
+<h1>Conn-Air Mobile WebApp</h1>
+<h4>Haussteuerung per Smartphone und Tablet</h4>
+</td>
+<td align=right>
+<img src="images/apple-touch-icon-144x144.png" style="margin:10px;padding:10px;">
+</td>
+</tr>
+</table>
+
+
+
+<p>
+<h2 class="titlezeile"><a name="Menu">Menu</a></h2>
+[<a href="#WozuDasGanze">Wozu das Ganze?</a>] - 
+[<a href="#Vorraussetzungen">Vorraussetzungen</a>] - 
+[<a href="#Screenshots">Screenshots</a>] - 
+[<a href="#History">History</a>] - 
+[<a href="#TODO">TODO</a>] - 
+[<a href="#Konfigurationshilfe">Konfigurationshilfe</a>] - 
+[<a href="#InstallationshilfenWebServer">Installationshilfen WebServer</a>] - 
+[<a href="#Tipps">Tipps</a>] - 
+[<a href="#Danksagung">Danksagung</a>] - 
+[<a href="#Forum">Forum</a>] - 
+[<a href="#Demo">Demo</a>] - 
+[<a href="#Spenden">Spenden</a>] - 
+[<a href="#Download">Download</a>]
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="WozuDasGanze">Umfragen, News und so weiter ...</a></h2>
+Hat einer von euch das <a href="http://www.intertechno.at/produkte/sender/gateway/ITGW-433.html" target=_blank>ITGW-433 Gateway von Intertechno</a> erfolgreich im Einsatz? Es sollte ja funktionieren, aber laut WebSeite von Intertechno gibt es eine eue Version und es wäre ja interessant zu wissen ob sich etwas geändert hat :-)
+<br/>
+<br/>
+Wenn ja schreibt mir doch unter [connair (ätt) l3x.de].
+<br/>
+<br/>
+<br/>
+<br/>
+<a href="screenshots/neuesdesign-0.6.6.png"><div class=screenshot><img src="screenshots/neuesdesign-0.6.6.png"><p>neues Design</p></div></a>
+<h1>
+letzte UPDATE: 2014-07-13 !!!
+</h1>
+Die edit-Funktion kommt noch, aber das ist sehr aufwändig, leider.
+<div style="clear:both;"></div>
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="WozuDasGanze">Wozu das Ganze?</a></h2>
+Die <a href="http://wiki.simple-solutions.de/de/products/Conn_Air" target=_blank>Conn Air</a> ist eine von <a href="http://simple-solutions.de" target=_blank>Simple-Solutions</a> entwickelte Box die die Brücke 
+zwischen Netzwerk und Funk (433 Mhz) schlägt. Somit kann man von einem PC, Tablet oder Smartphone die Steckdosen von Intertechno, Brennenstuhl oder Elro schalten.
+<br/>
+<br/>
+Leider wird die Connair nicht mehr hergestellt. Aber das Gateway von brennenstuhl <a href="http://www.brennenstuhl.de/de-DE/steckdosenleisten-schaltgeraete-und-adapter/brematic-hausautomation/brematic-home-automation-gateway-gwy-433-1.html" target=_blank>Brematic Home Automation Gateway GWY 433</a> ist 100% kompatibel. Es scheint die Connair im neuen Gewand zu sein ;-)
+<br/>
+<br/>
+<br/>
+Da dies eine WebApp ist (Client und Server) benötigst du einen WebServer mit php Unterstützung.<br/>
+Ich und viele andere Benutzer verwenden den <a href="http://httpd.apache.org/" target=_blank>Apache httpd</a> und das <a href="http://php.net/" target=_blank>php Addon</a>.<br/>
+Dieser kann auf einer <a href="http://www.avm.de/de/Produkte/FRITZBox/" target=_blank>FRITZBox</a>, einem <a href="http://www.raspberrypi.org/" target=_blank>Raspberry PI</a> oder einem normalen PC mit Windows, Linux oder Mac OS X laufen.<br/>
+Ich werde <a href="#InstallationshilfenWebServer">hier</a> nach und nach Installations-Vorschläge/Anleitungen veröffentlichen, um denen zu Helfen die dies nich jeden Tag tun ;-)<br/>
+Für Windows könnt ihr z.B. zu <a href="http://www.apachefriends.org/de/xampp-windows.html" target=_blank>XAMPP</a> greifen.
+<p>Die App sollte dank <a href="http://www.jquerymobile.com" target=_blank>jQueryMobile</a> auf jedem HTML5 fähigen Gerät funktionieren.</p>
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Vorraussetzungen">Vorraussetzungen</a></h2>
+</p>
+
+<p>
+<ul>
+<li>eine Conn Air</li>
+<li>Funksteckdosen</li>
+<li>einen Server (das kann sein: FritzBOX, Raspberry PI, NAS, PC, MAC, Apple TV, ...)</li>
+<li>Drang zum Basteln :-)</li>
+<li>Apache WebServer mit php Unterstützung (Installationshilfe gibts weiter unten und im Forum)</li>
+</ul>
+<br/>
+<br/>
+Folgende Hardware/Steckdosen besitze ich:<br/>
+
+<div class="screenshot"><img src=devices/connair.jpg><p>Simple Solutions<br>Conn-Air</p></div>
+<div class="screenshot"><img src=devices/intertechno-ycr-1000.jpg><p>Intertechno <br>YCR-1000</p></div>
+<div class="screenshot"><img src=devices/intertechno-itr-1500.jpg><p>Intertechno <br>ITR-1500</p></div>
+<div style="clear:both;"></div>
+</p>
+
+
+<br/>
+<br/>
+Folgende Steckdosen funktionieren auch (erfolgreich getestet von Benutzern):<br/>
+
+<div class="screenshot"><img src=devices/ELRO_AB440S.jpg><p>ELRO <br>AB440S</p></div>
+<div class="screenshot"><img src=devices/Zhejiang_Kanhtai_2603.jpg><p>Zhejiang Kanhtai <br>2603</p></div>
+<div class="screenshot"><img src=devices/Brennenstuhl_RCS-1000_N_Comfort.jpg><p>Brennenstuhl <br>RCS-1000 N Comfort</p></div>
+<div class="screenshot"><img src=devices/intertechno_PAR-1000.jpg><p>Intertechno <br>PAR-1000</p></div>
+<div style="clear:both;"></div>
+Danke an static77 und PatMo für die Fotos.
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Screenshots">Screenshots</a></h2>
+<a href="screenshots/start.PNG"><div class=screenshot><img src="screenshots/start_thumb.PNG"><p>Start</p></div></a>
+<div style="clear:both;"></div>
+</p>
+<p>
+<h4 class="titlezeile">Theme: Dunkel</h4>
+<a href="screenshots/menu_dunkel.PNG"><div class=screenshot><img src="screenshots/menu_dunkel_thumb.PNG"><p>Menü</p></div></a>
+<a href="screenshots/favorites_dunkel.PNG"><div class=screenshot><img src="screenshots/favorites_dunkel_thumb.PNG"><p>Favoriten</p></div></a>
+<a href="screenshots/devices_dunkel.PNG"><div class=screenshot><img src="screenshots/devices_dunkel_thumb.PNG"><p>Geräte</p></div></a>
+<a href="screenshots/groups_dunkel.PNG"><div class=screenshot><img src="screenshots/groups_dunkel_thumb.PNG"><p>Gruppen</p></div></a>
+<a href="screenshots/rooms_dunkel.PNG"><div class=screenshot><img src="screenshots/rooms_dunkel_thumb.PNG"><p>Räume</p></div></a>
+<a href="screenshots/timers_dunkel.PNG"><div class=screenshot><img src="screenshots/timers_dunkel_thumb.PNG"><p>Timer</p></div></a>
+<a href="screenshots/config1_dunkel.PNG"><div class=screenshot><img src="screenshots/config1_dunkel_thumb.PNG"><p>Einstellungen</p></div></a>
+<a href="screenshots/config3_dunkel.PNG"><div class=screenshot><img src="screenshots/config3_dunkel_thumb.PNG"><p>Einstellungen</p></div></a>
+<a href="screenshots/newdevice1_dunkel.PNG"><div class=screenshot><img src="screenshots/newdevice1_dunkel_thumb.PNG"><p>neues Gerät</p></div></a>
+<a href="screenshots/newdevice2_dunkel.PNG"><div class=screenshot><img src="screenshots/newdevice2_dunkel_thumb.PNG"><p>neues Gerät</p></div></a>
+<a href="screenshots/newtimer1_dunkel.PNG"><div class=screenshot><img src="screenshots/newtimer1_dunkel_thumb.PNG"><p>neuen Timer</p></div></a>
+<a href="screenshots/newtimer2_dunkel.PNG"><div class=screenshot><img src="screenshots/newtimer2_dunkel_thumb.PNG"><p>neuen Timer</p></div></a>
+<a href="screenshots/devicestatus1_dunkel.PNG"><div class=screenshot><img src="screenshots/devicestatus1_dunkel_thumb.PNG"><p>Geräte Status</p></div></a>
+<a href="screenshots/devicestatus2_dunkel.PNG"><div class=screenshot><img src="screenshots/devicestatus2_dunkel_thumb.PNG"><p>Geräte Status</p></div></a>
+<a href="screenshots/devicestatus3_dunkel.PNG"><div class=screenshot><img src="screenshots/devicestatus3_dunkel_thumb.PNG"><p>Geräte Status</p></div></a>
+<div style="clear:both;"></div>
+</p>
+<p>
+<h4 class="titlezeile">Theme: Hell</h4>
+<a href="screenshots/menu_hell.PNG"><div class=screenshot><img src="screenshots/menu_hell_thumb.PNG"><p>Menü</p></div></a>
+<a href="screenshots/favorites_hell.PNG"><div class=screenshot><img src="screenshots/favorites_hell_thumb.PNG"><p>Favoriten</p></div></a>
+<a href="screenshots/devices_hell.PNG"><div class=screenshot><img src="screenshots/devices_hell_thumb.PNG"><p>Geräte</p></div></a>
+<a href="screenshots/groups_hell.PNG"><div class=screenshot><img src="screenshots/groups_hell_thumb.PNG"><p>Gruppen</p></div></a>
+<a href="screenshots/rooms_hell.PNG"><div class=screenshot><img src="screenshots/rooms_hell_thumb.PNG"><p>Räume</p></div></a>
+<a href="screenshots/timers_hell.PNG"><div class=screenshot><img src="screenshots/timers_hell_thumb.PNG"><p>Timer</p></div></a>
+<a href="screenshots/config1_hell.PNG"><div class=screenshot><img src="screenshots/config1_hell_thumb.PNG"><p>Einstellungen</p></div></a>
+<a href="screenshots/config3_hell.PNG"><div class=screenshot><img src="screenshots/config3_hell_thumb.PNG"><p>Einstellungen</p></div></a>
+<a href="screenshots/newdevice1_hell.PNG"><div class=screenshot><img src="screenshots/newdevice1_hell_thumb.PNG"><p>neues Gerät</p></div></a>
+<a href="screenshots/newdevice2_hell.PNG"><div class=screenshot><img src="screenshots/newdevice2_hell_thumb.PNG"><p>neues Gerät</p></div></a>
+<a href="screenshots/newtimer1_hell.PNG"><div class=screenshot><img src="screenshots/newtimer1_hell_thumb.PNG"><p>neuen Timer</p></div></a>
+<a href="screenshots/newtimer2_hell.PNG"><div class=screenshot><img src="screenshots/newtimer2_hell_thumb.PNG"><p>neuen Timer</p></div></a>
+<div style="clear:both;"></div>
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="History">History</a></h2>
+</p>
+
+
+<p>
+<h3>Version 0.6.11 (2014-07-13)</h3>
+<ul>
+<li>Device anlegen mit SenderID ein Wunsch von olihamburg :-).  <a href="http://forum.power-switch.eu/viewtopic.php?f=15&t=11&sid=e27693ea04a14c67de43ad767aad4be8#p5416" target=_blank>Forum-Link</a></li>
+</ul>
+</p>
+
+
+<p>
+<h3>Version 0.6.10 (2014-07-13)</h3>
+<ul>
+<li>Jetzt könnt Ihr auch <a href="http://avm.de/produkte/fritzdect/fritzdect-200/" target=_blank>FritzBox DECT 200</a> schalten.</li>
+<li>Device anlegen mit RAW Code und Hersteller: URL, Computer, FritzBoxDECT200.</li>
+</ul>
+</p>
+
+
+<p>
+<h3>Version 0.6.9 (2014-07-06)</h3>
+<ul>
+<li>Connair neustarten über Einstellungen (möglich ab Firmware Version 014 <a href="http://wiki.simple-solutions.de/de/products/Conn_Air/Benutzeranleitung_Conn_Air_Gateway#Firmware_Update" target=_blank>Update-Anleitung</a>).</li>
+</ul>
+</p>
+
+
+<p>
+<h3>Version 0.6.8 (2014-07-06)</h3>
+<ul>
+<li>favicon hinzugefügt.</li>
+<li>Einfachen Texteditor eingebaut um die config.xml manuell via WebApp zu konfigurieren. Dieser erstellt natürlich auch Backups, aber tut dies vor dem nutzen auch nochmal, sicher ist sicher ;-)</li>
+</ul>
+</p>
+
+
+<p>
+<h3>Version 0.6.7 (2014-07-06)</h3>
+<ul>
+<li>Timer schalten auf Wunsch nur einmal. Siehe Einstellungen. Vorteil: Dimmer funktionieren besser.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.6 (2014-07-05)</h3>
+<ul>
+<li>Geräte über URLs Schalten (z.B. Dreamboxen, NetzwerkSchaltDosen, uvm.).</li>
+<li>Redisign der Schaltbuttons.</li>
+<li>Löschen der Geräte, Timer, ...</li>
+<li>Timer de-/aktivieren über Buttons</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.5 (2013-04-11)</h3>
+<ul>
+<li>Schaltbfehle zu Intertechno Steckdose deutlich verbessert.</li>
+<li>debug.log über die App einsehbar.</li>
+<li>Position über ein Klick herausfinden.</li>
+<li>Versionsnummer in der GUI zusehen.</li>
+<li>Erste Version mit Multi-Connair-Aber-Nur-Eine-Schaltet-Support. Wenn Oli getestet hat gibts mehr Infos.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.4 (2013-04-01)</h3>
+<ul>
+<li>Zwei Themes sind verfügbar (Hell und Dunkel). (Danke an oli für die tolle Idee (Ich nutze jetzt Dunkel))</li>
+<li>Timer an- und ausschaltbar. (aktuell nur per XML editieren)</li>
+<li>iPhone 5 (4") Support.</li>
+<li>Weitere interne Code-Optimierungen.</li>
+<li>Neuladen der WebApp nach AllOn oder AllOff um den Status zu aktualisieren.</li>
+<li>Erweiterung der Server-Informationen</li>
+<li>Aktuelle Sonnenauf- und untergangs Uhrzeiten werden beim Anlegen des Timers eingeblendet. (Danke für die Idee an carlsan)</li>
+<li>Nun kann man mit Timern auch NUR aus oder einschalten. (Z.B. als Abschaltvergissmichnichthilfe) (Danke an stromer für die Idee)</li>
+<li>Neue Timer über die WebApp anlegbar.</li>
+<li>Button Config Slider entfernt.</li>
+<li>Versteckte Funktion PCs via WakeOnLAN zustarten bzw. mit "net rcp shutdown" zustoppen. (Bitte stromer :-)</li>
+<li>Buttons können jetzt einen eigenen Text enthalten. (z.B. damit bei Rolladen statt "EIN/AUS" "AB/AUF" steht).</li>
+<li>Alle EIN / Alle AUS im Menu deaktivierbar. (Für mich nicht mehr zu nutzen da es zu viele Geräte sind die anbleiben müssen ;-).</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.3 (2013-03-27)</h3>
+<ul>
+<li>Debug Möglichkeit bei den Timern verbessert.</li>
+<li>Menu scrollt nicht mehr aus dem Fenster wenn man am Ende einer Liste ist.</li>
+<li>Struktur der Sripte überarbeitet = Performace-Gewinn.</li>
+<li>Fehlermeldung wenn die debug.log nicht geschrieben kann.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.2 (2013-03-24)</h3>
+<ul>
+<li>Zeitzone über die config.xml einstellbar.</li>
+<li>Neue Hilfe bei Einstellen vom masterDip und slaveDip bei neuem Device (Brennenstuhl und Elro) anlegen.</li>
+<li>Wieder kompatibel mit php kleiner Version 5.3.x.</li>
+<li>Einstellungs Menü aktiviert. Aber noch nicht alle Funktionen abgedeckt.</li>
+<li>Dialog für neuen Timer anlegen überarbeitet. Man muss keine ID mehr auswendig kennen.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.1 (2013-03-16)</h3>
+<ul>
+<li>Offset für Timer bei Sonnenuntergang oder Aufgang möglich. Also die Lampe geht bevor die Sonne unten ist an, so wie es praktisch ist ;-).</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.6.0 (2013-03-16)</h3>
+<ul>
+<li>Neues Device anlegen funktioniert nun über die App. (INFO: Es werden noch nicht alle Eingaben geprüft!)</li>
+<li>Geräte und Räume können jetzt anders sortiert werden (siehe <a href="#Konfigurationshilfe">Konfigurationshilfe</a> unten).</li>
+<li>Die Buttons in der Geräteübersicht für den Raum schalten sind jetzt Konfigurierbar. Ich will sie nämlich nicht :-) (siehe <a href="#Konfigurationshilfe">Konfigurationshilfe</a> unten).</li>
+<li>Bugfix: Timer Off schaltet nun auch bei Gruppen richtig.</li>
+<li>Bugfix: Wenn ein Gerät durch einen Timer geschaltet wurde, wird jetzt der Status dazu gespeichert.</li>
+<li>INFO: Um rawCodes zu nutzen bitte vendor "raw" nutzen.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.5.1 (2013-03-09)</h3>
+<ul>
+<li>Bugfix: Status-Anzeige sollte nun funktionieren.(BUTTON_SLIDER geht noch nicht richtig)</li>
+<li>Bugfix: Seitennamen Links nun ohne Umlaute (nun direkt ansprechbar z.B. #devices für die Geräte).</li>
+<li>Bugfix: Zeitzone ausversehen noch gesetzt. Bitte setzt diese selber in der php.ini</li>
+<li>Bugfix: Elro sollte jetzt auch richtig schalten (habe keine zum Testen :-).</li>
+<li>Übersicht für Timer aufgenommen. Danke an cinos22 für die Inspiration.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.5.0 (2013-02-27)</h3>
+<ul>
+<li>Option showMenuOnLoad eingefügt (öffnet das Menu nach dem Starten der App automatisch).</li>
+<li>Für die User mit einem Intertechno Gateway könnt ihr jetzt den Hack von <a href="http://simple-solutions.de/forum/viewtopic.php?p=3022#p3022" target=_blank>elduffy</a> aktivieren (siehe Config). Danke dir. Besser ist natürlich eine Connair zu nutzen ;-)</li>
+<li>Zeitsteuerung von <a href="http://simple-solutions.de/forum/viewtopic.php?p=3036#p3036" target=_blank>cinos22</a> etwas modifiziert eingebaut. Dafür noch mal danke.</li>
+<li>Schwellwerte für das Swipen angepasst.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.4.1 (2013-02-16)</h3>
+<ul>
+<li>Fehler beim "Menu swipen" gefunden. Funktioniert nun immer.</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.4 (2013-02-16)</h3>
+<ul>
+<li>debug Schalter hinzugefügt </li>
+<li>rudimentäre unterstützung des CUL USB Sticks. (<a href="http://busware.de/tiki-index.php?page=CUL">Wiki vom Hersteller</a>)</li>
+<li>Auf Wunsch von "cinos22" Support für POST und GET Requests aufgenommen. </li>
+  Danke für die Idee. Nun Könnt Ihr auch mit einem Aufruf einer URL schalten. 
+  Mehr dazu unten unter Tipps.</li>
+<li>Neue Option für die Statusanzeige: BUTTON_SLIDER</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.3 (2013-02-11)</h3>
+<ul>
+<li>GUI (Graphical User Interface) Einstellungen </li>
+<li>Status Anzeige des Schaltzustandes (nur sinnvoll wenn ausschließlich über die App geschaltet wird)</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.2 (2013-02-08)</h3>
+<ul>
+<li>Übersicht für Räume hinzugefügt</li>
+<li>Räume können auch in der Geräte Übersicht geschaltet werden</li>
+<li>In Gruppen ist es nun möglich Geräte beim Einschalten einer Gruppe auszuschalten</li>
+<li>jQueryMobile Lib update</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.1.1 (2013-02-06)</h3>
+<ul>
+<li>TXP Code wurde nicht sauber erzeugt</li>
+<li>config.xml mit sinnvollen Beispielen bestückt</li>
+</ul>
+</p>
+
+<p>
+<h3>Version 0.1 (2013-02-03)</h3>
+<ul>
+<li>Menu per wischen</li>
+<li>schneller schalten mit Favoriten</li>
+<li>Übersicht über alle Geräte</li>
+<li>Übersicht über die Gruppen</li>
+<li>direktes Schalten aller Geräte über das Menü</li>
+<li>senden des Befehls an mehrere Conn-Air gleichzeitig</li>
+<li>Konfigurieren mit Master und Slave Code</li>
+<li>Konfigurieren eines RAW Codes</li>
+</ul>
+</p>
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="TODO">TODO</a></h2>
+<ul>
+<li>Konfigurieren über die App</li>
+<li>Erweitertes Fehlerhandling</li>
+<li>Fotozuweisung zu Geräten</li>
+<li>Zugriffsberechtigen</li>
+<li>Schaltimpuls also wie ein Taster</li>
+<li>PCs via WOL (Wake On Lan) schalten</li>
+<li>Geräte die nach einer Zeit t automatisch wieder ausgehen</li>
+<li>Umstellung auf only AJAX</li>
+<li>Sourcecode säubern</li>
+<li>Geräte/Gruppen/Timer via GUI anlegen/editieren/löschen</li>
+<li>Navigation vom Raum aus zum Gerät</li>
+<li>...</li>
+<li>Wünsche?</li>
+</ul>
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Konfigurationshilfe">Konfigurationshilfe</a></h2>
+
+<h4 class="titlezeile">
+Debugging
+</h4>
+<p>
+Ihr könnt bei Problemen den DebugModus aktivieren und in das dann erstellte debug.log schauen was so passiert.
+<ul>
+<li><b>debug</b> mögliche Optionen sind: true (an) oder false (aus).</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;config debug="true"&gt;
+        ...
+    &lt;/config&gt;
+</pre></div>
+
+
+<br/>
+<h4 class="titlezeile">
+Globale Einstellungen
+</h4>
+<p>
+Hier werden die globalen Einstellungen von der WebApp vorgenommen.
+<ul>
+<li><b>timezone</b> eure Zeitzone. <i>Default: Wer aus der php.ini und wenn da nicht gesetzt dann UTC</i> Dies ist optional da immer wieder Probleme mit der Zeitzone über die php.ini aufgetreten sind.</li>
+<li><b>longitude</b> euer Längengrad. <i>Default: 9.44858</i></li>
+<li><b>latitude</b> euer Breitengrad. <i>Default: 48.64727</i> - Dies dient zur Ermittlung des Sonnenauf und -unterganges bei Euch. Um die Daten zu ermitteln, nutzt am besten <a href="http://www.linkr.de/2009/03/24/mit-google-maps-laengen-breitengrade-ermitteln-freies-geocoding-skript/" target=_blank>Google Maps</a>.</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;global&gt;
+        &lt;timezone&gt;Europe/Berlin&lt;/timezone&gt;
+        &lt;longitude&gt;9.44858&lt;/longitude&gt;
+        &lt;latitude&gt;48.64727&lt;/latitude&gt;
+    &lt;/global&gt;
+</pre></div>
+
+
+<br/>
+<h4 class="titlezeile">
+GUI (Graphical User Interface) Einstellungen
+</h4>
+<p>
+Hier kann die funktion der Oberfläche eingestellt werden. Es werden in Zukunft immer mehr Funktionen einstellbar sein.
+<ul>
+<li><b>showDeviceStatus</b> mögliche Optionen sind: ROW_COLOR, BUTTON_COLOR, BUTTON_ICON, OFF (Alles andere wird als OFF gewertet).</li>
+<li><b>showRoomButtonInDevices</b> mögliche Optionen sind: true oder false (Alles andere wird als false gewertet).</li>
+<li><b>showMenuOnLoad</b> öffnet das Menu nach dem Starten der App automatisch.</li>
+<li><b>sortOrderDevices</b> steuert die Sortierung der Geräte. Mögliche Optionen sind: SORT_BY_NAME, SORT_BY_ID (Bei leer lassen oder anderen Werten ist die Reihenfolge wie in der config.xml)</li>
+<li><b>sortOrderGroups</b> steuert die Sortierung der Gruppen. Mögliche Optionen sind: SORT_BY_NAME, SORT_BY_ID (Bei leer lassen oder anderen Werten ist die Reihenfolge wie in der config.xml)</li>
+<li><b>sortOrderRooms</b> steuert die Sortierung der Räume. Mögliche Optionen sind: SORT_BY_NAME (Bei leer lassen oder anderen Werten ist die Reihenfolge wie in der config.xml)</li>
+<li><b>sortOrderTimers</b> steuert die Sortierung der Timer. Mögliche Optionen sind: SORT_BY_NAME, SORT_BY_ID, SORT_BY_TYPE_AND_NAME (Bei leer lassen oder anderen Werten ist die Reihenfolge wie in der config.xml)</li>
+<li><b>theme</b> Das design des WebApp es gibt DARK und LIGHT</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;gui&gt;
+        &lt;showDeviceStatus&gt;OFF&lt;/showDeviceStatus&gt;
+        &lt;showRoomButtonInDevices&gt;false&lt;/showRoomButtonInDevices&gt;
+        &lt;showMenuOnLoad&gt;true&lt;/showMenuOnLoad&gt;
+        &lt;sortOrderDevices&gt;SORT_BY_NAME&lt;/sortOrderDevices&gt;
+        &lt;sortOrderGroups&gt;SORT_BY_NAME&lt;/sortOrderGroups&gt;
+        &lt;sortOrderRooms&gt;SORT_BY_NAME&lt;/sortOrderRooms&gt;
+        &lt;sortOrderTimers&gt;SORT_BY_TYPE_AND_NAME&lt;/sortOrderTimers&gt;
+        &lt;theme&gt;LIGHT&lt;/theme&gt;
+    &lt;/gui&gt;
+</pre></div>
+
+
+<br/>
+<h4 class="titlezeile">
+Die Conn-Airs
+</h4>
+<p>
+Der einfachste Part ist der für die Conn-Air[s], einfach mehrere untereinander siehe Beispiel.<br/><br/>
+INFO: Du brauchst nur soviele connair Blöcke wie du auch Conn-Airs besitzt. Im Beispiel unten sind zwei Stück drin. Wenn du nur eine Conn-Air hast dann schmeiß eine in deiner config.xml raus.<br/>
+<ul>
+<li><b>type</b> ist optional. Aktuell ist nur itgw möglich. Du benötigst das nur wenn du ein Intertechno Gateway hast, wenn du eine Conn-Air von Simple Solutions hast ignorier das einfach.</li>
+<li><b>address</b> hier muss nur der Hostname oder IP der Conn-Air rein.</li>
+<li><b>port</b> ist des Conn-Air.</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;connairs&gt;
+        &lt;connair&gt;
+            &lt;address&gt;192.168.42.3&lt;/address&gt;
+            &lt;port&gt;49880&lt;/port&gt;
+        &lt;/connair&gt;
+        &lt;connair type="itgw"&gt;
+            &lt;address&gt;192.168.42.4&lt;/address&gt;
+            &lt;port&gt;49880&lt;/port&gt;
+        &lt;/connair&gt;
+    &lt;/connairs&gt;
+</pre></div>
+
+
+<br/>
+<h4 class="titlezeile">
+Die CULs
+</h4>
+<p>
+Hier könnt ihr eure CULs bekanntmachen. NUR Linux supported. <br/><br/>
+INFO: Hast du überhaupt eine CUL? Wenn nicht kann der ganze Block culs aus deiner config.xml raus. Du weißt nicht ob du eine CUL hast? So sieht eine CUL aus --> <a href="http://busware.de/tiki-index.php?page=CUL">Wiki vom Hersteller</a>
+<ul>
+<li><b>device</b> hier muss das Linux Device von der CUL rein. Damit man aus dem php Script mit dem USB Stick sprechen darf muss der User für den Apache in der Gruppe sein die schreibrechte hat. Unter Tipps sehr ihr wie es bei gentoo ist.</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;culs&gt;
+        &lt;cul&gt;
+            &lt;device&gt;/dev/ttyACM0&lt;/device&gt;
+        &lt;/cul&gt;
+        &lt;cul&gt;
+            &lt;device&gt;/dev/ttyACM1&lt;/device&gt;
+        &lt;/cul&gt;
+    &lt;/culs&gt;
+</pre></div>
+
+
+<br/>
+<h4 class="titlezeile">
+Die Geräte
+</h4>
+<p>
+<ul>
+<li><b>id</b> ist eine fortlaufende Nummer.</li>
+<li><b>name</b> ist der Name des Gerätes welcher auch in der Oberfläche sichtbar ist.</li>
+<li><b>vendor</b> ist der Hersteller des Geräte. Aktuell möglich intertechno, elro oder brennenstuhl. Besondere typen sind computer und url.</li>
+<li><b>address</b> ist die Adresse des Gerätes, diese ist Hersteller abhängig.
+<ul>
+    <li><b>masterdip</b> bei Intertechno z.B. A.</li>
+    <li><b>slavedip</b> bei Intertechno z.B. 2.</li>
+    <li><b>tx433version</b> Version des Protokolls. Bei Intertechno immer 1.</li>
+    <li><b>rawCodeOn</b> der komplette TXP Datensatz der an die Conn-Air geschickt werden soll um das Gerät einzuschalten. Du benötigste diesen nur wenn dein Gerät aktuell nicht direkt mit masterdip und slavedip unterstützt wird. Wenn du einen rawCode setzt wird masterdip, slavedip und tx433version ignoriert.</li>
+    <li><b>rawCodeOff</b> der komplette TXP Datensatz der an die Conn-Air geschickt werden soll um das Gerät auszuschalten. Du benötigste diesen nur wenn dein Gerät aktuell nicht direkt mit masterdip und slavedip unterstützt wird. Wenn du einen rawCode setzt wird masterdip, slavedip und tx433version ignoriert.</li>
+</ul>
+</li>
+<li><b>room</b> sortiert das Gerät in einen Raum.</li>
+<li><b>favorite</b> macht das Gerät in der Favoriten übersicht sichtbar</li>
+<li><b>buttonLabelOn</b> ist die Beschriftung des EIN Button. (ist optional wenn du es weglässt steht da EIN)</li>
+<li><b>buttonLabelOff</b> ist die Beschriftung des AUS Button. (ist optional wenn du es weglässt steht da AUS)</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device buttonLabelOn="AB" buttonLabelOff="AUF"&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Lichterkette Wohnzimmertür&lt;/name&gt;
+            &lt;vendor&gt;Intertechno&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;M&lt;/masterdip&gt;
+                &lt;slavedip&gt;2&lt;/slavedip&gt;
+                &lt;tx433version&gt;1&lt;/tx433version&gt;
+                &lt;rawCodeOn&gt;&lt;/rawCodeOn&gt;
+                &lt;rawCodeOff&gt;&lt;/rawCodeOff&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Flur&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+
+
+
+<br/>
+<h4 class="titlezeile">
+Die Gruppen
+</h4>
+<p>
+<ul>
+<li><b>id</b> ist eine fortlaufende Nummer.</li>
+<li><b>name</b> ist der Name des Gerätes welcher auch in der Oberfläche sichtbar ist.</li>
+<li><b>favorite</b> macht das Gerät in der Favoriten übersicht sichtbar.</li>
+<li><b>deviceid</b> ist eine Liste mit Geräten die zu dieser Gruppe gehören.
+<ul>
+    <li><b>onaction</b> Was soll passieren wenn man die Gruppe einschaltet? Gerät einschalten, ausschalten oder dieses Gerät ignorieren? Mögliche Werte <i>on,off,none</i>.</li>
+    <li><b>offaction</b> Was soll passieren wenn man die Gruppe ausschaltet? Gerät einschalten, ausschalten oder dieses Gerät ignorieren? Mögliche Werte <i>on,off,none</i>.</li>
+</ul>
+</li>
+<li><b>buttonLabelOn</b> ist die Beschriftung des EIN Button. (ist optional wenn du es weglässt steht da EIN)</li>
+<li><b>buttonLabelOff</b> ist die Beschriftung des AUS Button. (ist optional wenn du es weglässt steht da AUS)</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;groups&gt;
+        &lt;group buttonLabelOn="AB" buttonLabelOff="AUF"&gt;
+            &lt;id&gt;2&lt;/id&gt;
+            &lt;name&gt;gemütlicher Abend&lt;/name&gt;
+            &lt;favorite&gt;true&lt;/favorite&gt;
+            &lt;deviceid onaction="on" offaction="off"&gt;1&lt;/deviceid&gt;
+            &lt;deviceid onaction="off" offaction="none"&gt;3&lt;/deviceid&gt;
+        &lt;/group&gt;
+    &lt;/groups&gt;
+</pre></div>
+</p>
+
+
+<br/>
+<h4 class="titlezeile">
+Die Timer
+</h4>
+<p>
+Aktuell werden die Timer via Cronjob angestartet. Details dazu unter Tipps.
+<ul>
+<li><b>debug</b> mögliche Optionen sind: true (an) oder false (aus). Erzeug ausgaben beim Aufruf der "timerrun"-URL.</li>
+<li><b>id</b> ist eine fortlaufende Nummer.</li>
+<li><b>active</b> ist der Timer aktiv dann schaltet er auch. Ihr könnt ihn z.B. im Urlaub ausstellen. (on oder off)</li>
+<li><b>type</b> Was soll geschaltet werden? (device, group, room).</li>
+<li><b>typeid</b> Die id der zuschaltenden Objekts (Beim Raum der Raumname).</li>
+<li><b>day</b> An welchen Tagen soll der Timer ausgeführt werden.
+Dieses Feld besteht aus 7 Zeichen. Das erste ist Montag das zweite Dienstag bis das siebte Sonntag.<br>
+Beispiele: <br>
+ nur Montag = &lt;day&gt;M______&lt;/day&gt;<br>
+ Montag und Mittwoch = &lt;day&gt;M_M____&lt;/day&gt;<br>
+ Samstag und Sonntag = &lt;day&gt;_____SS&lt;/day&gt;<br>
+ jeden Wochentag = &lt;day&gt;MDMDFSS&lt;/day&gt;<br>
+</li>
+<li><b>timerOn</b> Start Uhrzeit im Format hh:mm (z.B. 13:37) oder SU für Sonnenaufgang bzw. SD für Sonnenuntergang.
+<ul>
+    <li><b>offset</b> falls die Lampe vor dem Sonnenuntergang schon angehen soll, könnt ihr mit offset eine Zeit in Minuten angeben. Z.B. "-30" für dreißig Minuten eher. (Funktioniert nur bei SU und SD)</li>
+</ul>
+</li>
+<li><b>timerOff</b> Stop Uhrzeit im Format hh:mm (z.B. 23:23) oder SU für Sonnenaufgang bzw. SD für Sonnenuntergang.
+<ul>
+    <li><b>offset</b> falls die Lampe nach dem Sonnenaufgang erst angehen soll, könnt ihr mit offset eine Zeit in Minuten angeben. Z.B. "60" für sechzig Minuten nach dem Aufgang. (Funktioniert nur bei SU und SD)</li>
+</ul>
+</li>
+</ul>
+</p>
+<div class=codebox><pre>
+    &lt;timers debug="true"&gt;
+        &lt;timer&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;active&gt;on&lt;/active&gt;
+            &lt;type&gt;device&lt;/type&gt;
+            &lt;typeid&gt;1&lt;/typeid&gt;
+            &lt;day&gt;M______&lt;/day&gt;
+            &lt;timerOn&gt;SD&lt;/timerOn&gt;
+            &lt;timerOff&gt;23:59&lt;/timerOff&gt;
+        &lt;/timer&gt;
+        &lt;timer&gt;
+            &lt;id&gt;2&lt;/id&gt;
+            &lt;active&gt;off&lt;/active&gt;
+            &lt;type&gt;group&lt;/type&gt;
+            &lt;typeid&gt;2&lt;/typeid&gt;
+            &lt;day&gt;_____SS&lt;/day&gt;
+            &lt;timerOn offset="-30"&gt;SD&lt;/timerOn&gt;
+            &lt;timerOff&gt;00:30&lt;/timerOff&gt;
+        &lt;/timer&gt;
+        &lt;timer&gt;
+            &lt;id&gt;3&lt;/id&gt;
+            &lt;active&gt;on&lt;/active&gt;
+            &lt;type&gt;room&lt;/type&gt;
+            &lt;typeid&gt;Flur&lt;/typeid&gt;
+            &lt;day&gt;MDMDFSS&lt;/day&gt;
+            &lt;timerOn&gt;19:00&lt;/timerOn&gt;
+            &lt;timerOff&gt;23:00&lt;/timerOff&gt;
+        &lt;/timer&gt;
+    &lt;/timers&gt;
+</pre></div>
+</p>
+
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile">Wie bekomme ich den richigen masterdip und slavedip heraus?</h2>
+Ganz einfach :-)
+<br/>
+<h4 class="titlezeile">Intertechno YCR-1000 und YCR-3500</h4>
+<p>Der Buchstabe ist der masterdip und die Zahl ist der slavedip.</p>
+<div class=foto><img src="devices/intertechno-ycr-1000_SCHALTER.jpg"></div>
+<div style="clear:both;"></div>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Steckdose&lt;/name&gt;
+            &lt;vendor&gt;Intertechno&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;A&lt;/masterdip&gt;
+                &lt;slavedip&gt;2&lt;/slavedip&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Raum&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+<br/>
+<br/>
+<h4 class="titlezeile">Intertechno PAR-1000</h4>
+<p>Der Buchstabe ist der masterdip und die Zahl 1 bis 3 ist der slavedip.</p>
+<div class=foto><img src="devices/intertechno_PAR-1000_SCHALTER.jpg"></div>
+<div style="clear:both;"></div>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Steckdose&lt;/name&gt;
+            &lt;vendor&gt;Intertechno&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;D&lt;/masterdip&gt;
+                &lt;slavedip&gt;1&lt;/slavedip&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Raum&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+<br/>
+<br/>
+<h4 class="titlezeile">ELRO AB440S</h4>
+<p>Die Schalter 1 bis 5 sind der masterdip und die Schalter A bis E sind der slavedip.</p>
+<div class=foto><img src="devices/ELRO_AB440S_SCHALTER.jpg"></div>
+<div style="clear:both;"></div>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Steckdose&lt;/name&gt;
+            &lt;vendor&gt;ELRO&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;11111&lt;/masterdip&gt;
+                &lt;slavedip&gt;00010&lt;/slavedip&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Raum&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+<br/>
+<br/>
+<h4 class="titlezeile">Zhejiang Kanhtai 2603</h4>
+<p>Die Schalter 1 bis 5 sind der masterdip und die Schalter 6 bis 10 sind der slavedip.</p>
+<div class=foto><img src="devices/Zhejiang_Kanhtai_2603_SCHALTER.jpg"></div>
+<div style="clear:both;"></div>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Steckdose&lt;/name&gt;
+            &lt;vendor&gt;ELRO&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;10000&lt;/masterdip&gt;
+                &lt;slavedip&gt;00100&lt;/slavedip&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Raum&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+<br/>
+<br/>
+<h4 class="titlezeile">Intertek 0175926</h4>
+<p>Die Schalter 1 bis 5 sind der masterdip und die Schalter A bis E sind der slavedip.</p>
+<div class=foto><img src="devices/intertek_0175926_SCHALTER.jpg"></div>
+<div style="clear:both;"></div>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Steckdose&lt;/name&gt;
+            &lt;vendor&gt;Elro&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;11111&lt;/masterdip&gt;
+                &lt;slavedip&gt;00100&lt;/slavedip&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Raum&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+<br/>
+<br/>
+<h4 class="titlezeile">Brennenstuhl RCS-1000 N Comfort</h4>
+<p>Die Schalter 1 bis 5 sind der masterdip und die Schalter A bis E sind der slavedip.</p>
+<div class=foto><img src="devices/Brennenstuhl_RCS-1000_N_Comfort_SCHALTER.jpg"></div>
+<div style="clear:both;"></div>
+<div class=codebox><pre>
+    &lt;devices&gt;
+        &lt;device&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;name&gt;Steckdose&lt;/name&gt;
+            &lt;vendor&gt;Brennenstuhl&lt;/vendor&gt;
+            &lt;address&gt;
+                &lt;masterdip&gt;00011&lt;/masterdip&gt;
+                &lt;slavedip&gt;01010&lt;/slavedip&gt;
+                &lt;tx433version&gt;2&lt;/tx433version&gt;
+            &lt;/address&gt;
+            &lt;room&gt;Raum&lt;/room&gt;
+            &lt;favorite&gt;false&lt;/favorite&gt;
+        &lt;/device&gt;
+    &lt;/devices&gt;
+</pre></div>
+<br/>
+</p>
+
+
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="InstallationshilfenWebServer">Installationshilfen WebServer</a></h2>
+
+<a href="#" style="text-decoration: none;" onClick="return _decide('InstallFRITZBox');return false;"><h4 class="titlezeile">FRITZBox 7390</h4></a>
+<div id=InstallFRITZBox style="visibility:hidden;display:none;">
+Das habe ich gemacht ... Danke an <a href="http://www.fritzmod.net/" target="_blank">http://www.fritzmod.net/</a><br/>
+
+Als erstes muss man den Telnet Server starten. Dazu am Telefon das an die Fritzbox angeschlossen ist folgendes wählen:
+<div class=codebox><pre>
+#96*7* Telnet an
+#96*8* Telnet aus
+</pre></div>
+Dann mittels Putty oder Terminal auf die Fritzbox mit "telnet fritz.box" verbinden.<br/>
+Wen das klappt folgende Schritte abarbeiten (es müssen nur die Zeilen ohne # ausgeführt werden :-)
+<div class=codebox><pre>
+# Verzeichnis erstellen in dem wir apache ablegen
+mkdir /var/media/ftp/server
+
+# in das neue Verzeichnis wechseln
+cd /var/media/ftp/server
+
+# apache und php vo fritzmod laden
+wget http://www.fritzmod.net/download/mips/apache-2.2.17_php-5.4.3_mips_static.tar
+
+# das geladene Paket auspacken
+tar xvf apache-2.2.17_php-5.4.3_mips_static.tar
+
+# Testen ob der apache funktioniert
+./apache_bin -l
+# Compiled in modules:
+#   core.c
+#   mod_authn_file.c
+#   ...
+  
+# Standard-Konfiguration erstellen
+./set_apache_config 85
+
+# anpassen der config des apache an unsere gegebenheiten
+sed -i 's/Hitachi-HTS543216L9A300-01/server/g' apache/conf/apache.conf
+
+# den richtigen Usernamen rausfinden .. bei mir boxuser99
+cat /etc/passwd | grep boxusr | grep -v int
+# boxusr99
+# boxusr100
+
+# anpassen der config des apache an unsere gegebenheiten
+sed -i 's/^User .*/User boxusr99/g' apache/conf/apache.conf
+
+# apache testen
+./apache_bin -f /var/media/ftp/server/apache/conf/apache.conf
+
+# jawohl der apache läuft
+ps  | grep apache
+# 2756 root      2456 S    ./apache_bin -f /var/media/ftp/server/apache/conf/ap
+# 2757 boxusr99  2480 S    ./apache_bin -f /var/media/ftp/server/apache/conf/ap
+# 2758 boxusr99  2480 S    ./apache_bin -f /var/media/ftp/server/apache/conf/ap
+# 2765 root      1236 S    grep apache
+
+# apache wieder stoppen
+killall apache_bin
+
+# ja er ist weg
+ps  | grep apache
+# 2926 root      1236 S    grep apache
+
+# start befehl in die debug.cfg übernehmen damit der apache beim Neustart der FritzBOX auch startet
+echo "/var/media/ftp/server/apache_bin -f /var/media/ftp/server/apache/conf/apache.conf" > /var/media/ftp/server/debug.cfg
+
+# Jetzt die Busybox, dazu wieder in das server Verzeichnis
+cd /var/media/ftp/server/
+
+# die neue Busybox laden
+wget http://www.fritzmod.net/download/mips/busybox_1.20.2_mips
+
+# Umbenennen damit es besser lesbar ist
+mv busybox_1.20.2_mips busybox
+
+# busybox ausführbar machen
+chmod +x busybox
+
+# Verzeichnis für die CronJobs erstellen
+mkdir -p /var/media/ftp/server/cron
+
+# Cronjob für root anlegen
+echo "*/5 * * * * wget -q http://fritz.box:85/connair/index.php?timerrun=1 -O /dev/null >> /dev/null 2>>/dev/null" > /var/media/ftp/server/cron/root
+
+# crond starten
+/var/media/ftp/server/busybox crond -c /var/media/ftp/server/cron &
+
+# start befehl in die debug.cfg übernehmen damit der crond beim Neustart der FritzBOX auch startet
+echo "/var/media/ftp/server/busybox crond -c /var/media/ftp/server/cron &" >> /var/media/ftp/server/debug.cfg
+
+# Jetzt beides scharfschalten damit es auch einen Reboot überlebt, dazu wieder in das server Verzeichnis
+cd /var/media/ftp/server/
+
+# unsere debug.cfg aktivieren
+cat debug.cfg > /var/flash/debug.cfg
+
+
+# zur kontrolle gucken wir ob die debug.cfg im Speicher richtig ist
+cat /var/flash/debug.cfg
+#/var/media/ftp/server/apache_bin -f /var/media/ftp/server/apache/conf/apache.conf
+#/var/media/ftp/server/busybox crond -c /var/media/ftp/server/cron &
+
+# Optional und sollte auch gut überlegt sein. Bitte Zugriff mit Passwort schützen, Beispiele dazu unter Tipps.
+# jetzt noch der Zugriff von Außen, dazu die Datei ar7.cfg editieren und eine folgende Zeile hinzufügen (unbedingt nvi nutzen!) 
+#   mit / gann man suchen, mit i starten man das hinzufügen, mit ESC beendet man es und mit :x beendet man den editor und speichert die datei ab.
+nvi /var/flash/ar7.cfg
+#     forwardrules =                                                                                    
+#           "tcp 0.0.0.0:80 0.0.0.0:85 0 # apache",                                            
+#           ... 
+
+# FritzBox neustarten
+reboot
+</pre></div>
+</div>
+
+<a href="#" style="text-decoration: none;" onClick="return _decide('InstallFRITZBoxMIPSEL');return false;"><h4 class="titlezeile">FRITZBox 7570 7170 7270 7240</h4></a>
+<div id=InstallFRITZBoxMIPSEL style="visibility:hidden;display:none;">
+Danke an <a href="http://www.fritzmod.net/" target="_blank">http://www.fritzmod.net/</a><br/>
+<br/>
+Ich selber habe keine dieser Fritz.Box'en aber ich konnte es mit einem WebApp Nutzer durchspielen. Dafür danke.<br/>
+<br/>
+Als erstes muss man den Telnet Server starten. Dazu am Telefon das an die Fritzbox angeschlossen ist folgendes wählen:
+<div class=codebox><pre>
+#96*7* Telnet an
+#96*8* Telnet aus
+</pre></div>
+Dann mittels Putty oder Terminal auf die Fritzbox mit "telnet fritz.box" verbinden.<br/>
+Wen das klappt folgende Schritte abarbeiten (es müssen nur die Zeilen ohne # ausgeführt werden :-)
+<div class=codebox><pre>
+# USB Stick ermitteln
+ls /var/media/ftp
+
+# In den folgenden Befehlen müsst ihr USBSTICK durch den Namen eures Sticks ersetzen
+
+# Verzeichnis erstellen in dem wir apache ablegen
+mkdir /var/media/ftp/USBSTICK/server
+
+# in das neue Verzeichnis wechseln
+cd /var/media/ftp/USBSTICK/server
+
+# apache und php vo fritzmod laden
+wget http://www.fritzmod.net/download/mipsel/apache-1.3.41-modssl_php-5.4.3_sqlite-2.1.tar
+
+# das geladene Paket auspacken
+tar xvf apache-1.3.41-modssl_php-5.4.3_sqlite-2.1.tar
+
+# das Verzeichnis umbenennen
+mv apache-1.3.41-modssl_php-5.4.3_sqlite-2.1 apache
+
+# in den apache Ordner wechseln
+cd apache
+
+# Testen ob der apache funktioniert
+./bin/apache -l
+# Compiled in modules:
+#   core.c
+#   mod_authn_file.c
+#   ...
+
+# anpassen der config des apache an unsere gegebenheiten
+sed -i 's;Hitachi-HTS543216L9A300-01;USBSTICK/server;g' conf/apache.conf
+
+# den richtigen Usernamen rausfinden .. bei mir boxuser99
+cat /etc/passwd | grep boxusr | grep -v int
+# boxusr80
+
+# anpassen der config des apache an unsere gegebenheiten
+sed -i 's/^User .*/User boxusr80/g' conf/apache.conf
+
+# apache testen
+./bin/apache -f /var/media/ftp/USBSTICK/server/apache/conf/apache.conf
+
+# jawohl der apache läuft
+ps  | grep apache
+# 2756 root      2456 S    ./apache_bin -f /var/media/ftp/server/apache/conf/ap
+# 2757 boxusr99  2480 S    ./apache_bin -f /var/media/ftp/server/apache/conf/ap
+# 2758 boxusr99  2480 S    ./apache_bin -f /var/media/ftp/server/apache/conf/ap
+# 2765 root      1236 S    grep apache
+
+# apache wieder stoppen
+killall apache
+
+# ja er ist weg
+ps  | grep apache
+# 2926 root      1236 S    grep apache
+
+# start befehl in die debug.cfg übernehmen damit der apache beim Neustart der FritzBOX auch startet
+echo "/var/media/ftp/USBSTICK/server/apache/bin/apache -f /var/media/ftp/USBSTICK/server/apache/conf/apache.conf" > /var/media/ftp/USBSTICK/server/debug.cfg
+
+# Jetzt die Busybox, dazu wieder in das server Verzeichnis
+cd /var/media/ftp/USBSTICK/server/
+
+# die neue Busybox laden
+wget http://www.fritzmod.net/download/mipsel/busybox_1.20.2_mipsel
+
+# Umbenennen damit es besser lesbar ist
+mv busybox_1.20.2_mipsel busybox
+
+# busybox ausführbar machen
+chmod +x busybox
+
+# Verzeichnis für die CronJobs erstellen
+mkdir -p /var/media/ftp/USBSTICK/server/cron
+
+# Cronjob für root anlegen
+echo "*/5 * * * * wget -q http://fritz.box:85/connair/index.php?timerrun=1 -O /dev/null >> /dev/null 2>>/dev/null" > /var/media/ftp/USBSTICK/server/cron/root
+
+# crond starten
+/var/media/ftp/USBSTICK/server/busybox crond -c /var/media/ftp/USBSTICK/server/cron &
+
+# start befehl in die debug.cfg übernehmen damit der crond beim Neustart der FritzBOX auch startet
+echo "/var/media/ftp/USBSTICK/server/busybox crond -c /var/media/ftp/USBSTICK/server/cron &" >> /var/media/ftp/USBSTICK/server/debug.cfg
+
+# Jetzt beides scharfschalten damit es auch einen Reboot überlebt, dazu wieder in das server Verzeichnis
+cd /var/media/ftp/USBSTICK/server/
+
+# unsere debug.cfg aktivieren
+cat /var/media/ftp/USBSTICK/server/debug.cfg > /var/flash/debug.cfg
+
+# zur kontrolle gucken wir ob die debug.cfg im Speicher richtig ist
+cat /var/flash/debug.cfg
+#/var/media/ftp/USBSTICK/server/apache/bin/apache -f /var/media/ftp/USBSTICK/server/apache/conf/apache.conf
+#/var/media/ftp/USBSTICK/server/busybox crond -c /var/media/ftp/USBSTICK/server/cron &
+
+# Optional und sollte auch gut überlegt sein. Bitte Zugriff mit Passwort schützen, Beispiele dazu unter Tipps.
+# jetzt noch der Zugriff von Außen, dazu die Datei ar7.cfg editieren und eine folgende Zeile hinzufügen (unbedingt nvi nutzen!) 
+#   mit / gann man suchen, mit i starten man das hinzufügen, mit ESC beendet man es und mit :x beendet man den editor und speichert die datei ab.
+nvi /var/flash/ar7.cfg
+#     forwardrules =                                                                                    
+#           "tcp 0.0.0.0:80 0.0.0.0:85 0 # apache",                                            
+#           ... 
+
+# FritzBox neustarten
+reboot
+</pre></div>
+</div>
+
+<a href="#" style="text-decoration: none;" onClick="return _decide('InstallATV');return false;"><h4 class="titlezeile">Apple TV 2 (ATV2)</h4></a>
+<div id=InstallATV style="visibility:hidden;display:none;">
+Danke an Jürgen und plato für diese schöne Anleitung! (Ich habe sie etwas aufgebohrt :)
+<br/><br/>
+Hier das genutzte Repository: <a href="http://ios-webstack.tk/" target=_blank>ios-webstack</a> - <a href="http://code.google.com/p/cydia-ios-lighttpd-php-mysql-web-stack/wiki/PHP" target=_blank>cydia-ios-lighttpd-php-mysql-web-stack</a>
+<br/><br/>
+
+Was man so braucht:<br/>
+
+1. Apple TV 2te Generation<br/>
+
+2. Jailbreak z.B. Seas0nPass<br/>
+
+3. iOS WebStack<br/>
+<div class=codebox><pre>
+echo 'deb http://ios-webstack.tk/cydia/ ./' > /etc/apt/sources.list.d/ios-webstack.list
+</pre></div>
+
+4. Alle Pakete erstmal aktualisieren:<br/>
+<div class=codebox><pre>
+apt-get update
+apt-get upgrade
+</pre></div>
+
+5. Jetzt den "cydia-ios-lighttpd-mysql-web-stack" installieren:<br/>
+<div class=codebox><pre>
+apt-get install atv-lighttpd-php-mysql
+</pre></div>
+
+6. Damit die WebApp mit der Connair sprechen kann muss die sockets Erweiterung an sein. Einfach in die Datei /etc/php.d/load_all.ini folgende Zeile hinzugefügen:<br/>
+<div class=codebox><pre>
+extension=sockets.so
+</pre></div>
+
+7. com.connair.timer.plist<br/>
+eine kleine Anleitung für den 5 Minuten ConnAir Timer.<br/>
+
+Falls noch nicht vorhanden, muss 'wget' installiert werden:<br/>
+<div class=codebox><pre>
+apt-get install wget
+</pre></div>
+
+Dann die Datei <a href="com.connair.timer.plist.zip">com.connair.timer.plist</a> in das Verzeichnis /Library/LaunchDaemons/ kopieren.<br/>
+Die Datei ist mit einem Cronjob zu vergleichen. Der Service ruft alle 300 Sekunden die ConnAir Timer Seite vom lokalem Server auf.<br/>
+Jetzt muss Launchd nur noch gesagt werden, dass die Datei auch zu verarbeiten ist.<br/>
+Service starten mit folgendem Befehl:<br/>
+<br/>
+Ggf. müsst ihr das localhost in der plist durch eure IPAdresse ersetzen.<br/>
+<br/>
+<div class=codebox><pre>
+launchctl load  /Library/LaunchDaemons/com.connair.timer.plist
+</pre></div>
+
+Service stoppen mit folgendem Befehl (z.B. wenn du die plist geändert hast):<br/>
+<div class=codebox><pre>
+launchctl unload  /Library/LaunchDaemons/com.connair.timer.plist
+</pre></div>
+
+Wenn der Service einmal gestartet ist, überlebt er auch einen neustart.<br/>
+
+Du kannst in der Lighttpd-Log-Datei sehen, ob da jetzt alle 5 Minuten etwas aufgerufen wird:<br/>
+Die Log-Datei findest Du hier: <br/>
+/var/log/lighttpd/lighttpd.log<br/>
+
+
+Wenn alles geklappt hat, ist zu überlegen ob du evtl. das Lighttpd Logging unterbindest.<br/>
+Nur die ConnAir Timereinträge alle 5 Minuten, ergeben ca. 12 MByte an Log-Datei pro Jahr.<br/>
+
+Falls Du dieses unterdrücken möchtest, folgende Zeilen in /etc/lighttpd/lighttpd-atv.conf anpassen:<br/>
+<div class=codebox><pre>
+server.modules                 = (
+            "mod_access",
+#           "mod_accesslog",            #no logging
+            "mod_fastcgi",
+            "mod_cgi",
+            "mod_compress",
+            "mod_evasive",
+            "mod_rewrite"         #for example TYPO3 need this
+)
+</pre></div>
+<br/>
+Den Web-Server neustarten:<br/>
+<div class=codebox><pre>
+killall lighttpd
+</pre></div>
+<br/>
+
+Fertig !!!
+
+</div>
+
+<a href="#" style="text-decoration: none;" onClick="return _decide('InstallMacOSX');return false;"><h4 class="titlezeile">Mac OS X</h4></a>
+<div id=InstallMacOSX style="visibility:hidden;display:none;">
+<h3>Mac OS X Mountain Lion</h3>
+Danke an Jürgen und plato für diese schöne Anleitung!! (Ich habe sie etwas aufgebohrt :)
+<br/><br/>
+Der Webserver kann mit diesem Tool aktiviert werden:<br/>
+Web Sharing.prefPane (Google Suche benutzen)<br/>
+Die Web-Seiten werden im Ordner /Library/WebServer/Documents abgelegt.<br/>
+Testaufruf mit http://localhost/<br/>
+
+Das Tool zeigt auch an, ob PHP aktiviert ist. PHP ist ebenfalls Bestandteil von Mac OS X 10.8, allerdings serienmäßig nicht eingeschaltet.<br/>
+Ob PHP eingeschaltet ist kann auch mit diesem Aufruf getestet werden  http://localhost/info.php<br/>
+
+Folgende Datei muss editiert werden:<br/>
+<div class=codebox><pre>
+HD:private/etc/apache2/httpd.conf
+</pre></div>
+
+Finder Gehe zu: etc/apache2/httpd.conf<br/>
+Diesen Teil suchen, ist aus kommentiert <br/>
+<div class=codebox><pre>
+# LoadModule php5_module      libexec/apache2/libphp5.so
+</pre></div>
+
+und muss so aktiviert werden:<br/>
+<div class=codebox><pre>
+LoadModule php5_module      libexec/apache2/libphp5.so
+</pre></div>
+
+Nun der Timer:<br/>
+Dann die Datei <a href="com.connair.timer.plist-curl.zip">com.connair.timer.plist</a> in das Verzeichnis /Library/LaunchDaemons/ kopieren.<br/>
+Die Datei ist mit einem Cronjob zu vergleichen. Der Service ruft alle 300 Sekunden die ConnAir Timer Seite vom lokalem Server auf.<br/>
+Jetzt muss Launchd nur noch gesagt werden, dass die Datei auch zu verarbeiten ist.<br/>
+<br/>
+Ggf. müsst ihr das localhost in der plist durch eure IPAdresse ersetzen.<br/>
+<br/>
+Service starten mit folgendem Befehl:<br/>
+<div class=codebox><pre>
+launchctl load  /Library/LaunchDaemons/com.connair.timer.plist
+</pre></div>
+
+Service stoppen mit folgendem Befehl (z.B. wenn du die plist geändert hast):<br/>
+<div class=codebox><pre>
+launchctl unload  /Library/LaunchDaemons/com.connair.timer.plist
+</pre></div>
+
+Wenn der Service einmal gestartet ist, überlebt er auch einen neustart.<br/>
+<br/>
+Fertig
+</div>
+
+<a href="#" style="text-decoration: none;" onClick="return _decide('InstallUbuntu');return false;"><h4 class="titlezeile">Ubuntu</h4></a>
+<div id=InstallUbuntu style="visibility:hidden;display:none;">
+Kommt noch<br/>
+</div>
+
+<a href="#" style="text-decoration: none;" onClick="return _decide('InstallXAMPP');return false;"><h4 class="titlezeile">Windows XAMPP</h4></a>
+<div id=InstallXAMPP style="visibility:hidden;display:none;">
+Vielen Dank an Michael<br/>
+<br/>
+Xampp bei <a href="http://www.apachefriends.org/de/xampp-windows.html" target=_blank>www.apachefriends.org</a> downloaden und installieren:<br/>
+<a href="http://www.apachefriends.org/download.php?xampp-win32-1.8.1-VC9-installer.exe">http://www.apachefriends.org/download.php?xampp-win32-1.8.1-VC9-installer.exe</a><br/>
+<br/>
+In der <a href="http://www.apachefriends.org/de/faq-xampp-windows.html">FAQ</a> von apachefriends.org gibt es auch Hilfe wenn es mal nicht so klappt :-)<br/>
+<br/>
+<br/>
+Mobile WebApp konfigurieren und in das Verzeichnis htdocs ablegen (C:\xampp\htdocs)<br/>
+<br/>
+Xampp über xampp-control.exe starten<br/>
+<br/>
+Apache starten<br/>
+<br/>
+Zugriff auf die WebApp ist nun aus dem lokalen Netzwerk über die IP-Adresse oder das DNS Alias des Rechners möglich.<br/>
+<br/>
+Für den Zugriff über das Internet muss eine Portfreigabe (Standardport 80) über den Router eingerichtet werden.<br/>
+<br/>
+Soll ein abweichender Port verwendet werden, kann dieser in der Konfiguration von Apache (C:\xampp\apache\conf\httpd.conf) eingestellt werden. Dazu den Default-Port 80 auf den gewünschten Port umstellen.:<br/>
+<div class=codebox><pre>
+#
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# ports, instead of the default. See also the <VirtualHost>
+# directive.
+#
+# Change this to Listen on specific IP addresses as shown below to 
+# prevent Apache from glomming onto all bound IP addresses.
+#
+#Listen 0.0.0.0:80
+#Listen [::]:80
+Listen 80
+</pre></div>
+</div>
+</p>
+<script type="text/javascript">
+
+function _decide(div) {
+	(document.getElementById(div).style.visibility == "visible") ? _hide(div) :  _show(div);
+	return false;
+}
+
+function _hide(div) {
+	document.getElementById(div).style.visibility="hidden";
+	document.getElementById(div).style.display="none";
+}
+
+function _show(div) {
+	document.getElementById(div).style.visibility="visible";
+	document.getElementById(div).style.display="inline";
+}
+</script>
+
+
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Tipps">Tipps</a></h2>
+<h4 class="titlezeile">Du hast eine selbst lernenden Funksteckdosen von Intertechno ITR-1500 und kennst den Code nicht?</h4>
+Einfach ein Device, wie oben beschrieben, anlegen mit z.B. masterdip B und slavedip 1 (kannst auch gerne andere Kombinationen nehmen) und dann die Steckdose in den Lernmodus versetzen (in eine Steckdose stecken) und innerhalb von 5 Sekunden das neu angelegte Device über die WebApp einschalten.. dann hat die Dose auch diesen Code gelernt (maximal 3 Codes möglich) und ist über die Fernbedienung und WebbApp (Conn-Air) erreichbar ..
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Du mehrere Connairs und willst diese nutzen?</h4>
+Du musst diese dann in der config.xml eintragen und jeder Connair eine eigene ID zuweisen<br/>
+<br/>
+Connairs:
+<div class=codebox><pre>
+  &lt;connairs&gt;
+    &lt;connair&gt;
+      &lt;id&gt;1&lt;/id&gt;
+      &lt;address&gt;192.168.42.3&lt;/address&gt;
+      &lt;port&gt;49880&lt;/port&gt;
+    &lt;/connair&gt;
+    &lt;connair&gt;
+      &lt;id&gt;2&lt;/id&gt;
+      &lt;address&gt;192.168.42.4&lt;/address&gt;
+      &lt;port&gt;49880&lt;/port&gt;
+    &lt;/connair&gt;
+  &lt;/connairs&gt;
+</pre></div>
+Devices:
+<div class=codebox><pre>
+  &lt;devices&gt;
+    &lt;device&gt;
+      &lt;id&gt;1&lt;/id&gt;
+        &lt;senderid&gt;1&lt;/senderid&gt;
+        &lt;name&gt;Lampe Sideboard&lt;/name&gt;
+        &lt;vendor&gt;intertechno&lt;/vendor&gt;
+        &lt;address&gt;
+          &lt;masterdip&gt;C&lt;/masterdip&gt;
+          &lt;slavedip&gt;1&lt;/slavedip&gt;
+          &lt;tx433version&gt;1&lt;/tx433version&gt;
+        &lt;/address&gt;
+        &lt;room&gt;Wohnzimmer&lt;/room&gt;
+        &lt;favorite&gt;true&lt;/favorite&gt;
+        &lt;status&gt;OFF&lt;/status&gt;
+    &lt;/device&gt;
+    &lt;device&gt;
+      &lt;id&gt;2&lt;/id&gt;
+        &lt;senderid&gt;2&lt;/senderid&gt;
+        &lt;name&gt;Lampe Bett&lt;/name&gt;
+        &lt;vendor&gt;intertechno&lt;/vendor&gt;
+        &lt;address&gt;
+          &lt;masterdip&gt;C&lt;/masterdip&gt;
+          &lt;slavedip&gt;2&lt;/slavedip&gt;
+          &lt;tx433version&gt;1&lt;/tx433version&gt;
+        &lt;/address&gt;
+        &lt;room&gt;Schlafzimmer&lt;/room&gt;
+        &lt;favorite&gt;true&lt;/favorite&gt;
+        &lt;status&gt;OFF&lt;/status&gt;
+    &lt;/device&gt;
+  &lt;/devices&gt;
+</pre></div>
+Jetzt wird die "Lampe Sideboard" von der Connair mit der ID 1 geschaltet und die Lampe Bett von der Connair mit der ID 2. Wichitg ist dabei der Tag senderid im device.<br/>
+<br/>
+Das ganze ist leider noch nicht in der Webapp verdrahtet, da musst du aktuell noch selber hand anlegen. Im Standard werden alle Geräte mit alles Connairs angesprochen.
+</div>
+
+
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Du möchtest auch ohne die schöne Oberfläche schalten?</h4>
+Z.B. könnt ihr via crontab oder script schalten <i>(die id ist durch einen gültigen Wert aus der config.xml zu ersetzen)</i>:<br/>
+<br/>
+Geräte:
+<div class=codebox><pre>
+curl "http://sun/connair/index.php?action=on&type=device&id=1" 
+curl "http://sun/connair/index.php?action=off&type=device&id=1"
+</pre></div>
+Gruppen:
+<div class=codebox><pre>
+curl "http://sun/connair/index.php?action=on&type=group&id=1" 
+curl "http://sun/connair/index.php?action=off&type=group&id=1"
+</pre></div>
+Räume:
+<div class=codebox><pre>
+curl "http://sun/connair/index.php?action=on&type=room&id=flur" 
+curl "http://sun/connair/index.php?action=off&type=room&id=flur"
+</pre></div>
+Alles:
+<div class=codebox><pre>
+curl "http://sun/connair/index.php?action=allon" 
+curl "http://sun/connair/index.php?action=alloff"
+</pre></div>
+
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Timer schaltet zur falschen Uhrzeit?</h4>
+Bist du dir sicher das du die richtige Zeitzone in der php.ini eingestellt hast?<br/>
+Bei mir lieg die php.ini im Ordner <i>/etc/php/apache2-php5.4/php.ini</i><br/>
+<div class=codebox><pre>
+[Date]
+; Defines the default timezone used by the date functions
+; http://php.net/date.timezone
+date.timezone = "Europe/Berlin"
+date.default_latitude = 48.64727
+date.default_longitude = 9.44858
+</pre></div>
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Achtung: Richtige Rechte für Apache bei der Verwendung eines CULs</h4>
+Welche Rechte hat das Device?<br/>
+<div class=codebox><pre>
+sun ~ # ls -lha /dev/ttyACM0 
+crw-rw---- 1 root uucp 166, 0 16. Feb 22:33 /dev/ttyACM0
+</pre></div>
+<br/>
+Gruppe dem User Apache zuordnen. In meinem Fall die Gruppe "uucp" (Geht natürlich auch händisch über die /etc/groups)<br/>
+<div class=codebox><pre>
+sun ~ # groupmems -g uucp -a apache
+</pre></div>
+Danach am besten neustarten :-)<br/>
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Du möchtest den Zugriff mit einem Passwort schützen?</h4>
+Wenn du einen Apache Webserver verwendest kann ich dir da das Thema <i>.htaccess</i> 
+ans Herz legen. Habe ich selbst auch im Einsatz um Zugriffe von außen zu schützen.
+Zugriffe aus dem Netz zu Hause sind dagegen ohne läßtiges Passwort möglich. 
+<div class=codebox><pre>
+AuthType Basic
+AuthName "Conn-Air Mobile WebApp"
+AuthUserFile /etc/apache2/htpasswd.users
+Require valid-user
+Order deny,allow
+Deny from all
+Allow from 192.168
+Satisfy any
+</pre></div>
+Mit dem Befehl htpasswd könnt ihr die users Datei anlegen.<br/>
+Bei SelfHTML gibt es auch einen guten Artikel dazu: <a href="http://de.selfhtml.org/servercgi/server/htaccess.htm">.htaccess - Server-Reaktionen kontrollieren</a>
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Einrichten des Crontab-Timers</h4>
+Um die Timersteuerung zu aktivieren, müsst Ihr noch einen Cronjob / Trigger alle 5 Minuten mit folgenden Link erstellen:
+<i>http://LinkZurSeite/index.php?timerrun=1</i><br/>
+Unter Linux wir meist dazu der Befehl <i>crontab -e</i> benutzt. Jenach dem ob euch wget oder curl zur Verfügung steht hier zwei Beispiele.
+<div class=codebox><pre>
+*/5 * * * * curl -s -S http://localhost/connair/index.php?timerrun=1 >> /dev/null
+</pre></div>
+<div class=codebox><pre>
+*/5 * * * * wget -q http://localhost/connair/index.php?timerrun=1 -O /dev/null >> /dev/null
+</pre></div>
+Wenn der crontab Aufruf nicht auf demselben Server läuft wie der Webserver dann müsst ihr localhost durch den richtige Netzwerknamen oder die IP Adresse ersetzen.<br/>
+INFO: Die aktuelle Umsetzung verlangt das der Aufruf im 5 Minutentakt ist und nicht jede oder alle zwei Minuten.
+
+
+
+<br/>
+<br/>
+<br/>
+<h4 class="titlezeile">Wie kann ich die WebApp debuggen?</h4>
+Zum einen gibt es den oben beschriebenen debug=true Schalter in der config.xml, zum anderen kann man
+aber auch eine zweite connair einrichten und mit der IP Adresse des eigenen Rechners versehen. Dann kommen die
+Befehle auch am PC an und werden in der Console ausgegeben. Hierzu werwendet man <a href="http://de.wikipedia.org/wiki/Netcat" target=_blank>netcat</a>.
+<div class=codebox><pre>
+netcat -l -u -p 49880
+</pre></div>
+INFO: Leider muss nach jedem Empfangen der netcat Befehl erneut gestartet werden :-(<br/>
+<br/>
+Besser gehts noch mit <a href="http://wiki.ubuntuusers.de/tcpdump" target=_blank>tcpdump</a> ...
+<div class=codebox><pre>
+sudo tcpdump -v -q -A -n -i wlan0 udp port 49880
+</pre></div>
+
+</p>
+
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Danksagung">Danksagung</a></h2>
+<h4>Danke an morsix, perrpf, muckel, manu, vorband, schmiedel, qualidat, olliberlin, ollihamburg, tecxmecx, cyberdev, cinos22, elduffy, static77, carlsan, stromer und den anderen aus dem <a href="http://simple-solutions.de/forum" target=_blank>Forum</a> für die Pionierarbeit und Unterstützung</h4>
+Forum-Thread:<a href="http://simple-solutions.de/forum/viewtopic.php?f=15&t=260" target=_blank>Steuern per Rechner ...</a>
+<br/>
+Forum-Thread:<a href="http://simple-solutions.de/forum/viewtopic.php?f=15&t=637" target=_blank>Conn-Air Mobile WebApp (iPhone, iPad, Android, PC, ...)</a> 
+</p>
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Forum">Forum</a></h2>
+Das PowerSwitch Team hat ein <a href="http://forum.power-switch.eu/" target=_forum>Forum</a> aufgesetzt und ich habe ein Stück abbekommen. Vielen Dank Jungs.<br/>
+<br/>
+<a href="http://forum.power-switch.eu/viewforum.php?f=4" target=_forum>zum WebApp Forum</a>
+<br/><br/>
+<a href="http://power-switch.eu" target=_forum><img src="PowerSwitch.PNG" /></a>
+</p>
+
+
+
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Demo">Demo</a></h2>
+<a href="http://www.l3x.de/connair/demo/" target=_demo>Demo starten<br/><br/><img src="images/apple-touch-icon-144x144.png" /></a>
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Spenden">Spenden</a></h2>
+Die WebApp ist und bleibt kostenlos für private Anwender. 
+Diese Spende ist freiwillig und man erwirbt dadurch kein 
+Recht auf Support oder Garantie auf Funktion (du kannst auch 
+nach der Installation und wenn du zufrieden bist spenden :), 
+zu gleich ich aber bemüht bin die Anwendung zu pflegen. 
+Aber dies geschieht in meiner Freizeit in der du evtl. 
+gemütlich ein kaltes Bier zischt und aus der Bar  
+zuhause Licht an und aus schaltest. ;-)
+Würden wir gemeinsam in dieser Bar sitzen würdest du mir
+vermutlich auch ein Bier spendieren, oder?
+<br/>
+<br/>
+<form target=paypalspende name="_xclick" action="https://www.paypal.com/de/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_xclick">
+<input type="hidden" name="business" value="root@l3x.de">
+<input type="hidden" name="item_name" value="Mobile Connair WebApp Spende">
+<input type="hidden" name="currency_code" value="EUR">
+<input type="image" src="https://www.paypalobjects.com/de_DE/DE/i/btn/x-click-butcc-donate.gif" border="0" name="submit" alt="Zahlen Sie mit PayPal - schnell, kostenlos und sicher!">
+</form>
+</p>
+
+
+
+<p>
+<br/>
+<br/>
+<h2 class="titlezeile"><a name="Download">Download</a></h2>
+<h4>Ihr könnt gerne die App privat nutzen und verändern.
+<br/>
+Dies geschieht auf eigenes Risiko!
+<br/>
+<br/>
+ Ich würde mich sehr über Feedback, neue Features und Ideen unter [connair (ätt) l3x.de] freuen.</h4>
+<hr/>
+
+<a href="http://www.l3x.de/connair/connair-0.6.11.zip">connair-0.6.11.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.10.zip">connair-0.6.10.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.9.zip">connair-0.6.9.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.8.zip">connair-0.6.8.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.7.zip">connair-0.6.7.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.6.zip">connair-0.6.6.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.5.zip">connair-0.6.5.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.4.zip">connair-0.6.4.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.3.zip">connair-0.6.3.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.2.zip">connair-0.6.2.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.1.zip">connair-0.6.1.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.6.0.zip">connair-0.6.0.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.5.1.zip">connair-0.5.1.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.5.0.zip">connair-0.5.0.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.4.1.zip">connair-0.4.1.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.3.zip">connair-0.3.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.2.zip">connair-0.2.zip</a><br/>
+<a href="http://www.l3x.de/connair/connair-0.1.1.zip">connair-0.1.1.zip</a><br/>
+</p>
+
+</body>
+</html>
